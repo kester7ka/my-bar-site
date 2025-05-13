@@ -526,15 +526,16 @@
       width: 100%;
       top: 0; left: 0;
       z-index: 3000;
-      background: rgba(30,46,70,0.26);
-      /* backdrop-filter: blur(2px); */
+      background: rgba(30,46,70,0.22);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
       animation: fadeIn 0.16s;
     }
     body.dark .modal-overlay {
-      background: rgba(21,28,36,0.65);
+      background: rgba(21,28,36,0.36);
+      backdrop-filter: blur(10px);
     }
     .modal-dialog {
       background: #fff;
@@ -619,6 +620,7 @@
       from { opacity: 1; }
       to { opacity: 0; pointer-events: none; }
     }
+    /* --- Loader overlay с fadeIn/fadeOut --- */
     .global-loader-overlay {
       position: fixed;
       min-height: 100vh;
@@ -627,15 +629,21 @@
       width: 100%;
       top: 0; left: 0; right: 0; bottom: 0;
       z-index: 4000;
-      background: rgba(30,46,70,0.13);
+      background: rgba(30,46,70,0.28);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.36s;
+      transition: opacity 0.44s cubic-bezier(.4,0,.2,1), background 0.22s;
       flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .global-loader-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
     }
     body.dark .global-loader-overlay {
-      background: rgba(21,28,36,0.8);
+      background: rgba(21,28,36,0.80);
     }
     .global-loader-spinner {
       width: 54px;
@@ -734,7 +742,7 @@
     <div id="main"></div>
   </div>
   <!-- Глобальный экран загрузки -->
-  <div class="global-loader-overlay" id="globalLoader" style="display:none;">
+  <div class="global-loader-overlay" id="globalLoader">
     <div class="global-loader-spinner"></div>
     <div class="global-loader-text">Загрузка...</div>
   </div>
@@ -1161,12 +1169,11 @@
     // --- Экран глобальной загрузки на 3-4 секунды при старте ---
     function showGlobalLoader(show = true) {
       const loader = document.getElementById('globalLoader');
+      if (!loader) return;
       if (show) {
-        loader.style.display = 'flex';
-        setTimeout(() => loader.style.opacity = "1", 10);
+        loader.classList.add('visible');
       } else {
-        loader.style.opacity = "0";
-        setTimeout(() => loader.style.display = 'none', 370);
+        loader.classList.remove('visible');
       }
     }
 
