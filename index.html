@@ -26,7 +26,7 @@
     html, body {
       height: 100%;
       min-height: 100vh;
-      background: var(--main-bg);
+      background: var(--main-bg)!important;
       font-family: 'Montserrat', Arial, sans-serif;
       color: var(--text);
       letter-spacing: 0.01em;
@@ -42,7 +42,7 @@
       height: 100%;
       max-width: 480px;
       margin: 0 auto;
-      background: var(--card-bg);
+      background: var(--main-bg);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: 32px 24px 20px 24px;
@@ -360,25 +360,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 200px;
+      min-height: 120px;
       animation: fadeIn 0.7s;
       margin-bottom: 12px;
     }
-    .welcome-loader {
-      width: 38px;
-      height: 38px;
-      border: 4px solid #e3eaff;
-      border-top: 4px solid var(--accent);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin-bottom: 22px;
-      margin-top: 12px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0);}
-      100% { transform: rotate(360deg);}
-    }
-        .welcome-greet {
+    .welcome-greet {
       font-size: 1.16em;
       font-weight: 700;
       color: var(--accent-dark);
@@ -538,12 +524,15 @@
       z-index: 3000;
       top: 0; left: 0; right: 0; bottom: 0;
       width: 100vw; height: 100vh;
-      background: rgba(30,46,70,0.18);
+      background: var(--main-bg, #f1f3f7);
       backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
       animation: fadeIn 0.16s;
+    }
+    body.dark .modal-overlay {
+      background: var(--main-bg, #151c24);
     }
     .modal-dialog {
       background: #fff;
@@ -565,7 +554,6 @@
       font-size: 1.08em;
       margin-bottom: 16px;
     }
-    /* --------- ВАЖНО: выделение удаляемого названия -------- */
     .modal-dialog .delete-item-name {
       font-weight: 700;
       color: #ee4747;
@@ -585,7 +573,6 @@
       border-color: #ff4f4f;
       box-shadow: 0 1px 6px #ff4f4f33;
     }
-    /* --------- /ВАЖНО -------- */
     .modal-dialog .modal-buttons {
       margin-top: 18px;
       display: flex;
@@ -631,7 +618,6 @@
       background: #3a4e68;
       color: #f1f1f1;
     }
-    /* --- Плавное исчезновение модалки --- */
     .modal-overlay.hide {
       animation: fadeOut 0.22s cubic-bezier(.4,0,.2,1) forwards;
     }
@@ -639,7 +625,6 @@
       from { opacity: 1; }
       to { opacity: 0; pointer-events: none; }
     }
-    /* --- Экран загрузки --- */
     .global-loader-overlay {
       position: fixed;
       z-index: 4000;
@@ -651,6 +636,9 @@
       justify-content: center;
       transition: opacity 0.36s;
       flex-direction: column;
+    }
+    body.dark .global-loader-overlay {
+      background: var(--main-bg, #151c24);
     }
     .global-loader-spinner {
       width: 54px;
@@ -668,9 +656,6 @@
       color: var(--accent-dark, #0051b3);
       text-align: center;
       letter-spacing: 0.01em;
-    }
-    body.dark .global-loader-overlay {
-      background: var(--main-bg, #151c24);
     }
     body.dark .global-loader-text {
       color: var(--accent, #62b0ff);
@@ -871,20 +856,27 @@
         </div>
       `);
     }
+
+    // ---- Единая анимация для welcome и меню ----
     function showMenu() {
       setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
-      showWelcome(false);
-      setTimeout(() => {
-        document.getElementById("main").querySelector('.page-anim').innerHTML += `
-          <div class="menu fadeIn" id="menuBlock">
-            <button onclick="showAddPage()">Добавить позицию</button>
-            <button onclick="showExpiredPage()">Проверить сроки</button>
-            <button onclick="showSearchPage()">Поиск</button>
-            <button onclick="showEditPage()">Переоткрыть (редактировать)</button>
-          </div>
-        `;
-      }, 200);
+      // Всё меню и приветствие в одном showPage — одна анимация!
+      let menuHtml = `
+        <div class="welcome-block">
+          <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
+          ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
+        </div>
+        <div class="menu fadeIn" id="menuBlock">
+          <button onclick="showAddPage()">Добавить позицию</button>
+          <button onclick="showExpiredPage()">Проверить сроки</button>
+          <button onclick="showSearchPage()">Поиск</button>
+          <button onclick="showEditPage()">Переоткрыть (редактировать)</button>
+        </div>
+      `;
+      showPage(menuHtml);
     }
+    // --------------------------------------------
+
     function showAddPage() {
       setPageTitle('Добавить позицию');
       showPage(addBackButton(`
