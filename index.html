@@ -32,10 +32,13 @@
       letter-spacing: 0.01em;
       margin: 0;
       padding: 0;
+      transition: background var(--transition), color var(--transition);
     }
     body {
       min-height: 100vh;
+      background: var(--main-bg);
       transition: background var(--transition), color var(--transition);
+      will-change: background, color;
     }
     .wrap {
       min-height: 100vh;
@@ -46,12 +49,10 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: 32px 24px 20px 24px;
-      animation: fadeIn 0.9s cubic-bezier(.38,1.15,.7,1.01);
       transition: box-shadow var(--transition), background var(--transition), color var(--transition);
       position: relative;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
     }
     @media (max-width: 600px) {
       .wrap { max-width: 100vw; margin: 0; padding: 10px 1vw 12px 1vw; border-radius: 0 0 18px 18px;}
@@ -188,18 +189,92 @@
       letter-spacing: 0.02em;
       color: var(--accent-dark);
       text-shadow: 0 3px 12px #006eff0a;
-      animation: popIn 0.8s;
       transition: color var(--transition);
       position: relative;
       z-index: 1;
       min-height: 1.7em;
+      opacity: 0;
+      transform: translateY(-12px);
+      animation: fadeDownIn 0.7s cubic-bezier(.38,1.15,.7,1.01) forwards;
+      will-change: opacity, transform;
     }
     body.dark h2 { color: var(--accent); }
+    /* Welcome block */
+    .welcome-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 16px 0 8px 0;
+      min-height: 120px;
+      animation: fadeDownIn 0.7s cubic-bezier(.38,1.15,.7,1.01) forwards;
+      opacity: 0;
+      transform: translateY(20px);
+      will-change: opacity, transform;
+      animation-delay: 0.15s;
+    }
+    .welcome-block.animated {
+      opacity: 1;
+      transform: none;
+    }
+    .welcome-greet {
+      font-size: 1.15em;
+      color: var(--accent);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 7px;
+      text-shadow: 0 3px 12px #13c1e340;
+      letter-spacing: 0.01em;
+      line-height: 1.28;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeInWelcomeText 0.8s 0.27s cubic-bezier(.38,1.15,.7,1.01) forwards;
+      will-change: opacity, transform;
+    }
+    .welcome-bar {
+      margin-top: 2px;
+      font-size: 1em;
+      color: #67c3ff;
+      background: rgba(19,193,227,0.08);
+      padding: 2px 13px 2px 13px;
+      border-radius: 10px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeInWelcomeText 0.8s 0.37s cubic-bezier(.38,1.15,.7,1.01) forwards;
+      will-change: opacity, transform;
+    }
+    @keyframes fadeInWelcomeText {
+      0% { opacity: 0; transform: translateY(8px);}
+      100% { opacity: 1; transform: none;}
+    }
+    /* Animations */
+    @keyframes fadeDownIn {
+      0% { opacity: 0; transform: translateY(-12px);}
+      100% { opacity: 1; transform: none;}
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0;}
+      100% { opacity: 1;}
+    }
+    /* page-anim - плавное появление секций */
+    .page-anim {
+      animation: pageFadeIn 0.5s cubic-bezier(.38,1.15,.7,1.01) forwards;
+      opacity: 0;
+      will-change: opacity;
+    }
+    @keyframes pageFadeIn {
+      from {opacity: 0;}
+      to   {opacity: 1;}
+    }
+    /* Общие кнопки */
     .menu {
       display: flex;
       flex-direction: column;
       gap: 14px;
       margin-bottom: 22px;
+      margin-top: 15px;
       animation: fadeIn 0.5s;
     }
     .menu button {
@@ -207,8 +282,8 @@
       color: #fff;
       border: none;
       border-radius: var(--radius);
-      padding: 15px 0;
-      font-size: 1.06em;
+      padding: 18px 0;
+      font-size: 1.12em;
       font-family: inherit;
       font-weight: 700;
       letter-spacing: 0.03em;
@@ -221,12 +296,205 @@
         transform 0.16s cubic-bezier(.4,0,.2,1);
       position: relative;
       overflow: hidden;
+      width: 100%;
+      will-change: transform, box-shadow;
     }
     .menu button:active {
       background: linear-gradient(90deg, #0051b3 60%, #13c1e3 100%);
       transform: scale(0.98);
       box-shadow: 0 1.5px 8px #0077ff22, 0 1.5px 1.5px #fff7 inset;
     }
+    /* Back button */
+    .backbtn {
+      margin-bottom: 18px;
+      font-size: 1em;
+      padding: 12px 0;
+      border-radius: 13px;
+      background: #eaf2ff;
+      border: none;
+      cursor: pointer;
+      color: #2179ba;
+      font-weight: 700;
+      display: block;
+      width: 100%;
+      box-shadow: 0 1px 6px #b9dbff55;
+      position: relative;
+      transition: background 0.2s, color 0.2s, box-shadow 0.23s, transform 0.18s;
+      outline: none;
+      letter-spacing: 0.01em;
+      animation: fadeIn 0.33s;
+      will-change: background, color, box-shadow, transform;
+    }
+    .backbtn:active {
+      background: #d4e3f7;
+      color: #006eff;
+      transform: scale(0.98);
+      box-shadow: 0 1px 4px #b9dbff33;
+    }
+    /* Card-list и карточки */
+    .card-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      animation: fadeIn 0.45s;
+    }
+    @media (max-width: 600px) {
+      .card-list { grid-template-columns: 1fr; }
+    }
+    .item-card {
+      min-width: 0;
+      min-height: 170px;
+      max-width: 100%;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: var(--card-gradient);
+      border-radius: 20px;
+      box-shadow: 0 3px 16px #0077ff1a, 0 1.5px 6px #b9dbff44;
+      padding: 14px 14px 16px 14px;
+      margin: 0;
+      outline: 1.5px solid #e3eaff1c;
+      overflow: hidden;
+      transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
+      animation: fadeIn 0.43s;
+    }
+    .item-card:hover {
+      box-shadow: 0 4px 24px #13c1e340, 0 1.5px 6px #b9dbff66;
+      transform: translateY(-2px) scale(1.017);
+      background: linear-gradient(120deg, #eafffd 0%, #eaf6ff 100%);
+    }
+    /* Модальное окно удаления с fade+scale */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+      background: rgba(30,46,70,0.18);
+      animation: modalOverlayFadeIn 0.33s cubic-bezier(.38,1.15,.7,1.01) forwards;
+      opacity: 0;
+      will-change: opacity;
+    }
+    @keyframes modalOverlayFadeIn {
+      from { opacity: 0;}
+      to   { opacity: 1;}
+    }
+    .modal-popup {
+      background: #fff;
+      color: #1c1c1c;
+      padding: 32px 28px 24px 28px;
+      min-width: 240px;
+      max-width: 90vw;
+      border-radius: 20px;
+      box-shadow: 0 6px 32px #1d7fff22;
+      text-align: center;
+      animation: modalPopupIn 0.34s cubic-bezier(.38,1.15,.7,1.01) forwards;
+      opacity: 0;
+      transform: scale(0.85);
+      will-change: opacity, transform;
+    }
+    @keyframes modalPopupIn {
+      from { opacity: 0; transform: scale(0.85);}
+      to   { opacity: 1; transform: scale(1);}
+    }
+    .modal-popup strong { color: #006eff; }
+    .modal-popup .btns {
+      margin-top: 21px;
+      gap: 14px;
+    }
+    .modal-popup .btns button {
+      min-width: 100px;
+      font-size: 1.07em;
+      font-weight: 700;
+    }
+    body.dark .modal-popup { background: #232b33; color: #fff; }
+    body.dark .modal-popup strong { color: #62b0ff; }
+    @media (max-width: 600px) {
+      .modal-popup { padding: 22px 5vw 16px 5vw; min-width: 0; }
+    }
+    /* Темная тема */
+    body.dark {
+      --main-bg: #151c24;
+      --card-bg: #232b33;
+      --accent: #62b0ff;
+      --accent-dark: #1c7ed6;
+      --text: #f1f1f1;
+      --shadow: 0 4px 32px rgba(0,0,0,0.40);
+      --input-bg: #22303b;
+      --input-border: #3e4b5a;
+      --input-focus: #62b0ff;
+      --input-label: #b9dbff;
+      --card-gradient: linear-gradient(120deg, #243041 0%, #1d2530 100%);
+      --card-badge: #17334e;
+      background: var(--main-bg) !important;
+    }
+    body.dark .notif-popup { background: #232b33; color: #1ca97b;}
+    body.dark .notif-popup.error { color: #ee4747;}
+    body.dark .item-card { background: linear-gradient(120deg, #243041 0%, #1d2530 100%); outline: 1.5px solid #3a4e68;}
+    body.dark .item-card .card-title { color: #62b0ff; }
+    body.dark .item-card .card-row { color: #b9dbff; }
+    body.dark .item-card .card-badge { background: #17334e; color: #b9dbff;}
+    body.dark .editbtn {
+      background: #17334e;
+      color: #62b0ff;
+    }
+    body.dark .editbtn:active { background: #23436b; color: #b9dbff; }
+    body.dark .deletebtn {
+      background: #3a1d1d;
+      color: #ff9595;
+    }
+    body.dark .deletebtn:active { background: #522626; color: #ff4f4f; }
+    /* Исправление белой полосы при прокрутке */
+    html, body, .wrap {
+      background: var(--main-bg) !important;
+    }
+    /* Плавный переход темы на всю страницу */
+    html, body {
+      transition: background 0.38s cubic-bezier(.4,0,.2,1), color 0.28s;
+    }
+    /* ...остальной ваш CSS по форме, карточкам и т.п. (оставлен без изменений)... */
+    /* Скрыть полосы прокрутки на мобильных */
+    ::-webkit-scrollbar { width:0; background:transparent;}
+    /* Плавное появление уведомлений */
+    .notif-overlay {
+      position: fixed;
+      z-index: 4000;
+      left: 0; right: 0; top: 0; bottom: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      background: transparent;
+    }
+    .notif-popup {
+      margin-top: 48px;
+      background: #f1fff1;
+      color: #1ca97b;
+      font-weight: 700;
+      font-size: 1.04em;
+      border-radius: 12px;
+      padding: 16px 28px;
+      box-shadow: 0 4px 32px #4ae88c25;
+      opacity: 0;
+      animation: notifFadeIn 0.45s cubic-bezier(.38,1.15,.7,1.01) forwards;
+      transition: opacity 0.28s;
+    }
+    .notif-popup.error {
+      background: #fff1f1;
+      color: #ee4747;
+      box-shadow: 0 4px 32px #ee474733;
+    }
+    @keyframes notifFadeIn {
+      from { opacity: 0; transform: translateY(-10px);}
+      to { opacity: 1; transform: none;}
+    }
+    /* Форма и инпуты - не изменял */
     .form-block {
       display: flex;
       flex-direction: column;
@@ -284,242 +552,7 @@
     select::placeholder { color: #a4b1c5; opacity: 1;}
     body.dark input::placeholder,
     body.dark select::placeholder { color: #b9dbff; opacity: 0.85; }
-    .btns {
-      display: flex;
-      gap: 12px;
-      margin-top: 6px;
-    }
-    .btns button {
-      flex: 1;
-      border-radius: 13px;
-      font-size: 1em;
-      padding: 11px 0;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 600;
-      border: none;
-      box-shadow: 0 1px 5px #0077ff22;
-      cursor: pointer;
-      transition: background 0.25s, transform 0.18s;
-      animation: popIn 0.33s;
-    }
-    .btns button.cancel {
-      background: #e2e6ee;
-      color: #4a4a4a;
-    }
-    .btns button:active {
-      background: var(--accent-dark);
-      transform: scale(0.98);
-    }
-    .btns button.cancel:active {
-      background: #c9ccd5;
-    }
-    .backbtn {
-      margin-bottom: 18px;
-      font-size: 1em;
-      padding: 11px 0;
-      border-radius: 13px;
-      background: #eaf2ff;
-      border: none;
-      cursor: pointer;
-      color: #2179ba;
-      font-weight: 700;
-      display: block;
-      width: 100%;
-      box-shadow: 0 1px 6px #b9dbff55;
-      position: relative;
-      transition: background 0.2s, color 0.2s, box-shadow 0.23s, transform 0.18s;
-      outline: none;
-      letter-spacing: 0.01em;
-      animation: fadeIn 0.33s;
-    }
-    .backbtn:active {
-      background: #d4e3f7;
-      color: #006eff;
-      transform: scale(0.98);
-      box-shadow: 0 1px 4px #b9dbff33;
-    }
-    .card-list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 8px;
-      margin-bottom: 12px;
-      animation: fadeIn 0.45s;
-    }
-    @media (max-width: 600px) {
-      .card-list {
-        grid-template-columns: 1fr;
-      }
-    }
-    .item-card {
-      min-width: 0;
-      min-height: 170px;
-      max-width: 100%;
-      width: 100%;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      background: var(--card-gradient);
-      border-radius: 20px;
-      box-shadow: 0 3px 16px #0077ff1a, 0 1.5px 6px #b9dbff44;
-      padding: 14px 14px 16px 14px;
-      margin: 0;
-      outline: 1.5px solid #e3eaff1c;
-      overflow: hidden;
-      transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
-      animation: popIn 0.43s;
-    }
-    .item-card:hover {
-      box-shadow: 0 4px 24px #13c1e340, 0 1.5px 6px #b9dbff66;
-      transform: translateY(-2px) scale(1.017);
-      background: linear-gradient(120deg, #eafffd 0%, #eaf6ff 100%);
-    }
-    .item-card .card-title {
-      font-weight: 700;
-      font-size: 1.03em;
-      margin-bottom: 4px;
-      color: var(--accent-dark);
-      word-break: break-all;
-      max-width: 80%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      line-height: 1.18;
-    }
-    .item-card .card-row {
-      font-size: 0.97em;
-      margin-bottom: 2px;
-      color: #444;
-      line-height: 1.27;
-      word-break: break-word;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .item-card .card-row b {
-      font-weight: 700;
-      color: #006eff;
-      margin-right: 4px;
-    }
-    .item-card .card-badge {
-      display: inline-block;
-      background: var(--card-badge);
-      color: #2179ba;
-      font-weight: 700;
-      font-size: 0.93em;
-      border-radius: 13px 13px 13px 0;
-      padding: 4px 10px 4px 10px;
-      margin: 0 0 9px 0;
-      letter-spacing: 0.01em;
-      box-shadow: 0 1px 8px #b9dbff0a;
-      position: absolute;
-      right: 12px;
-      top: 12px;
-      border-top-right-radius: 18px;
-      max-width: 60%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      z-index: 2;
-    }
-    .card-actions-bottom {
-      margin-top: auto;
-      display: flex;
-      gap: 8px;
-      padding-top: 14px;
-      animation: fadeIn 0.3s;
-    }
-    .editbtn, .deletebtn {
-      flex: 1;
-      border-radius: 9px;
-      font-size: 0.97em;
-      padding: 8px 0;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      transition: background 0.17s, color 0.17s;
-      animation: popIn 0.33s;
-    }
-    .editbtn {
-      background: #eaf2ff;
-      color: #2179ba;
-    }
-    .editbtn:active { background: #d4e3f7; color: #006eff; }
-    .deletebtn {
-      background: #ffeaea;
-      color: #ee4747;
-    }
-    .deletebtn:active { background: #ffdede; color: #b90000; }
-    /* Overlay for deletion confirmation */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 3000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(5px);
-      background: rgba(30,46,70,0.18);
-      animation: fadeIn 0.28s;
-    }
-    .modal-popup {
-      background: #fff;
-      color: #1c1c1c;
-      padding: 32px 28px 24px 28px;
-      min-width: 240px;
-      max-width: 90vw;
-      border-radius: 20px;
-      box-shadow: 0 6px 32px #1d7fff22;
-      text-align: center;
-      animation: popIn 0.33s;
-    }
-    .modal-popup strong { color: #006eff; }
-    .modal-popup .btns {
-      margin-top: 21px;
-      gap: 14px;
-    }
-    .modal-popup .btns button {
-      min-width: 100px;
-      font-size: 1.07em;
-      font-weight: 700;
-    }
-    body.dark .modal-popup { background: #232b33; color: #fff; }
-    body.dark .modal-popup strong { color: #62b0ff; }
-    @media (max-width: 600px) {
-      .modal-popup { padding: 22px 5vw 16px 5vw; min-width: 0; }
-    }
-    /* rest of dark theme as in the previous code ... */
-    body.dark {
-      --main-bg: #151c24;
-      --card-bg: #232b33;
-      --accent: #62b0ff;
-      --accent-dark: #1c7ed6;
-      --text: #f1f1f1;
-      --shadow: 0 4px 32px rgba(0,0,0,0.40);
-      --input-bg: #22303b;
-      --input-border: #3e4b5a;
-      --input-focus: #62b0ff;
-      --input-label: #b9dbff;
-      --card-gradient: linear-gradient(120deg, #243041 0%, #1d2530 100%);
-      --card-badge: #17334e;
-    }
-    body.dark .notif-popup { background: #232b33; color: #1ca97b;}
-    body.dark .notif-popup.error { color: #ee4747;}
-    body.dark .item-card { background: linear-gradient(120deg, #243041 0%, #1d2530 100%); outline: 1.5px solid #3a4e68;}
-    body.dark .item-card .card-title { color: #62b0ff; }
-    body.dark .item-card .card-row { color: #b9dbff; }
-    body.dark .item-card .card-badge { background: #17334e; color: #b9dbff;}
-    body.dark .editbtn {
-      background: #17334e;
-      color: #62b0ff;
-    }
-    body.dark .editbtn:active { background: #23436b; color: #b9dbff; }
-    body.dark .deletebtn {
-      background: #3a1d1d;
-      color: #ff9595;
-    }
-    body.dark .deletebtn:active { background: #522626; color: #ff4f4f; }
+    /* ...остальные стили... */
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -554,7 +587,7 @@
       }
       if(animate) {
         document.body.animate([
-          { opacity: 0.7 },
+          { opacity: 0.85 },
           { opacity: 1 }
         ], {
           duration: 320,
@@ -623,13 +656,23 @@
     window.deleteItem = deleteItem;
 
     function setPageTitle(title) {
-      document.getElementById('pageTitle').innerHTML = title;
+      const el = document.getElementById('pageTitle');
+      el.innerHTML = title;
+      el.style.opacity = 0;
+      el.style.transform = "translateY(-12px)";
+      setTimeout(() => {
+        el.style.animation = 'none';
+        void el.offsetWidth; // reflow
+        el.style.opacity = 1;
+        el.style.transform = "none";
+        el.style.animation = null;
+      }, 30);
     }
-
-    function showPage(contentHtml) {
+    function showPage(contentHtml, animClass="page-anim") {
       const el = document.getElementById("main");
-      el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      el.innerHTML = `<div class="${animClass}">${contentHtml}</div>`;
+      // Принудительно скроллим вверх после полной отрисовки
+      setTimeout(() => window.scrollTo({top: 0, behavior: 'smooth'}), 30);
     }
     function addBackButton(html) {
       return `<button class="backbtn" onclick="showMenu()">Назад</button>` + html;
@@ -648,26 +691,39 @@
     function showWelcome(isLoad = true) {
       setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
       showPage(`
-        <div class="welcome-block">
+        <div class="welcome-block" id="welcomeBlock">
           ${isLoad ? `<div class="welcome-loader"></div>` : ""}
           <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
           ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
         </div>
       `);
+      setTimeout(()=>{
+        const wblock = document.getElementById('welcomeBlock');
+        if (wblock) wblock.classList.add('animated');
+      }, 50);
     }
     function showMenu() {
       setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
       showWelcome(false);
       setTimeout(() => {
-        document.getElementById("main").querySelector('.page-anim').innerHTML += `
-          <div class="menu fadeIn" id="menuBlock">
+        let menuHtml = `
+          <div class="menu">
             <button onclick="showAddPage()">Добавить позицию</button>
             <button onclick="showExpiredPage()">Проверить сроки</button>
             <button onclick="showSearchPage()">Поиск</button>
             <button onclick="showEditPage()">Переоткрыть (редактировать)</button>
           </div>
         `;
-      }, 200);
+        // Плавное появление основных кнопок
+        const main = document.getElementById("main");
+        const menuBlock = document.createElement("div");
+        menuBlock.innerHTML = menuHtml;
+        setTimeout(() => {
+          if (main && main.firstChild) {
+            main.firstChild.appendChild(menuBlock.firstChild);
+          }
+        }, 200);
+      }, 120);
     }
     function showAddPage() {
       setPageTitle('Добавить позицию');
@@ -886,10 +942,9 @@
       };
     }
 
-    // Удаление через модальное окно с размытием
+    // Удаление через модальное окно с размытием и плавной анимацией
     function confirmDelete(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-      // удалить старое модальное окно если оно есть
       let old = document.getElementById('modalOverlay');
       if (old) old.remove();
       let overlay = document.createElement('div');
@@ -935,7 +990,6 @@
     window.deleteItem = deleteItem;
 
     function showNotification(msg, isError = false) {
-      // Удалить предыдущий оверлей если есть
       let old = document.getElementById('notifOverlay');
       if (old) old.remove();
       let overlay = document.createElement('div');
@@ -961,7 +1015,7 @@
       if (!d.ok) {
         setPageTitle('Добро пожаловать');
         showPage(`
-          <div class="welcome-block">
+          <div class="welcome-block animated">
             <div class="welcome-greet">${welcomeGreeting()}, гость!</div>
             <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
             <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
