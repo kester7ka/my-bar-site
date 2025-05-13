@@ -532,34 +532,119 @@
       color: #ee4747;
     }
     .deletebtn:active { background: #ffdede; color: #b90000; }
-    .notif-overlay {
+    /* --- Новый стиль для модального подтверждения удаления --- */
+    .modal-overlay {
       position: fixed;
+      z-index: 3000;
       top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 2000;
+      width: 100vw; height: 100vh;
+      background: rgba(30,46,70,0.18);
+      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(4.5px);
-      background: rgba(30,46,70,0.18);
-      transition: background 0.2s;
-      animation: fadeIn 0.23s;
+      animation: fadeIn 0.16s;
     }
-    .notif-popup {
+    .modal-dialog {
       background: #fff;
       color: #1ca97b;
-      padding: 20px 34px;
+      padding: 27px 34px 26px 34px;
       font-size: 1.13em;
       font-weight: 700;
       border-radius: 18px;
       box-shadow: 0 3px 16px #13c1e340;
-      min-width: 200px;
+      min-width: 220px;
+      min-height: 60px;
       text-align: center;
-      opacity: 0;
-      transform: scale(0.97);
       animation: notifPopupIn .3s cubic-bezier(.4,0,.2,1) forwards;
+      position: relative;
     }
-    .notif-popup.error {
-      color: #ee4747;
+    .modal-dialog .modal-title {
+      color: #222;
+      font-weight: 700;
+      font-size: 1.08em;
+      margin-bottom: 16px;
+    }
+    .modal-dialog .modal-buttons {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+    }
+    .modal-dialog button {
+      flex: 1;
+      border-radius: 13px;
+      font-size: 1em;
+      padding: 11px 0;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      box-shadow: 0 1px 5px #0077ff22;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.18s;
+      animation: popIn 0.33s;
+    }
+    .modal-dialog button.cancel {
+      background: #e2e6ee;
+      color: #4a4a4a;
+    }
+    .modal-dialog button:active {
+      background: var(--accent-dark);
+      transform: scale(0.98);
+    }
+    .modal-dialog button.cancel:active {
+      background: #c9ccd5;
+    }
+    body.dark .modal-dialog {
+      background: #232b33;
+      color: #b9dbff;
+    }
+    body.dark .modal-dialog .modal-title {
+      color: #b9dbff;
+    }
+    body.dark .modal-dialog button {
+      background: #62b0ff;
+      color: #232b33;
+    }
+    body.dark .modal-dialog button.cancel {
+      background: #3a4e68;
+      color: #f1f1f1;
+    }
+    /* --- Экран загрузки --- */
+    .global-loader-overlay {
+      position: fixed;
+      z-index: 4000;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw; height: 100vh;
+      background: var(--main-bg, #f1f3f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.36s;
+      flex-direction: column;
+    }
+    .global-loader-spinner {
+      width: 54px;
+      height: 54px;
+      border: 6px solid #e3eaff;
+      border-top: 6px solid var(--accent, #006eff);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 22px;
+      margin-top: 12px;
+    }
+    .global-loader-text {
+      font-size: 1.18em;
+      font-weight: 700;
+      color: var(--accent-dark, #0051b3);
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+    body.dark .global-loader-overlay {
+      background: var(--main-bg, #151c24);
+    }
+    body.dark .global-loader-text {
+      color: var(--accent, #62b0ff);
     }
     @keyframes notifPopupIn {
       from { opacity: 0; transform: scale(0.93);}
@@ -581,9 +666,11 @@
       .backbtn { font-size: 0.98em; padding: 10px 0;}
       h2 { font-size: 1.07em; }
       .mini-notification { font-size: 0.98em; padding: 10px 14px;}
+      .modal-dialog { padding: 18px 7vw 18px 7vw; min-width: 0; }
     }
     @media (max-width: 400px) {
       .notif-popup { font-size: 0.98em; padding: 12px 2vw;}
+      .modal-dialog { padding: 12px 2vw 12px 2vw;}
     }
     body.dark {
       --main-bg: #151c24;
@@ -634,6 +721,11 @@
     <img src="" id="userAvatar" class="user-avatar" style="display:none;" alt="Аватар">
     <h2 id="pageTitle">Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span></h2>
     <div id="main"></div>
+  </div>
+  <!-- Глобальный экран загрузки -->
+  <div class="global-loader-overlay" id="globalLoader" style="display:none;">
+    <div class="global-loader-spinner"></div>
+    <div class="global-loader-text">Загрузка...</div>
   </div>
   <script>
     // --- Theme Switcher ---
@@ -981,19 +1073,64 @@
       };
     }
 
+    // --- Новый модальный диалог подтверждения удаления ---
+    function showDeleteConfirmModal({title, onConfirm, onCancel}) {
+      // Если модалка уже есть — удалить
+      let old = document.getElementById('modalOverlay');
+      if (old) old.remove();
+      // Создать новый overlay
+      let overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.id = 'modalOverlay';
+      overlay.innerHTML = `
+        <div class="modal-dialog">
+          <div class="modal-title">${title}</div>
+          <div class="modal-buttons">
+            <button class="confirm" id="modalConfirmBtn">Да, удалить</button>
+            <button class="cancel" id="modalCancelBtn">Нет</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      // Блокировать скролл за модалкой
+      document.body.style.overflow = "hidden";
+
+      document.getElementById('modalConfirmBtn').onclick = () => {
+        overlay.remove();
+        document.body.style.overflow = "";
+        onConfirm && onConfirm();
+      };
+      document.getElementById('modalCancelBtn').onclick = () => {
+        overlay.remove();
+        document.body.style.overflow = "";
+        onCancel && onCancel();
+      };
+      // Также закрытие по клику вне окна
+      overlay.addEventListener('mousedown', e => {
+        if (e.target === overlay) {
+          overlay.remove();
+          document.body.style.overflow = "";
+          onCancel && onCancel();
+        }
+      });
+    }
+
+    // --- Переписанная функция confirmDelete с использованием модалки ---
     function confirmDelete(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       setPageTitle('Удаление позиции');
-      showPage(addBackButton(`
-        <div class="confirm-delete-block">
-          <div style="font-size:1.12em;margin-bottom:13px;">Вы действительно хотите удалить <b>${r.name}</b>?</div>
-          <div class="btns">
-            <button onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Да, удалить</button>
-            <button class="cancel" onclick="showEditPage()">Нет</button>
-          </div>
-        </div>
-      `));
+      showDeleteConfirmModal({
+        title: `Вы действительно хотите удалить <b>${r.name}</b>?`,
+        onConfirm: function() {
+          deleteItem(rJson);
+        },
+        onCancel: function() {
+          showEditPage();
+        }
+      });
     }
+
     function showNotification(msg, isError = false) {
       // Удалить предыдущий оверлей если есть
       let old = document.getElementById('notifOverlay');
@@ -1026,7 +1163,22 @@
       }
     }
 
+    // --- Экран глобальной загрузки на 3-4 секунды при старте ---
+    function showGlobalLoader(show = true) {
+      const loader = document.getElementById('globalLoader');
+      if (show) {
+        loader.style.display = 'flex';
+        setTimeout(() => loader.style.opacity = "1", 10);
+      } else {
+        loader.style.opacity = "0";
+        setTimeout(() => loader.style.display = 'none', 370);
+      }
+    }
+
     async function startApp() {
+      showGlobalLoader(true);
+      const MIN_LOAD = 3200 + Math.floor(Math.random()*800); // 3.2-4 сек
+      let t0 = Date.now();
       showWelcome(true);
       let r = await fetch(backend + "/userinfo", {
         method: "POST",
@@ -1034,6 +1186,9 @@
         body: JSON.stringify({ user_id: userId })
       });
       let d = await r.json();
+      let dt = Date.now() - t0;
+      if (dt < MIN_LOAD) await new Promise(res => setTimeout(res, MIN_LOAD - dt));
+      showGlobalLoader(false);
       if (!d.ok) {
         setPageTitle('Добро пожаловать');
         showPage(`
