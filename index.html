@@ -404,30 +404,36 @@
       font-weight: 600;
       animation: fadeIn 0.7s;
     }
-    /* --- Карточки для поиска/редактирования --- */
+    /* --- Карточки для поиска/редактирования (2 в ряд, одинаковая высота) --- */
     .card-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--card-gap);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
       margin-top: 12px;
       margin-bottom: 12px;
     }
+    @media (max-width: 600px) {
+      .card-list {
+        grid-template-columns: 1fr;
+      }
+    }
     .item-card {
-      background: var(--card-gradient);
-      border-radius: 26px;
-      box-shadow: 0 3px 16px #0077ff1a, 0 1.5px 6px #b9dbff44;
-      padding: 17px 18px 18px 18px;
-      margin: 0 auto;
-      transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
+      min-width: 0;
+      min-height: 170px;
+      max-width: 100%;
+      width: 100%;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       position: relative;
-      border: none;
-      min-width:0;
-      max-width: 100%;
-      word-break: break-word;
-      overflow: hidden;
+      background: var(--card-gradient);
+      border-radius: 20px;
+      box-shadow: 0 3px 16px #0077ff1a, 0 1.5px 6px #b9dbff44;
+      padding: 14px 14px 16px 14px;
+      margin: 0;
       outline: 1.5px solid #e3eaff1c;
+      overflow: hidden;
+      transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
     }
     .item-card:hover {
       box-shadow: 0 4px 24px #13c1e340, 0 1.5px 6px #b9dbff66;
@@ -435,18 +441,25 @@
       background: linear-gradient(120deg, #eafffd 0%, #eaf6ff 100%);
     }
     .item-card .card-title {
-      font-weight: 800;
-      font-size: 1.1em;
-      margin-bottom: 5px;
+      font-weight: 700;
+      font-size: 1.01em;
+      margin-bottom: 4px;
       color: var(--accent-dark);
-      word-break: break-word;
-      padding-right: 48px;
+      word-break: break-all;
+      max-width: 80%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.18;
     }
     .item-card .card-row {
-      font-size: 1em;
+      font-size: 0.97em;
       margin-bottom: 2px;
       color: #444;
-      line-height: 1.35;
+      line-height: 1.27;
+      word-break: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .item-card .card-row b {
       font-weight: 700;
@@ -460,27 +473,32 @@
       font-weight: 700;
       font-size: 0.93em;
       border-radius: 13px 13px 13px 0;
-      padding: 4px 13px 4px 12px;
+      padding: 4px 10px 4px 10px;
       margin: 0 0 9px 0;
       letter-spacing: 0.01em;
       box-shadow: 0 1px 8px #b9dbff0a;
       position: absolute;
-      right: 0;
-      top: 0;
+      right: 12px;
+      top: 12px;
       border-top-right-radius: 18px;
+      max-width: 60%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      z-index: 2;
     }
     .item-card .editbtn {
       position: absolute;
-      top: 18px;
-      right: 18px;
-      z-index: 2;
+      top: 12px;
+      left: 12px;
+      z-index: 3;
       margin: 0;
       padding: 2px 9px;
       background: #fff5db;
       border-radius: 8px;
       color: #b48700;
       border: none;
-      font-size: 1.17em;
+      font-size: 1.13em;
       box-shadow: 0 1px 8px #ffd76b4d;
       transition: background 0.13s, color 0.13s, transform 0.13s;
     }
@@ -546,7 +564,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap" id="wrap">
     <div class="theme-toggle-row">
       <button class="theme-toggle" id="themeToggle" aria-label="Сменить тему" title="Сменить тему">
         <span class="icon sun" aria-hidden="true" style="top:0;left:0;">
@@ -605,6 +623,17 @@
     const backend = "https://bar-backend-production.up.railway.app";
     const botLink = "https://t.me/BarHelperAB_bot";
     if (tg && tg.expand) tg.expand();
+
+    // --- Закрытие клавиатуры по тапу на пустое место ---
+    document.getElementById('wrap').addEventListener('touchstart', function(e) {
+      // Если клик был не по input/textarea/select и не по кнопке, снять фокус
+      if (!e.target.closest('input, textarea, select, button')) {
+        const active = document.activeElement;
+        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
+          active.blur();
+        }
+      }
+    });
 
     if (!userId) {
       document.getElementById('main').innerHTML = `
@@ -765,7 +794,7 @@
           cards += `
             <div class="item-card">
               <div class="card-badge">${r.category}</div>
-              <div class="card-title">${r.name}</div>
+              <div class="card-title" title="${r.name}">${r.name}</div>
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
@@ -818,7 +847,7 @@
             <div class="item-card">
               <button class="editbtn" title="Переоткрыть" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">✏️</button>
               <div class="card-badge">${r.category}</div>
-              <div class="card-title">${r.name}</div>
+              <div class="card-title" title="${r.name}">${r.name}</div>
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
