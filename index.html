@@ -284,22 +284,6 @@
     select::placeholder { color: #a4b1c5; opacity: 1;}
     body.dark input::placeholder,
     body.dark select::placeholder { color: #b9dbff; opacity: 0.85; }
-    input:-webkit-autofill,
-    input:-webkit-autofill:focus,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:active {
-      -webkit-box-shadow: 0 0 0 50px var(--input-bg) inset !important;
-      box-shadow: 0 0 0 50px var(--input-bg) inset !important;
-      -webkit-text-fill-color: var(--text) !important;
-    }
-    body.dark input:-webkit-autofill,
-    body.dark input:-webkit-autofill:focus,
-    body.dark input:-webkit-autofill:hover,
-    body.dark input:-webkit-autofill:active {
-      -webkit-box-shadow: 0 0 0 50px #22303b inset !important;
-      box-shadow: 0 0 0 50px #22303b inset !important;
-      -webkit-text-fill-color: #f1f1f1 !important;
-    }
     .btns {
       display: flex;
       gap: 12px;
@@ -354,71 +338,6 @@
       color: #006eff;
       transform: scale(0.98);
       box-shadow: 0 1px 4px #b9dbff33;
-    }
-    .welcome-block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 200px;
-      animation: fadeIn 0.7s;
-      margin-bottom: 12px;
-    }
-    .welcome-loader {
-      width: 38px;
-      height: 38px;
-      border: 4px solid #e3eaff;
-      border-top: 4px solid var(--accent);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin-bottom: 22px;
-      margin-top: 12px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0);}
-      100% { transform: rotate(360deg);}
-    }
-    .welcome-greet {
-      font-size: 1.16em;
-      font-weight: 700;
-      color: var(--accent-dark);
-      margin-bottom: 6px;
-      letter-spacing: 0.01em;
-      text-align: center;
-    }
-    .welcome-user {
-      font-size: 1.08em;
-      color: #4a4f56;
-      margin-bottom: 3px;
-      text-align: center;
-      font-weight: 500;
-    }
-    .welcome-bar {
-      font-size: 0.98em;
-      color: #4b8be8;
-      background: #eaf2ff;
-      padding: 5px 15px;
-      border-radius: 11px;
-      margin-bottom: 8px;
-      font-weight: 600;
-      display: inline-block;
-      text-align: center;
-    }
-    .result {
-      margin: 14px 0 0 0;
-      font-size: 1.07em;
-      text-align: center;
-      transition: color 0.3s;
-    }
-    .success {
-      color: #1ca97b;
-      font-weight: 600;
-      animation: fadeIn 0.7s;
-    }
-    .error {
-      color: #ee4747;
-      font-weight: 600;
-      animation: fadeIn 0.7s;
     }
     .card-list {
       display: grid;
@@ -532,59 +451,45 @@
       color: #ee4747;
     }
     .deletebtn:active { background: #ffdede; color: #b90000; }
-    .notif-overlay {
+    /* Overlay for deletion confirmation */
+    .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 2000;
+      z-index: 3000;
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(4.5px);
+      backdrop-filter: blur(5px);
       background: rgba(30,46,70,0.18);
-      transition: background 0.2s;
-      animation: fadeIn 0.23s;
+      animation: fadeIn 0.28s;
     }
-    .notif-popup {
+    .modal-popup {
       background: #fff;
-      color: #1ca97b;
-      padding: 20px 34px;
-      font-size: 1.13em;
-      font-weight: 700;
-      border-radius: 18px;
-      box-shadow: 0 3px 16px #13c1e340;
-      min-width: 200px;
+      color: #1c1c1c;
+      padding: 32px 28px 24px 28px;
+      min-width: 240px;
+      max-width: 90vw;
+      border-radius: 20px;
+      box-shadow: 0 6px 32px #1d7fff22;
       text-align: center;
-      opacity: 0;
-      transform: scale(0.97);
-      animation: notifPopupIn .3s cubic-bezier(.4,0,.2,1) forwards;
+      animation: popIn 0.33s;
     }
-    .notif-popup.error {
-      color: #ee4747;
+    .modal-popup strong { color: #006eff; }
+    .modal-popup .btns {
+      margin-top: 21px;
+      gap: 14px;
     }
-    @keyframes notifPopupIn {
-      from { opacity: 0; transform: scale(0.93);}
-      to   { opacity: 1; transform: scale(1);}
+    .modal-popup .btns button {
+      min-width: 100px;
+      font-size: 1.07em;
+      font-weight: 700;
     }
-    @keyframes fadeIn {
-      from { opacity:0; transform: translateY(32px);}
-      to   { opacity:1; transform: none;}
-    }
-    @keyframes popIn {
-      from { opacity:0; transform: scale(0.95);}
-      to   { opacity:1; transform: scale(1);}
-    }
+    body.dark .modal-popup { background: #232b33; color: #fff; }
+    body.dark .modal-popup strong { color: #62b0ff; }
     @media (max-width: 600px) {
-      .notif-popup { font-size: 1em; padding: 15px 10vw; min-width: 0; }
-      .item-card { min-height: 138px; padding: 11px 10px 13px 10px;}
-      .card-list { gap: 10px; }
-      .menu button { padding: 13px 0; }
-      .backbtn { font-size: 0.98em; padding: 10px 0;}
-      h2 { font-size: 1.07em; }
-      .mini-notification { font-size: 0.98em; padding: 10px 14px;}
+      .modal-popup { padding: 22px 5vw 16px 5vw; min-width: 0; }
     }
-    @media (max-width: 400px) {
-      .notif-popup { font-size: 0.98em; padding: 12px 2vw;}
-    }
+    /* rest of dark theme as in the previous code ... */
     body.dark {
       --main-bg: #151c24;
       --card-bg: #232b33;
@@ -981,35 +886,37 @@
       };
     }
 
+    // Удаление через модальное окно с размытием
     function confirmDelete(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-      setPageTitle('Удаление позиции');
-      showPage(addBackButton(`
-        <div class="confirm-delete-block">
-          <div style="font-size:1.12em;margin-bottom:13px;">Вы действительно хотите удалить <b>${r.name}</b>?</div>
-          <div class="btns">
-            <button onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Да, удалить</button>
-            <button class="cancel" onclick="showEditPage()">Нет</button>
-          </div>
-        </div>
-      `));
-    }
-    function showNotification(msg, isError = false) {
-      // Удалить предыдущий оверлей если есть
-      let old = document.getElementById('notifOverlay');
+      // удалить старое модальное окно если оно есть
+      let old = document.getElementById('modalOverlay');
       if (old) old.remove();
       let overlay = document.createElement('div');
-      overlay.className = 'notif-overlay';
-      overlay.id = 'notifOverlay';
-      overlay.innerHTML = `<div class="notif-popup${isError?' error':''}">${msg}</div>`;
+      overlay.className = 'modal-overlay';
+      overlay.id = 'modalOverlay';
+      overlay.innerHTML = `
+        <div class="modal-popup">
+          <div style="font-size:1.15em;margin-bottom:16px;">
+            Вы действительно хотите удалить<br><strong>${r.name}</strong>?
+          </div>
+          <div class="btns">
+            <button onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}');">Да</button>
+            <button class="cancel" onclick="closeModalDelete()">Нет</button>
+          </div>
+        </div>
+      `;
       document.body.appendChild(overlay);
-      setTimeout(() => { overlay.querySelector('.notif-popup').style.opacity = 1; }, 10);
-      setTimeout(() => {
-        overlay.style.opacity = 0;
-        setTimeout(()=>overlay.remove(), 400);
-      }, 1500);
     }
+    window.confirmDelete = confirmDelete;
+    function closeModalDelete() {
+      let overlay = document.getElementById('modalOverlay');
+      if (overlay) overlay.remove();
+    }
+    window.closeModalDelete = closeModalDelete;
+
     async function deleteItem(rJson) {
+      closeModalDelete();
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       let resp = await fetch(`${backend}/delete`, {
         method: "POST",
@@ -1024,6 +931,23 @@
         showNotification("Ошибка удаления: " + data.error, true);
         showEditPage();
       }
+    }
+    window.deleteItem = deleteItem;
+
+    function showNotification(msg, isError = false) {
+      // Удалить предыдущий оверлей если есть
+      let old = document.getElementById('notifOverlay');
+      if (old) old.remove();
+      let overlay = document.createElement('div');
+      overlay.className = 'notif-overlay';
+      overlay.id = 'notifOverlay';
+      overlay.innerHTML = `<div class="notif-popup${isError?' error':''}">${msg}</div>`;
+      document.body.appendChild(overlay);
+      setTimeout(() => { overlay.querySelector('.notif-popup').style.opacity = 1; }, 10);
+      setTimeout(() => {
+        overlay.style.opacity = 0;
+        setTimeout(()=>overlay.remove(), 400);
+      }, 1500);
     }
 
     async function startApp() {
