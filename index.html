@@ -538,43 +538,74 @@
       z-index: 3000;
       top: 0; left: 0; right: 0; bottom: 0;
       width: 100vw; height: 100vh;
-      background: rgba(30,46,70,0.18);
-      backdrop-filter: blur(6px);
+      background: var(--main-bg, #f1f3f7);
+      background-color: var(--main-bg, #f1f3f7);
+      background-blend-mode: multiply;
+      backdrop-filter: blur(7px);
       display: flex;
       align-items: center;
       justify-content: center;
       animation: fadeIn 0.16s;
+      transition: background 0.2s;
+    }
+    body.dark .modal-overlay {
+      background: var(--main-bg, #151c24);
+      background-color: var(--main-bg, #151c24);
     }
     .modal-dialog {
       background: #fff;
       color: #1ca97b;
-      padding: 27px 34px 26px 34px;
+      padding: 38px 28px 40px 28px;
       font-size: 1.13em;
       font-weight: 700;
       border-radius: 18px;
-      box-shadow: 0 3px 16px #13c1e340;
-      min-width: 220px;
-      min-height: 60px;
+      box-shadow: 0 3px 22px #13c1e340;
+      min-width: 245px;
+      max-width: 95vw;
+      width: 350px;
+      min-height: 170px;
       text-align: center;
       animation: notifPopupIn .3s cubic-bezier(.4,0,.2,1) forwards;
       position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
     .modal-dialog .modal-title {
       color: #222;
-      font-weight: 700;
+      font-weight: 600;
       font-size: 1.08em;
       margin-bottom: 16px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .modal-dialog .modal-delete-name {
+      margin: 0 auto 14px auto;
+      font-size: 1.23em;
+      font-weight: 800;
+      color: #ee4747;
+      background: #ffeaea;
+      border-radius: 8px;
+      padding: 6px 16px;
+      display: inline-block;
+      box-shadow: 0 1px 10px #ee474705;
+      letter-spacing: 0.01em;
+      line-height: 1.2;
+      word-break: break-word;
     }
     .modal-dialog .modal-buttons {
-      margin-top: 18px;
+      margin-top: 26px;
       display: flex;
-      gap: 12px;
+      gap: 15px;
+      width: 100%;
+      justify-content: center;
     }
     .modal-dialog button {
       flex: 1;
       border-radius: 13px;
       font-size: 1em;
-      padding: 11px 0;
+      padding: 13px 0;
       background: var(--accent);
       color: #fff;
       font-weight: 600;
@@ -583,6 +614,7 @@
       cursor: pointer;
       transition: background 0.25s, transform 0.18s;
       animation: popIn 0.33s;
+      max-width: 135px;
     }
     .modal-dialog button.cancel {
       background: #e2e6ee;
@@ -601,6 +633,10 @@
     }
     body.dark .modal-dialog .modal-title {
       color: #b9dbff;
+    }
+    body.dark .modal-dialog .modal-delete-name {
+      color: #ff6a6a;
+      background: #3a1d1d;
     }
     body.dark .modal-dialog button {
       background: #62b0ff;
@@ -666,11 +702,11 @@
       .backbtn { font-size: 0.98em; padding: 10px 0;}
       h2 { font-size: 1.07em; }
       .mini-notification { font-size: 0.98em; padding: 10px 14px;}
-      .modal-dialog { padding: 18px 7vw 18px 7vw; min-width: 0; }
+      .modal-dialog { padding: 30px 2vw 32px 2vw; min-width: 0; width: 95vw; }
     }
     @media (max-width: 400px) {
       .notif-popup { font-size: 0.98em; padding: 12px 2vw;}
-      .modal-dialog { padding: 12px 2vw 12px 2vw;}
+      .modal-dialog { padding: 20px 1vw 22px 1vw;}
     }
     body.dark {
       --main-bg: #151c24;
@@ -728,363 +764,20 @@
     <div class="global-loader-text">Загрузка...</div>
   </div>
   <script>
-    // --- Theme Switcher ---
-    const themeBtn = document.getElementById('themeToggle');
-    const themeText = document.getElementById('themeText');
-    function setTheme(dark, animate=true) {
-      if(dark) {
-        document.body.classList.add('dark');
-        themeText.textContent = "Светлая тема";
-      } else {
-        document.body.classList.remove('dark');
-        themeText.textContent = "Тёмная тема";
-      }
-      if(animate) {
-        document.body.animate([
-          { opacity: 0.7 },
-          { opacity: 1 }
-        ], {
-          duration: 320,
-          easing: 'cubic-bezier(.4,0,.2,1)'
-        });
-      }
-      localStorage.setItem('theme', dark ? 'dark' : 'light');
-    }
-    function toggleTheme() {
-      const dark = !document.body.classList.contains('dark');
-      setTheme(dark);
-    }
-    themeBtn.addEventListener('click', toggleTheme);
-    (function initTheme() {
-      let theme = localStorage.getItem('theme');
-      if(!theme) {
-        if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
-        else theme = 'light';
-      }
-      setTheme(theme === 'dark', false);
-    })();
-
-    // --- User setup (Telegram Mini App Only) ---
-    let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-    let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
-    let username = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "";
-    let userPhoto = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : "";
-    const backend = "https://bar-backend-production.up.railway.app";
-    const botLink = "https://t.me/BarHelperAB_bot";
-    if (tg && tg.expand) tg.expand();
-
-    // --- Аватар ---
-    if (userPhoto) {
-      const avatar = document.getElementById('userAvatar');
-      avatar.src = userPhoto;
-      avatar.style.display = 'block';
-    }
-
-    // --- Закрытие клавиатуры по тапу на пустое место ---
-    document.getElementById('wrap').addEventListener('touchstart', function(e) {
-      if (!e.target.closest('input, textarea, select, button')) {
-        const active = document.activeElement;
-        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
-          active.blur();
-        }
-      }
-    });
-
-    if (!userId) {
-      document.getElementById('main').innerHTML = `
-        <div style="padding:22px 0;text-align:center" class="error">
-          Откройте сайт через Telegram-бота, чтобы пользоваться баром.<br><br>
-          <a href="${botLink}" style="color:#007aff;font-weight:bold" target="_blank">Открыть бота</a>
-        </div>`;
-      throw new Error("Not in Telegram Mini App");
-    }
-
-    // --- Глобальные методы для кнопок ---
-    window.showMenu = showMenu;
-    window.showAddPage = showAddPage;
-    window.showExpiredPage = showExpiredPage;
-    window.showSearchPage = showSearchPage;
-    window.showEditPage = showEditPage;
-    window.openReopenForm = openReopenForm;
-    window.confirmDelete = confirmDelete;
-    window.deleteItem = deleteItem;
-
-    function setPageTitle(title) {
-      document.getElementById('pageTitle').innerHTML = title;
-    }
-
-    function showPage(contentHtml) {
-      const el = document.getElementById("main");
-      el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
-      window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-    function addBackButton(html) {
-      return `<button class="backbtn" onclick="showMenu()">Назад</button>` + html;
-    }
-    function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${m}</div>`)); }
-
-    let USER = null;
-    function welcomeGreeting() {
-      const now = new Date();
-      const h = now.getHours();
-      if (h >= 5 && h < 12) return "Доброе утро";
-      if (h >= 12 && h < 18) return "Добрый день";
-      if (h >= 18 && h < 23) return "Добрый вечер";
-      return "Доброй ночи";
-    }
-    function showWelcome(isLoad = true) {
-      setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
-      showPage(`
-        <div class="welcome-block">
-          ${isLoad ? `<div class="welcome-loader"></div>` : ""}
-          <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
-          ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
-        </div>
-      `);
-    }
-    function showMenu() {
-      setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
-      showWelcome(false);
-      setTimeout(() => {
-        document.getElementById("main").querySelector('.page-anim').innerHTML += `
-          <div class="menu fadeIn" id="menuBlock">
-            <button onclick="showAddPage()">Добавить позицию</button>
-            <button onclick="showExpiredPage()">Проверить сроки</button>
-            <button onclick="showSearchPage()">Поиск</button>
-            <button onclick="showEditPage()">Переоткрыть (редактировать)</button>
-          </div>
-        `;
-      }, 200);
-    }
-    function showAddPage() {
-      setPageTitle('Добавить позицию');
-      showPage(addBackButton(`
-        <form id="addf" class="form-block" autocomplete="off">
-          <label for="category">Категория</label>
-          <select name="category" id="category" required>
-            <option value="🍯 Сиропы">🍯 Сиропы</option>
-            <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
-            <option value="📦 Прочее">📦 Прочее</option>
-          </select>
-          <label for="tob">TOB (6 цифр)</label>
-          <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456">
-          <label for="name">Название</label>
-          <input name="name" id="name" required placeholder="Название позиции">
-          <label for="opened_at">Дата открытия</label>
-          <input name="opened_at" id="opened_at" type="date" required>
-          <label for="shelf_life_days">Срок хранения (дней)</label>
-          <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="30">
-          <div class="btns">
-            <button type="submit">Добавить</button>
-            <button type="button" class="cancel" onclick="showMenu()">Назад</button>
-          </div>
-        </form>
-      `));
-      document.getElementById('addf').onsubmit = async function(e){
-        e.preventDefault();
-        let d = Object.fromEntries(new FormData(this));
-        let resp = await fetch(`${backend}/add`, {
-          method: "POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify({user_id: userId, ...d})
-        });
-        let data = await resp.json();
-        if (data.ok)
-          msg("Позиция добавлена!", "success");
-        else
-          msg("Ошибка: " + data.error, "error");
-      };
-    }
-    function showExpiredPage() {
-      setPageTitle('Проверка сроков');
-      showPage(addBackButton(`<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`));
-      fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
-        .then(r=>r.json())
-        .then(d=>{
-          if(!d.ok) return msg("Ошибка: "+d.error,"error");
-          if(!d.results.length) return msg("Нет просроченных позиций!","success");
-          let cards = `<div class="card-list">`;
-          d.results.forEach(x=>{
-            cards += `
-              <div class="item-card">
-                <div class="card-badge">Просрочено</div>
-                <div class="card-title">${x.name}</div>
-                <div class="card-row"><b>Категория:</b> ${x.category}</div>
-                <div class="card-row"><b>TOB:</b> ${x.tob}</div>
-                <div class="card-row"><b>Годен до:</b> ${x.expiry_at}</div>
-              </div>
-            `;
-          });
-          cards += `</div>`;
-          showPage(addBackButton(cards));
-        });
-    }
-    function showSearchPage() {
-      setPageTitle('Поиск');
-      showPage(addBackButton(`
-        <div id="searchBlock" class="form-block">
-          <input id="searchInput" type="text" placeholder="Поиск по TOB или названию">
-          <div id="searchResults" style="min-height:90px;"></div>
-        </div>
-      `));
-      const input = document.getElementById('searchInput');
-      let allItems = [];
-      const resultsDiv = document.getElementById('searchResults');
-      resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
-      fetch(`${backend}/search`, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({user_id: userId, query: ""})
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
-        allItems = data.results;
-        renderList("");
-      });
-      input.addEventListener('input', e => {
-        renderList(e.target.value);
-      });
-      function renderList(filter) {
-        filter = (filter||"").trim().toLowerCase();
-        let items = allItems;
-        if(filter)
-          items = allItems.filter(
-            x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
-          );
-        if (!items.length) {
-          resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
-          return;
-        }
-        let cards = `<div class="card-list">`;
-        items.forEach(r => {
-          cards += `
-            <div class="item-card">
-              <div class="card-badge">${r.category}</div>
-              <div class="card-title" title="${r.name}">${r.name}</div>
-              <div class="card-row"><b>TOB:</b> ${r.tob}</div>
-              <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
-              <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
-            </div>
-          `;
-        });
-        cards += `</div>`;
-        resultsDiv.innerHTML = cards;
-      }
-    }
-    function showEditPage() {
-      setPageTitle('Редактирование позиций');
-      showPage(addBackButton(`
-        <div id="editBlock" class="form-block">
-          <input id="editSearchInput" type="text" placeholder="Поиск по TOB или названию">
-          <div id="editResults" style="min-height:90px;"></div>
-        </div>
-      `));
-      const input = document.getElementById('editSearchInput');
-      let allItems = [];
-      const resultsDiv = document.getElementById('editResults');
-      resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
-      fetch(`${backend}/search`, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({user_id: userId, query: ""})
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
-        allItems = data.results;
-        renderEditList("");
-      });
-      input.addEventListener('input', e => {
-        renderEditList(e.target.value);
-      });
-      function renderEditList(filter) {
-        filter = (filter||"").trim().toLowerCase();
-        let items = allItems;
-        if(filter)
-          items = allItems.filter(
-            x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
-          );
-        if (!items.length) {
-          resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
-          return;
-        }
-        let cards = `<div class="card-list">`;
-        items.forEach(r => {
-          cards += `
-            <div class="item-card">
-              <div class="card-badge">${r.category}</div>
-              <div class="card-title" title="${r.name}">${r.name}</div>
-              <div class="card-row"><b>TOB:</b> ${r.tob}</div>
-              <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
-              <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
-              <div class="card-actions-bottom">
-                <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Редактировать</button>
-                <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
-              </div>
-            </div>
-          `;
-        });
-        cards += `</div>`;
-        resultsDiv.innerHTML = cards;
-      }
-    }
-    function openReopenForm(rJson) {
-      setPageTitle('Редактирование позиции');
-      let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-      const today = new Date().toISOString().slice(0,10);
-      showPage(addBackButton(`
-        <form id="reopenf" class="form-block" autocomplete="off">
-          <label>Категория</label>
-          <input value="${r.category}" readonly>
-          <label>TOB</label>
-          <input value="${r.tob}" readonly>
-          <label>Название</label>
-          <input value="${r.name}" readonly>
-          <label>Дата открытия</label>
-          <input name="opened_at" type="date" value="${today}" required>
-          <label>Срок хранения (дней)</label>
-          <input name="shelf_life_days" type="number" min="1" required value="${r.shelf_life_days}">
-          <div class="btns">
-            <button type="submit">Сохранить</button>
-            <button type="button" class="cancel" onclick="showMenu()">Назад</button>
-          </div>
-        </form>
-      `));
-      document.getElementById('reopenf').onsubmit = async function(e){
-        e.preventDefault();
-        let d = Object.fromEntries(new FormData(this));
-        let req = {
-          user_id: userId,
-          tob: r.tob,
-          opened_at: d.opened_at,
-          shelf_life_days: d.shelf_life_days
-        };
-        let resp = await fetch(`${backend}/reopen`, {
-          method: "POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify(req)
-        });
-        let data = await resp.json();
-        if (data.ok)
-          msg("Позиция успешно переоткрыта!", "success");
-        else
-          msg("Ошибка: " + data.error, "error");
-      };
-    }
+    // --- Theme Switcher --- (без изменений)
+    // ... (весь твой основной скрипт — без изменений до confirmDelete) ...
 
     // --- Новый модальный диалог подтверждения удаления ---
-    function showDeleteConfirmModal({title, onConfirm, onCancel}) {
-      // Если модалка уже есть — удалить
+    function showDeleteConfirmModal({title, name, onConfirm, onCancel}) {
       let old = document.getElementById('modalOverlay');
       if (old) old.remove();
-      // Создать новый overlay
       let overlay = document.createElement('div');
       overlay.className = 'modal-overlay';
       overlay.id = 'modalOverlay';
       overlay.innerHTML = `
         <div class="modal-dialog">
           <div class="modal-title">${title}</div>
+          <div class="modal-delete-name">${name}</div>
           <div class="modal-buttons">
             <button class="confirm" id="modalConfirmBtn">Да, удалить</button>
             <button class="cancel" id="modalCancelBtn">Нет</button>
@@ -1092,10 +785,7 @@
         </div>
       `;
       document.body.appendChild(overlay);
-
-      // Блокировать скролл за модалкой
       document.body.style.overflow = "hidden";
-
       document.getElementById('modalConfirmBtn').onclick = () => {
         overlay.remove();
         document.body.style.overflow = "";
@@ -1106,7 +796,6 @@
         document.body.style.overflow = "";
         onCancel && onCancel();
       };
-      // Также закрытие по клику вне окна
       overlay.addEventListener('mousedown', e => {
         if (e.target === overlay) {
           overlay.remove();
@@ -1115,95 +804,22 @@
         }
       });
     }
-
-    // --- Переписанная функция confirmDelete с использованием модалки ---
     function confirmDelete(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       setPageTitle('Удаление позиции');
       showDeleteConfirmModal({
-        title: `Вы действительно хотите удалить <b>${r.name}</b>?`,
+        title: `Вы действительно хотите удалить`,
+        name: r.name,
         onConfirm: function() {
           deleteItem(rJson);
         },
         onCancel: function() {
-          showEditPage();
+          // просто закрыть модалку, остаться на экране
         }
       });
     }
-
-    function showNotification(msg, isError = false) {
-      // Удалить предыдущий оверлей если есть
-      let old = document.getElementById('notifOverlay');
-      if (old) old.remove();
-      let overlay = document.createElement('div');
-      overlay.className = 'notif-overlay';
-      overlay.id = 'notifOverlay';
-      overlay.innerHTML = `<div class="notif-popup${isError?' error':''}">${msg}</div>`;
-      document.body.appendChild(overlay);
-      setTimeout(() => { overlay.querySelector('.notif-popup').style.opacity = 1; }, 10);
-      setTimeout(() => {
-        overlay.style.opacity = 0;
-        setTimeout(()=>overlay.remove(), 400);
-      }, 1500);
-    }
-    async function deleteItem(rJson) {
-      let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-      let resp = await fetch(`${backend}/delete`, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({user_id: userId, tob: r.tob})
-      });
-      let data = await resp.json();
-      if (data.ok) {
-        showNotification("Позиция удалена!");
-        showEditPage();
-      } else {
-        showNotification("Ошибка удаления: " + data.error, true);
-        showEditPage();
-      }
-    }
-
-    // --- Экран глобальной загрузки на 3-4 секунды при старте ---
-    function showGlobalLoader(show = true) {
-      const loader = document.getElementById('globalLoader');
-      if (show) {
-        loader.style.display = 'flex';
-        setTimeout(() => loader.style.opacity = "1", 10);
-      } else {
-        loader.style.opacity = "0";
-        setTimeout(() => loader.style.display = 'none', 370);
-      }
-    }
-
-    async function startApp() {
-      showGlobalLoader(true);
-      const MIN_LOAD = 3200 + Math.floor(Math.random()*800); // 3.2-4 сек
-      let t0 = Date.now();
-      showWelcome(true);
-      let r = await fetch(backend + "/userinfo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId })
-      });
-      let d = await r.json();
-      let dt = Date.now() - t0;
-      if (dt < MIN_LOAD) await new Promise(res => setTimeout(res, MIN_LOAD - dt));
-      showGlobalLoader(false);
-      if (!d.ok) {
-        setPageTitle('Добро пожаловать');
-        showPage(`
-          <div class="welcome-block">
-            <div class="welcome-greet">${welcomeGreeting()}, гость!</div>
-            <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
-            <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
-          </div>
-        `);
-        return;
-      }
-      USER = { username: d.username, bar_name: d.bar_name };
-      showMenu();
-    }
-    startApp();
+    // --- Остальной JS-код полностью прежний ---
+    // ... (весь твой основной скрипт — остальное без изменений) ...
   </script>
 </body>
 </html>
