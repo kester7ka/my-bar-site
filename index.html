@@ -54,10 +54,10 @@
       min-height: 100vh;
     }
     @media (max-width: 600px) {
-      .wrap { max-width: 100vw; margin: 0; padding: 12px 2vw 14px 2vw; border-radius: 0 0 20px 20px;}
+      .wrap { max-width: 100vw; margin: 0; padding: 10px 1vw 12px 1vw; border-radius: 0 0 18px 18px;}
     }
     @media (max-width: 500px) {
-      .wrap { padding: 10px 0 10px 0; }
+      .wrap { padding: 5px 0 7px 0; }
     }
     .theme-toggle-row {
       display: flex;
@@ -176,6 +176,7 @@
       transition: color var(--transition);
       position: relative;
       z-index: 1;
+      min-height: 1.7em;
     }
     body.dark h2 { color: var(--accent); }
     .menu {
@@ -310,34 +311,26 @@
     .backbtn {
       margin-bottom: 18px;
       font-size: 1em;
-      padding: 9px 0 9px 0;
+      padding: 11px 0;
       border-radius: 13px;
-      background: linear-gradient(90deg, #006eff 70%, #13c1e3 100%);
+      background: #eaf2ff;
       border: none;
       cursor: pointer;
-      color: #fff;
+      color: #2179ba;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      box-shadow: 0 2px 10px #0077ff33;
+      display: block;
+      width: 100%;
+      box-shadow: 0 1px 6px #b9dbff55;
       position: relative;
-      transition: background 0.23s, color 0.23s, box-shadow 0.23s, transform 0.18s;
+      transition: background 0.2s, color 0.2s, box-shadow 0.23s, transform 0.18s;
       outline: none;
+      letter-spacing: 0.01em;
     }
     .backbtn:active {
-      background: linear-gradient(90deg, #0051b3 70%, #13c1e3 100%);
-      color: #e8f3ff;
-      transform: scale(0.97);
-      box-shadow: 0 1px 6px #0077ff22;
-    }
-    .backbtn .arrow {
-      font-size: 1.25em;
-      margin-right: 5px;
-      display: inline-block;
-      transition: transform 0.2s;
-      font-weight: bold;
-      filter: drop-shadow(1px 2px 2px #0077ff33);
+      background: #d4e3f7;
+      color: #006eff;
+      transform: scale(0.98);
+      box-shadow: 0 1px 4px #b9dbff33;
     }
     .welcome-block {
       display: flex;
@@ -409,7 +402,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
-      margin-top: 12px;
+      margin-top: 8px;
       margin-bottom: 12px;
     }
     @media (max-width: 600px) {
@@ -442,7 +435,7 @@
     }
     .item-card .card-title {
       font-weight: 700;
-      font-size: 1.01em;
+      font-size: 1.03em;
       margin-bottom: 4px;
       color: var(--accent-dark);
       word-break: break-all;
@@ -487,26 +480,31 @@
       white-space: nowrap;
       z-index: 2;
     }
-    .item-card .editbtn {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      z-index: 3;
-      margin: 0;
-      padding: 2px 9px;
-      background: #fff5db;
-      border-radius: 8px;
-      color: #b48700;
+    .card-actions {
+      display: flex;
+      gap: 7px;
+      margin-bottom: 7px;
+    }
+    .editbtn, .deletebtn {
+      flex: 1;
+      border-radius: 9px;
+      font-size: 0.97em;
+      padding: 7px 0;
+      font-weight: 600;
       border: none;
-      font-size: 1.13em;
-      box-shadow: 0 1px 8px #ffd76b4d;
-      transition: background 0.13s, color 0.13s, transform 0.13s;
+      cursor: pointer;
+      transition: background 0.17s, color 0.17s;
     }
-    .item-card .editbtn:hover, .item-card .editbtn:focus {
-      background: #ffe8a8;
-      color: #a06b00;
-      transform: scale(1.09);
+    .editbtn {
+      background: #eaf2ff;
+      color: #2179ba;
     }
+    .editbtn:active { background: #d4e3f7; color: #006eff; }
+    .deletebtn {
+      background: #ffeaea;
+      color: #ee4747;
+    }
+    .deletebtn:active { background: #ffdede; color: #b90000; }
     body.dark .item-card { 
       background: linear-gradient(120deg, #243041 0%, #1d2530 100%);
       outline: 1.5px solid #3a4e68;
@@ -514,15 +512,16 @@
     body.dark .item-card .card-title { color: #62b0ff; }
     body.dark .item-card .card-row { color: #b9dbff; }
     body.dark .item-card .card-badge { background: #17334e; color: #b9dbff;}
-    body.dark .item-card .editbtn {
-      background: #382e13;
-      color: #ffe18b;
-      box-shadow: 0 1px 3px #382e134d;
+    body.dark .editbtn {
+      background: #17334e;
+      color: #62b0ff;
     }
-    body.dark .item-card .editbtn:hover, body.dark .item-card .editbtn:focus {
-      background: #4c3e19;
-      color: #ffd76b;
+    body.dark .editbtn:active { background: #23436b; color: #b9dbff; }
+    body.dark .deletebtn {
+      background: #3a1d1d;
+      color: #ff9595;
     }
+    body.dark .deletebtn:active { background: #522626; color: #ff4f4f; }
     /* --- Анимация появления страниц --- */
     .page-anim {
       opacity: 0;
@@ -545,6 +544,51 @@
     }
     .result {
       animation: popIn 0.5s;
+    }
+    /* --- Мини-уведомление --- */
+    .mini-notification {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.97);
+      background: #1ca97b;
+      color: #fff;
+      padding: 13px 32px;
+      border-radius: 16px;
+      font-size: 1.1em;
+      font-weight: 700;
+      opacity: 0;
+      z-index: 9999;
+      transition: opacity 0.24s, transform 0.19s;
+      box-shadow: 0 3px 16px #13c1e340;
+      pointer-events: none;
+    }
+    .mini-notification.show {
+      opacity: 1;
+      transform: translateX(-50%) scale(1.04);
+    }
+    .mini-notification.error {
+      background: #ee4747;
+    }
+    /* --- Подтверждение удаления --- */
+    .confirm-delete-block {
+      padding: 22px 0 10px 0;
+      text-align: center;
+    }
+    /* --- Мобильные стили --- */
+    @media (max-width: 600px) {
+      .item-card { min-height: 138px; padding: 11px 10px 13px 10px;}
+      .card-list { gap: 10px; }
+      .menu button { padding: 13px 0; }
+      .backbtn { font-size: 0.98em; padding: 10px 0;}
+      h2 { font-size: 1.07em; }
+      .mini-notification { font-size: 0.98em; padding: 10px 14px;}
+    }
+    @media (max-width: 420px) {
+      .item-card { min-height: 117px; font-size: 0.98em;}
+      .menu button { font-size: 0.98em; }
+      .backbtn { font-size: 0.93em; }
+      .mini-notification { font-size: 0.93em; }
     }
     body.dark {
       --main-bg: #151c24;
@@ -576,7 +620,7 @@
         <span class="theme-label" id="themeText">Тёмная тема</span>
       </button>
     </div>
-    <h2>Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span></h2>
+    <h2 id="pageTitle">Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span></h2>
     <div id="main"></div>
   </div>
   <script>
@@ -651,13 +695,20 @@
     window.showSearchPage = showSearchPage;
     window.showEditPage = showEditPage;
     window.openReopenForm = openReopenForm;
+    window.confirmDelete = confirmDelete;
+    window.deleteItem = deleteItem;
+
+    function setPageTitle(title) {
+      document.getElementById('pageTitle').innerHTML = title;
+    }
 
     function showPage(contentHtml) {
       const el = document.getElementById("main");
       el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
+      window.scrollTo({top: 0, behavior: 'smooth'});
     }
     function addBackButton(html) {
-      return `<button class="backbtn" onclick="showMenu()"><span class="arrow">←</span> Назад</button>` + html;
+      return `<button class="backbtn" onclick="showMenu()">Назад</button>` + html;
     }
     function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${m}</div>`)); }
 
@@ -671,6 +722,7 @@
       return "Доброй ночи";
     }
     function showWelcome(isLoad = true) {
+      setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
       showPage(`
         <div class="welcome-block">
           ${isLoad ? `<div class="welcome-loader"></div>` : ""}
@@ -680,6 +732,7 @@
       `);
     }
     function showMenu() {
+      setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
       showWelcome(false);
       setTimeout(() => {
         document.getElementById("main").querySelector('.page-anim').innerHTML += `
@@ -693,6 +746,7 @@
       }, 200);
     }
     function showAddPage() {
+      setPageTitle('Добавить позицию');
       showPage(addBackButton(`
         <form id="addf" class="form-block" autocomplete="off">
           <label for="category">Категория</label>
@@ -731,6 +785,7 @@
       };
     }
     function showExpiredPage() {
+      setPageTitle('Проверка сроков');
       showPage(addBackButton(`<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`));
       fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
         .then(r=>r.json())
@@ -754,6 +809,7 @@
         });
     }
     function showSearchPage() {
+      setPageTitle('Поиск');
       showPage(addBackButton(`
         <div id="searchBlock" class="form-block">
           <input id="searchInput" type="text" placeholder="Поиск по TOB или названию">
@@ -806,6 +862,7 @@
       }
     }
     function showEditPage() {
+      setPageTitle('Редактирование позиций');
       showPage(addBackButton(`
         <div id="editBlock" class="form-block">
           <input id="editSearchInput" type="text" placeholder="Поиск по TOB или названию">
@@ -845,7 +902,10 @@
         items.forEach(r => {
           cards += `
             <div class="item-card">
-              <button class="editbtn" title="Переоткрыть" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">✏️</button>
+              <div class="card-actions">
+                <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Редактировать</button>
+                <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+              </div>
               <div class="card-badge">${r.category}</div>
               <div class="card-title" title="${r.name}">${r.name}</div>
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
@@ -859,6 +919,7 @@
       }
     }
     function openReopenForm(rJson) {
+      setPageTitle('Редактирование позиции');
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       const today = new Date().toISOString().slice(0,10);
       showPage(addBackButton(`
@@ -901,6 +962,44 @@
       };
     }
 
+    function confirmDelete(rJson) {
+      let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+      setPageTitle('Удаление позиции');
+      showPage(addBackButton(`
+        <div class="confirm-delete-block">
+          <div style="font-size:1.12em;margin-bottom:13px;">Вы действительно хотите удалить <b>${r.name}</b>?</div>
+          <div class="btns">
+            <button onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Да, удалить</button>
+            <button class="cancel" onclick="showEditPage()">Нет</button>
+          </div>
+        </div>
+      `));
+    }
+    async function deleteItem(rJson) {
+      let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+      let resp = await fetch(`${backend}/delete`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({user_id: userId, tob: r.tob})
+      });
+      let data = await resp.json();
+      if (data.ok) {
+        showMiniNotification("Позиция удалена!");
+        showEditPage();
+      } else {
+        showMiniNotification("Ошибка удаления: " + data.error, true);
+        showEditPage();
+      }
+    }
+    function showMiniNotification(msg, isError = false) {
+      let notif = document.createElement('div');
+      notif.className = "mini-notification" + (isError ? " error" : "");
+      notif.innerHTML = msg;
+      document.body.appendChild(notif);
+      setTimeout(() => { notif.classList.add('show'); }, 10);
+      setTimeout(() => { notif.classList.remove('show'); setTimeout(()=>notif.remove(),350); }, 1900);
+    }
+
     async function startApp() {
       showWelcome(true);
       let r = await fetch(backend + "/userinfo", {
@@ -910,6 +1009,7 @@
       });
       let d = await r.json();
       if (!d.ok) {
+        setPageTitle('Добро пожаловать');
         showPage(`
           <div class="welcome-block">
             <div class="welcome-greet">${welcomeGreeting()}, гость!</div>
