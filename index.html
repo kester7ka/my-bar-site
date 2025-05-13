@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Ингредиенты бара</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-bg: #f1f3f7;
+      --card-bg: #fff;
+      --accent: #006eff;
+      --accent-dark: #0051b3;
+      --text: #222;
+      --radius: 18px;
+      --shadow: 0 4px 32px rgba(0,0,0,0.13);
+      --transition: 0.23s cubic-bezier(.4,0,.2,1);
+      --input-bg: #f7f9fc;
+      --input-border: #e3e6ef;
+      --input-focus: #006eff;
+      --input-label: #223b5a;
+    }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      background: var(--main-bg);
+      font-family: 'Montserrat', Arial, sans-serif;
+      color: var(--text);
+      letter-spacing: 0.01em;
+      transition: background var(--transition), color var(--transition);
+    }
+    .wrap {
+      max-width: 420px;
+      margin: 40px auto 0;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 24px 20px 24px;
+      animation: fadeIn 0.9s cubic-bezier(.38,1.15,.7,1.01);
+      transition: box-shadow var(--transition), background var(--transition), color var(--transition);
+      position: relative;
+    }
+    @media (max-width: 500px) {
+      .wrap { max-width: 98vw; margin: 10px 1vw 0 1vw; padding: 18px 6vw 14px 6vw;}
+    }
+    .theme-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 42px;
+      margin-bottom: 0.3em;
+      position: relative;
+      z-index: 2;
+    }
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1.09em;
+      padding: 6px 16px 6px 5px;
+      border-radius: 10px;
+      transition: background 0.18s;
+      min-width: 44px;
+      position: relative;
+      height: 38px;
+    }
+    .theme-toggle:active {
+      background: #f3f8ff77;
+    }
+    body.dark .theme-toggle:active {
+      background: #2d3c4e99;
+    }
+    .theme-toggle .icon {
+      width: 26px;
+      height: 26px;
+      display: block;
+      position: relative;
+      transition: transform 0.36s cubic-bezier(.4,0,.2,1), opacity 0.23s;
+      top: 0;
+    }
+    .theme-toggle .icon.sun,
+    .theme-toggle .icon.moon {
+      position: absolute;
+      left: 0; top: 0;
+      width: 26px; height: 26px;
+      transition: opacity 0.23s, transform 0.36s cubic-bezier(.4,0,.2,1);
+      will-change: opacity, transform;
+      display: block;
+    }
+    .theme-toggle .icon.sun {
+      color: #ffbe34;
+      filter: drop-shadow(0 1px 2px #f1c40f33);
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      z-index: 2;
+    }
+    .theme-toggle .icon.moon {
+      color: #8ecaff;
+      filter: drop-shadow(0 2px 7px #4dabf7a0);
+      opacity: 0;
+      transform: scale(0.6) translateY(0);
+      z-index: 1;
+    }
+    body.dark .theme-toggle .icon.sun {
+      opacity: 0;
+      transform: scale(0.6) translateY(0);
+    }
+    body.dark .theme-toggle .icon.moon {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .theme-toggle .theme-label {
+      font-size: 0.98em;
+      font-weight: 700;
+      color: var(--accent-dark);
+      letter-spacing: 0.01em;
+      opacity: 0.78;
+      margin-left: 30px;
+      margin-right: 0;
+      line-height: 1.1;
+      min-width: 110px;
+      text-align: left;
+      transition: color var(--transition);
+      user-select: none;
+      white-space: nowrap;
+    }
+    body.dark .theme-toggle .theme-label {
+      color: #8ecaff;
+      opacity: 0.92;
+    }
+    @media (max-width: 440px) {
+      .theme-toggle .theme-label {
+        font-size: 0.91em;
+        min-width: 0;
+        margin-left: 30px;
+        max-width: 85vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    @media (max-width: 380px) {
+      .theme-toggle .theme-label {
+        display: none;
+      }
+    }
+    h2 {
+      text-align: center;
+      margin: 0 0 18px 0;
+      font-weight: 700;
+      font-size: 1.37em;
+      letter-spacing: 0.02em;
+      color: var(--accent-dark);
+      text-shadow: 0 3px 12px #006eff0a;
+      animation: popIn 0.8s;
+      transition: color var(--transition);
+      position: relative;
+      z-index: 1;
+    }
+    body.dark h2 { color: var(--accent); }
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 22px;
+      animation: fadeIn 0.5s;
+    }
+    .menu button {
+      background: linear-gradient(90deg, #006eff 60%, #13c1e3 100%);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 15px 0;
+      font-size: 1.06em;
+      font-family: inherit;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      box-shadow: 0 2px 14px #0077ff33, 0 2px 1.5px #fff7 inset;
+      cursor: pointer;
+      outline: none;
+      transition: 
+        box-shadow var(--transition),
+        background var(--transition),
+        transform 0.16s cubic-bezier(.4,0,.2,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .menu button:active {
+      background: linear-gradient(90deg, #0051b3 60%, #13c1e3 100%);
+      transform: scale(0.98);
+      box-shadow: 0 1.5px 8px #0077ff22, 0 1.5px 1.5px #fff7 inset;
+    }
+    .form-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    label {
+      font-size: 1em;
+      font-weight: 500;
+      color: var(--input-label);
+      margin-bottom: 2px;
+      display: block;
+      letter-spacing: 0.01em;
+      transition: color var(--transition);
+    }
+    input, select {
+      width: 100%;
+      padding: 13px 10px;
+      margin: 8px 0 18px 0;
+      border: 1px solid var(--input-border);
+      border-radius: 9px;
+      box-shadow: 0 1.5px 7px #006eff07;
+      font-size: 1em;
+      font-family: inherit;
+      background: var(--input-bg);
+      transition: border 0.22s, background var(--transition), color var(--transition);
+      outline: none;
+      color: var(--text);
+    }
+    input:focus, select:focus {
+      border: 1.5px solid var(--input-focus);
+      background: #fff;
+    }
+    .btns {
+      display: flex;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .btns button {
+      flex: 1;
+      border-radius: 13px;
+      font-size: 1em;
+      padding: 11px 0;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      box-shadow: 0 1px 5px #0077ff22;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.18s;
+    }
+    .btns button.cancel {
+      background: #e2e6ee;
+      color: #4a4a4a;
+    }
+    .btns button:active {
+      background: var(--accent-dark);
+      transform: scale(0.98);
+    }
+    .btns button.cancel:active {
+      background: #c9ccd5;
+    }
+    .backbtn {
+      margin-bottom: 18px;
+      font-size: 1em;
+      padding: 9px 0 9px 0;
+      border-radius: 13px;
+      background: linear-gradient(90deg, #006eff 70%, #13c1e3 100%);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 2px 10px #0077ff33;
+      position: relative;
+      transition: background 0.23s, color 0.23s, box-shadow 0.23s, transform 0.18s;
+      outline: none;
+    }
+    .backbtn:active {
+      background: linear-gradient(90deg, #0051b3 70%, #13c1e3 100%);
+      color: #e8f3ff;
+      transform: scale(0.97);
+      box-shadow: 0 1px 6px #0077ff22;
+    }
+    .backbtn .arrow {
+      font-size: 1.25em;
+      margin-right: 5px;
+      display: inline-block;
+      transition: transform 0.2s;
+      font-weight: bold;
+      filter: drop-shadow(1px 2px 2px #0077ff33);
+    }
+    .welcome-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      animation: fadeIn 0.7s;
+      margin-bottom: 12px;
+    }
+    .welcome-loader {
+      width: 38px;
+      height: 38px;
+      border: 4px solid #e3eaff;
+      border-top: 4px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 22px;
+      margin-top: 12px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0);}
+      100% { transform: rotate(360deg);}
+    }
+    .welcome-greet {
+      font-size: 1.16em;
+      font-weight: 700;
+      color: var(--accent-dark);
+      margin-bottom: 6px;
+      letter-spacing: 0.01em;
+      text-align: center;
+    }
+    .welcome-user {
+      font-size: 1.08em;
+      color: #4a4f56;
+      margin-bottom: 3px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .welcome-bar {
+      font-size: 0.98em;
+      color: #4b8be8;
+      background: #eaf2ff;
+      padding: 5px 15px;
+      border-radius: 11px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      display: inline-block;
+      text-align: center;
+    }
+    .result {
+      margin: 14px 0 0 0;
+      font-size: 1.07em;
+      text-align: center;
+      transition: color 0.3s;
+    }
+    .success {
+      color: #1ca97b;
+      font-weight: 600;
+      animation: fadeIn 0.7s;
+    }
+    .error {
+      color: #ee4747;
+      font-weight: 600;
+      animation: fadeIn 0.7s;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: #f7faff;
+      border-radius: 13px;
+      overflow: hidden;
+      animation: fadeIn 0.7s;
+      transition: background var(--transition), color var(--transition);
+    }
+    th, td {
+      border: none;
+      padding: 10px 7px;
+      text-align: left;
+      transition: color var(--transition), background var(--transition);
+    }
+    th {
+      background: linear-gradient(90deg, #006eff 70%, #13c1e3 100%);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    tr:nth-child(even) { background: #f1f3f9; }
+    tr { transition: background 0.18s; }
+    tr:hover { background: #e8f2ff; }
+    .editbtn {
+      background: #ffecbb;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      color: #b48700;
+      font-size: 1.18em;
+      padding: 2px 8px;
+      transition: background 0.18s, color 0.18s, transform 0.18s;
+      box-shadow: 0 1px 3px #ffedbc4d;
+      margin-right: 2px;
+    }
+    .editbtn:hover, .editbtn:focus {
+      background: #ffd76b;
+      color: #a06b00;
+      transform: scale(1.09);
+    }
+    /* --- Анимация появления страниц --- */
+    .page-anim {
+      opacity: 0;
+      transform: translateY(40px) scale(0.98);
+      animation: pageIn 0.42s cubic-bezier(.38,1.15,.7,1.01) forwards;
+    }
+    @keyframes pageIn {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity:0; transform: translateY(32px);}
+      to   { opacity:1; transform: none;}
+    }
+    @keyframes popIn {
+      from { opacity:0; transform: scale(0.95);}
+      to   { opacity:1; transform: scale(1);}
+    }
+    .result {
+      animation: popIn 0.5s;
+    }
+    /* --- Тёмная тема --- */
+    body.dark {
+      --main-bg: #151c24;
+      --card-bg: #232b33;
+      --accent: #62b0ff;
+      --accent-dark: #1c7ed6;
+      --text: #f1f1f1;
+      --shadow: 0 4px 32px rgba(0,0,0,0.40);
+      --input-bg: #22303b;
+      --input-border: #3e4b5a;
+      --input-focus: #62b0ff;
+      --input-label: #b9dbff;
+    }
+    body.dark .welcome-greet { color: #8ecaff; }
+    body.dark .welcome-user { color: #e7ecff; }
+    body.dark .welcome-bar { color: #e1eeff; background: #213c5e; }
+    body.dark .editbtn {
+      background: #382e13;
+      color: #ffe18b;
+      box-shadow: 0 1px 3px #382e134d;
+    }
+    body.dark .editbtn:hover, body.dark .editbtn:focus {
+      background: #4c3e19;
+      color: #ffd76b;
+    }
+    body.dark .backbtn {
+      background: linear-gradient(90deg, #295cff 70%, #13c1e3 100%);
+      color: #fff;
+    }
+    body.dark .backbtn:active {
+      background: linear-gradient(90deg, #1c7ed6 70%, #13c1e3 100%);
+      color: #e8f3ff;
+    }
+    body.dark table {
+      background: #232b33;
+      color: #f1f1f1;
+    }
+    body.dark tr:nth-child(even) { background: #19202a; }
+    body.dark tr:hover { background: #1c2836; }
+    body.dark th {
+      background: linear-gradient(90deg, #295cff 70%, #13c1e3 100%);
+      color: #fff;
+    }
+  </style>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="theme-toggle-row">
+      <button class="theme-toggle" id="themeToggle" aria-label="Сменить тему" title="Сменить тему">
+        <span class="icon sun" aria-hidden="true" style="top:0;left:0;">
+          <svg width="26" height="26" viewBox="0 0 23 23" fill="none"><circle cx="11.5" cy="11.5" r="5" fill="currentColor"/><g stroke="currentColor" stroke-width="2"><line x1="11.5" y1="2" x2="11.5" y2="0"/><line x1="11.5" y1="21" x2="11.5" y2="23"/><line x1="2" y1="11.5" x2="0" y2="11.5"/><line x1="21" y1="11.5" x2="23" y2="11.5"/><line x1="4.38" y1="4.38" x2="2.97" y2="2.97"/><line x1="18.62" y1="18.62" x2="20.03" y2="20.03"/><line x1="18.62" y1="4.38" x2="20.03" y2="2.97"/><line x1="4.38" y1="18.62" x2="2.97" y2="20.03"/></g></svg>
+        </span>
+        <span class="icon moon" aria-hidden="true" style="top:0;left:0;">
+          <svg width="26" height="26" viewBox="0 0 23 23" fill="none"><path d="M21 16.5C19.5 17.5 18 18 16.5 18C11.5294 18 7.5 13.9706 7.5 9C7.5 6.5 8.5 4.5 10 3C6 4 3 7.5 3 12C3 17 7.02944 21 12 21C15.5 21 18.5 19 21 16.5Z" fill="currentColor"/></svg>
+        </span>
+        <span class="theme-label" id="themeText">Тёмная тема</span>
+      </button>
+    </div>
+    <h2>Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span></h2>
+    <div id="main"></div>
+  </div>
+  <script>
+    // --- Theme Switcher ---
+    const themeBtn = document.getElementById('themeToggle');
+    const themeText = document.getElementById('themeText');
+    function setTheme(dark, animate=true) {
+      if(dark) {
+        document.body.classList.add('dark');
+        themeText.textContent = "Светлая тема";
+      } else {
+        document.body.classList.remove('dark');
+        themeText.textContent = "Тёмная тема";
+      }
+      if(animate) {
+        document.body.animate([
+          { opacity: 0.7 },
+          { opacity: 1 }
+        ], {
+          duration: 320,
+          easing: 'cubic-bezier(.4,0,.2,1)'
+        });
+      }
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    function toggleTheme() {
+      const dark = !document.body.classList.contains('dark');
+      setTheme(dark);
+    }
+    themeBtn.addEventListener('click', toggleTheme);
+    (function initTheme() {
+      let theme = localStorage.getItem('theme');
+      if(!theme) {
+        if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+        else theme = 'light';
+      }
+      setTheme(theme === 'dark', false);
+    })();
+
+    // --- User setup ---
+    let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    let userId = tg && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 123;
+    let username = tg && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "test";
+    const backend = "http://localhost:5000"; // <--- Измени при деплое
+
+    // --- Универсальная анимация для страниц ---
+    function showPage(contentHtml) {
+      const el = document.getElementById("main");
+      el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
+    }
+    // --- Красивая кнопка "назад" ---
+    function addBackButton(html) {
+      return `<button class="backbtn" onclick="showMenu()"><span class="arrow">←</span> Назад</button>` + html;
+    }
+    // --- Сообщение (с анимацией и назад) ---
+    function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${m}</div>`)); }
+    // --- Загрузка и приветствие ---
+    let USER = null; // {username, bar_name}
+    function welcomeGreeting() {
+      const now = new Date();
+      const h = now.getHours();
+      if (h >= 5 && h < 12) return "Доброе утро";
+      if (h >= 12 && h < 18) return "Добрый день";
+      if (h >= 18 && h < 23) return "Добрый вечер";
+      return "Доброй ночи";
+    }
+    function showWelcome(isLoad = true) {
+      showPage(`
+        <div class="welcome-block">
+          ${isLoad ? `<div class="welcome-loader"></div>` : ""}
+          <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
+          ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
+        </div>
+      `);
+    }
+    // --- Главное меню ---
+    function showMenu() {
+      showWelcome(false);
+      setTimeout(() => {
+        document.getElementById("main").querySelector('.page-anim').innerHTML += `
+          <div class="menu fadeIn" id="menuBlock">
+            <button onclick="showAddPage()">Добавить позицию</button>
+            <button onclick="showExpiredPage()">Проверить сроки</button>
+            <button onclick="showSearchPage()">Поиск</button>
+            <button onclick="showEditPage()">Переоткрыть (редактировать)</button>
+          </div>
+        `;
+      }, 200);
+    }
+    // --- Страница: Добавить позицию ---
+    function showAddPage() {
+      showPage(addBackButton(`
+        <form id="addf" class="form-block" autocomplete="off">
+          <label for="category">Категория</label>
+          <select name="category" id="category" required>
+            <option value="🍯 Сиропы">🍯 Сиропы</option>
+            <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
+            <option value="📦 Прочее">📦 Прочее</option>
+          </select>
+          <label for="tob">TOB (6 цифр)</label>
+          <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456">
+          <label for="name">Название</label>
+          <input name="name" id="name" required placeholder="Название позиции">
+          <label for="opened_at">Дата открытия</label>
+          <input name="opened_at" id="opened_at" type="date" required>
+          <label for="shelf_life_days">Срок хранения (дней)</label>
+          <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="30">
+          <div class="btns">
+            <button type="submit">Добавить</button>
+            <button type="button" class="cancel" onclick="showMenu()">Назад</button>
+          </div>
+        </form>
+      `));
+      document.getElementById('addf').onsubmit = async function(e){
+        e.preventDefault();
+        let d = Object.fromEntries(new FormData(this));
+        let resp = await fetch(`${backend}/add`, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({user_id: userId, ...d})
+        });
+        let data = await resp.json();
+        if (data.ok)
+          msg("Позиция добавлена!", "success");
+        else
+          msg("Ошибка: " + data.error, "error");
+      };
+    }
+    // --- Страница: Проверить сроки ---
+    function showExpiredPage() {
+      showPage(addBackButton(`<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`));
+      fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
+        .then(r=>r.json())
+        .then(d=>{
+          if(!d.ok) return msg("Ошибка: "+d.error,"error");
+          if(!d.results.length) return msg("Нет просроченных позиций!","success");
+          let html = `<table><tr><th>Категория</th><th>TOB</th><th>Название</th><th>Годен до</th></tr>`;
+          d.results.forEach(x=>{
+            html+=`<tr>
+              <td>${x.category}</td>
+              <td>${x.tob}</td>
+              <td>${x.name}</td>
+              <td>${x.expiry_at}</td>
+            </tr>`;
+          });
+          html+="</table>";
+          showPage(addBackButton(html));
+        });
+    }
+    // --- Страница: Поиск (живой, сразу все из БД) ---
+    function showSearchPage() {
+      showPage(addBackButton(`
+        <div id="searchBlock" class="form-block">
+          <input id="searchInput" type="text" placeholder="Поиск по TOB или названию">
+          <div id="searchResults" style="min-height:90px;"></div>
+        </div>
+      `));
+      const input = document.getElementById('searchInput');
+      let allItems = [];
+      const resultsDiv = document.getElementById('searchResults');
+      resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
+      fetch(`${backend}/search`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({user_id: userId, query: ""})
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+        allItems = data.results;
+        renderList("");
+      });
+      input.addEventListener('input', e => {
+        renderList(e.target.value);
+      });
+      function renderList(filter) {
+        filter = (filter||"").trim().toLowerCase();
+        let items = allItems;
+        if(filter)
+          items = allItems.filter(
+            x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
+          );
+        if (!items.length) {
+          resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
+          return;
+        }
+        let html = `<table class="fadeIn"><tr>
+          <th>Категория</th>
+          <th>TOB</th>
+          <th>Название</th>
+          <th>Открыто</th>
+          <th>Годен до</th>
+        </tr>`;
+        items.forEach(r => {
+          html += `<tr>
+            <td>${r.category}</td>
+            <td>${r.tob}</td>
+            <td>${r.name}</td>
+            <td>${r.opened_at}</td>
+            <td>${r.expiry_at}</td>
+          </tr>`;
+        });
+        html += "</table>";
+        resultsDiv.innerHTML = html;
+      }
+    }
+    // --- Страница: Переоткрыть (редактировать) ---
+    function showEditPage() {
+      showPage(addBackButton(`
+        <div id="editBlock" class="form-block">
+          <input id="editSearchInput" type="text" placeholder="Поиск по TOB или названию">
+          <div id="editResults" style="min-height:90px;"></div>
+        </div>
+      `));
+      const input = document.getElementById('editSearchInput');
+      let allItems = [];
+      const resultsDiv = document.getElementById('editResults');
+      resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
+      fetch(`${backend}/search`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({user_id: userId, query: ""})
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+        allItems = data.results;
+        renderEditList("");
+      });
+      input.addEventListener('input', e => {
+        renderEditList(e.target.value);
+      });
+      function renderEditList(filter) {
+        filter = (filter||"").trim().toLowerCase();
+        let items = allItems;
+        if(filter)
+          items = allItems.filter(
+            x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
+          );
+        if (!items.length) {
+          resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
+          return;
+        }
+        let html = `<table class="fadeIn"><tr>
+          <th></th>
+          <th>Категория</th>
+          <th>TOB</th>
+          <th>Название</th>
+          <th>Открыто</th>
+          <th>Годен до</th>
+        </tr>`;
+        items.forEach(r => {
+          html += `<tr>
+            <td>
+              <button class="editbtn" title="Переоткрыть" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">✏️</button>
+            </td>
+            <td>${r.category}</td>
+            <td>${r.tob}</td>
+            <td>${r.name}</td>
+            <td>${r.opened_at}</td>
+            <td>${r.expiry_at}</td>
+          </tr>`;
+        });
+        html += "</table>";
+        resultsDiv.innerHTML = html;
+      }
+    }
+    window.openReopenForm = function(rJson) {
+      let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+      const today = new Date().toISOString().slice(0,10);
+      showPage(addBackButton(`
+        <form id="reopenf" class="form-block" autocomplete="off">
+          <label>Категория</label>
+          <input value="${r.category}" readonly>
+          <label>TOB</label>
+          <input value="${r.tob}" readonly>
+          <label>Название</label>
+          <input value="${r.name}" readonly>
+          <label>Дата открытия</label>
+          <input name="opened_at" type="date" value="${today}" required>
+          <label>Срок хранения (дней)</label>
+          <input name="shelf_life_days" type="number" min="1" required value="${r.shelf_life_days}">
+          <div class="btns">
+            <button type="submit">Сохранить</button>
+            <button type="button" class="cancel" onclick="showMenu()">Назад</button>
+          </div>
+        </form>
+      `));
+      document.getElementById('reopenf').onsubmit = async function(e){
+        e.preventDefault();
+        let d = Object.fromEntries(new FormData(this));
+        let req = {
+          user_id: userId,
+          tob: r.tob,
+          opened_at: d.opened_at,
+          shelf_life_days: d.shelf_life_days
+        };
+        let resp = await fetch(`${backend}/reopen`, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify(req)
+        });
+        let data = await resp.json();
+        if (data.ok)
+          msg("Позиция успешно переоткрыта!", "success");
+        else
+          msg("Ошибка: " + data.error, "error");
+      };
+    };
+    // --- Загрузка профиля и старт ---
+    async function startApp() {
+      showWelcome(true);
+      // Проверяем регистрацию
+      let r = await fetch(backend + "/userinfo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId })
+      });
+      let d = await r.json();
+      if (!d.ok) {
+        showPage(`
+          <div class="welcome-block">
+            <div class="welcome-greet">${welcomeGreeting()}, гость!</div>
+            <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
+            <a href="https://t.me/YOUR_BOT_USERNAME" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
+          </div>
+        `);
+        return;
+      }
+      USER = { username: d.username, bar_name: d.bar_name };
+      showMenu();
+    }
+    // --- Показываем меню/приветствие при загрузке ---
+    startApp();
+  </script>
+</body>
+</html>
