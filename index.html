@@ -20,6 +20,8 @@
       --input-focus: #006eff;
       --input-label: #223b5a;
       --card-gap: 18px;
+      --card-gradient: linear-gradient(120deg, #eaf6ff 0%, #f1f3fa 100%);
+      --card-badge: #e5f3ff;
     }
     html, body {
       height: 100%;
@@ -38,7 +40,7 @@
     .wrap {
       min-height: 100vh;
       height: 100%;
-      max-width: 460px;
+      max-width: 480px;
       margin: 0 auto;
       background: var(--card-bg);
       border-radius: var(--radius);
@@ -52,10 +54,10 @@
       min-height: 100vh;
     }
     @media (max-width: 600px) {
-      .wrap { max-width: 100vw; margin: 0; padding: 12px 4vw 14px 4vw; border-radius: 0 0 20px 20px;}
+      .wrap { max-width: 100vw; margin: 0; padding: 12px 2vw 14px 2vw; border-radius: 0 0 20px 20px;}
     }
     @media (max-width: 500px) {
-      .wrap { padding: 12px 1vw 12px 1vw; }
+      .wrap { padding: 10px 0 10px 0; }
     }
     .theme-toggle-row {
       display: flex;
@@ -242,6 +244,40 @@
       border: 1.5px solid var(--input-focus);
       background: #fff;
     }
+    body.dark input,
+    body.dark select {
+      background: #22303b !important;
+      color: #f1f1f1 !important;
+      border: 1.5px solid #3e4b5a;
+    }
+    body.dark input:focus,
+    body.dark select:focus {
+      background: #232b33 !important;
+      color: #f1f1f1 !important;
+      border: 1.5px solid #62b0ff;
+    }
+    body.dark label      { color: #b9dbff; }
+    body.dark .form-block label { color: #b9dbff; }
+    input::placeholder,
+    select::placeholder { color: #a4b1c5; opacity: 1;}
+    body.dark input::placeholder,
+    body.dark select::placeholder { color: #b9dbff; opacity: 0.85; }
+    input:-webkit-autofill,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 50px var(--input-bg) inset !important;
+      box-shadow: 0 0 0 50px var(--input-bg) inset !important;
+      -webkit-text-fill-color: var(--text) !important;
+    }
+    body.dark input:-webkit-autofill,
+    body.dark input:-webkit-autofill:focus,
+    body.dark input:-webkit-autofill:hover,
+    body.dark input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 50px #22303b inset !important;
+      box-shadow: 0 0 0 50px #22303b inset !important;
+      -webkit-text-fill-color: #f1f1f1 !important;
+    }
     .btns {
       display: flex;
       gap: 12px;
@@ -368,7 +404,7 @@
       font-weight: 600;
       animation: fadeIn 0.7s;
     }
-    /* Карточки для поиска и редактирования */
+    /* --- Карточки для поиска/редактирования --- */
     .card-list {
       display: flex;
       flex-direction: column;
@@ -377,49 +413,98 @@
       margin-bottom: 12px;
     }
     .item-card {
-      background: var(--card-bg);
-      border-radius: 22px;
-      box-shadow: 0 2px 12px #0077ff13;
-      padding: 18px 18px 15px 18px;
+      background: var(--card-gradient);
+      border-radius: 26px;
+      box-shadow: 0 3px 16px #0077ff1a, 0 1.5px 6px #b9dbff44;
+      padding: 17px 18px 18px 18px;
       margin: 0 auto;
-      transition: box-shadow 0.24s, background 0.18s;
+      transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
       display: flex;
       flex-direction: column;
       position: relative;
-      border: 1.5px solid #e3eaff;
+      border: none;
       min-width:0;
       max-width: 100%;
       word-break: break-word;
+      overflow: hidden;
+      outline: 1.5px solid #e3eaff1c;
     }
-    .item-card .editbtn {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      z-index: 2;
-      margin: 0;
-      padding: 2px 9px;
+    .item-card:hover {
+      box-shadow: 0 4px 24px #13c1e340, 0 1.5px 6px #b9dbff66;
+      transform: translateY(-2px) scale(1.017);
+      background: linear-gradient(120deg, #eafffd 0%, #eaf6ff 100%);
     }
     .item-card .card-title {
-      font-weight: 700;
-      font-size: 1.04em;
-      margin-bottom: 3px;
+      font-weight: 800;
+      font-size: 1.1em;
+      margin-bottom: 5px;
       color: var(--accent-dark);
       word-break: break-word;
+      padding-right: 48px;
     }
     .item-card .card-row {
-      font-size: 0.99em;
-      margin-bottom: 1.5px;
+      font-size: 1em;
+      margin-bottom: 2px;
       color: #444;
-      line-height: 1.3;
+      line-height: 1.35;
     }
     .item-card .card-row b {
-      font-weight: 600;
+      font-weight: 700;
       color: #006eff;
       margin-right: 4px;
     }
-    body.dark .item-card { background: #232b33; border-color: #354872; }
+    .item-card .card-badge {
+      display: inline-block;
+      background: var(--card-badge);
+      color: #2179ba;
+      font-weight: 700;
+      font-size: 0.93em;
+      border-radius: 13px 13px 13px 0;
+      padding: 4px 13px 4px 12px;
+      margin: 0 0 9px 0;
+      letter-spacing: 0.01em;
+      box-shadow: 0 1px 8px #b9dbff0a;
+      position: absolute;
+      right: 0;
+      top: 0;
+      border-top-right-radius: 18px;
+    }
+    .item-card .editbtn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 2;
+      margin: 0;
+      padding: 2px 9px;
+      background: #fff5db;
+      border-radius: 8px;
+      color: #b48700;
+      border: none;
+      font-size: 1.17em;
+      box-shadow: 0 1px 8px #ffd76b4d;
+      transition: background 0.13s, color 0.13s, transform 0.13s;
+    }
+    .item-card .editbtn:hover, .item-card .editbtn:focus {
+      background: #ffe8a8;
+      color: #a06b00;
+      transform: scale(1.09);
+    }
+    body.dark .item-card { 
+      background: linear-gradient(120deg, #243041 0%, #1d2530 100%);
+      outline: 1.5px solid #3a4e68;
+    }
     body.dark .item-card .card-title { color: #62b0ff; }
     body.dark .item-card .card-row { color: #b9dbff; }
+    body.dark .item-card .card-badge { background: #17334e; color: #b9dbff;}
+    body.dark .item-card .editbtn {
+      background: #382e13;
+      color: #ffe18b;
+      box-shadow: 0 1px 3px #382e134d;
+    }
+    body.dark .item-card .editbtn:hover, body.dark .item-card .editbtn:focus {
+      background: #4c3e19;
+      color: #ffd76b;
+    }
     /* --- Анимация появления страниц --- */
     .page-anim {
       opacity: 0;
@@ -454,8 +539,9 @@
       --input-border: #3e4b5a;
       --input-focus: #62b0ff;
       --input-label: #b9dbff;
+      --card-gradient: linear-gradient(120deg, #243041 0%, #1d2530 100%);
+      --card-badge: #17334e;
     }
-    /* ... остальной CSS без изменений ... */
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -520,7 +606,6 @@
     const botLink = "https://t.me/BarHelperAB_bot";
     if (tg && tg.expand) tg.expand();
 
-    // Проверка что открыто в Telegram Mini App
     if (!userId) {
       document.getElementById('main').innerHTML = `
         <div style="padding:22px 0;text-align:center" class="error">
@@ -538,7 +623,6 @@
     window.showEditPage = showEditPage;
     window.openReopenForm = openReopenForm;
 
-    // --- Универсальная анимация для страниц ---
     function showPage(contentHtml) {
       const el = document.getElementById("main");
       el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
@@ -628,6 +712,7 @@
           d.results.forEach(x=>{
             cards += `
               <div class="item-card">
+                <div class="card-badge">Просрочено</div>
                 <div class="card-title">${x.name}</div>
                 <div class="card-row"><b>Категория:</b> ${x.category}</div>
                 <div class="card-row"><b>TOB:</b> ${x.tob}</div>
@@ -679,8 +764,8 @@
         items.forEach(r => {
           cards += `
             <div class="item-card">
+              <div class="card-badge">${r.category}</div>
               <div class="card-title">${r.name}</div>
-              <div class="card-row"><b>Категория:</b> ${r.category}</div>
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
@@ -732,8 +817,8 @@
           cards += `
             <div class="item-card">
               <button class="editbtn" title="Переоткрыть" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">✏️</button>
+              <div class="card-badge">${r.category}</div>
               <div class="card-title">${r.name}</div>
-              <div class="card-row"><b>Категория:</b> ${r.category}</div>
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
