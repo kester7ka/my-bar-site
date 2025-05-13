@@ -59,6 +59,22 @@
     @media (max-width: 500px) {
       .wrap { padding: 5px 0 7px 0; }
     }
+    .user-avatar {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 2px 14px #0077ff33, 0 2px 1.5px #fff7 inset;
+      border: 3px solid #fff;
+      background: #eaf6ff;
+      z-index: 11;
+      transition: border-color 0.2s;
+      object-fit: cover;
+    }
+    body.dark .user-avatar { border: 3px solid #232b33; background: #243041;}
     .theme-toggle-row {
       display: flex;
       align-items: center;
@@ -397,7 +413,6 @@
       font-weight: 600;
       animation: fadeIn 0.7s;
     }
-    /* --- Карточки для поиска/редактирования (2 в ряд, одинаковая высота) --- */
     .card-list {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -480,16 +495,17 @@
       white-space: nowrap;
       z-index: 2;
     }
-    .card-actions {
+    .card-actions-bottom {
+      margin-top: auto;
       display: flex;
-      gap: 7px;
-      margin-bottom: 7px;
+      gap: 8px;
+      padding-top: 14px;
     }
     .editbtn, .deletebtn {
       flex: 1;
       border-radius: 9px;
       font-size: 0.97em;
-      padding: 7px 0;
+      padding: 8px 0;
       font-weight: 600;
       border: none;
       cursor: pointer;
@@ -505,10 +521,47 @@
       color: #ee4747;
     }
     .deletebtn:active { background: #ffdede; color: #b90000; }
-    body.dark .item-card { 
-      background: linear-gradient(120deg, #243041 0%, #1d2530 100%);
-      outline: 1.5px solid #3a4e68;
+    .notif-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4.5px);
+      background: rgba(30,46,70,0.18);
+      transition: background 0.2s;
     }
+    .notif-popup {
+      background: #fff;
+      color: #1ca97b;
+      padding: 20px 34px;
+      font-size: 1.13em;
+      font-weight: 700;
+      border-radius: 18px;
+      box-shadow: 0 3px 16px #13c1e340;
+      min-width: 200px;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.97);
+      animation: notifPopupIn .3s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    .notif-popup.error {
+      color: #ee4747;
+    }
+    @keyframes notifPopupIn {
+      from { opacity: 0; transform: scale(0.93);}
+      to   { opacity: 1; transform: scale(1);}
+    }
+    @media (max-width: 600px) {
+      .notif-popup { font-size: 1em; padding: 15px 10vw; min-width: 0; }
+    }
+    @media (max-width: 400px) {
+      .notif-popup { font-size: 0.98em; padding: 12px 2vw;}
+    }
+    body.dark .notif-popup { background: #232b33; color: #1ca97b;}
+    body.dark .notif-popup.error { color: #ee4747;}
+    body.dark .item-card { background: linear-gradient(120deg, #243041 0%, #1d2530 100%); outline: 1.5px solid #3a4e68;}
     body.dark .item-card .card-title { color: #62b0ff; }
     body.dark .item-card .card-row { color: #b9dbff; }
     body.dark .item-card .card-badge { background: #17334e; color: #b9dbff;}
@@ -522,88 +575,6 @@
       color: #ff9595;
     }
     body.dark .deletebtn:active { background: #522626; color: #ff4f4f; }
-    /* --- Анимация появления страниц --- */
-    .page-anim {
-      opacity: 0;
-      transform: translateY(40px) scale(0.98);
-      animation: pageIn 0.42s cubic-bezier(.38,1.15,.7,1.01) forwards;
-    }
-    @keyframes pageIn {
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-    @keyframes fadeIn {
-      from { opacity:0; transform: translateY(32px);}
-      to   { opacity:1; transform: none;}
-    }
-    @keyframes popIn {
-      from { opacity:0; transform: scale(0.95);}
-      to   { opacity:1; transform: scale(1);}
-    }
-    .result {
-      animation: popIn 0.5s;
-    }
-    /* --- Мини-уведомление --- */
-    .mini-notification {
-      position: fixed;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%) scale(0.97);
-      background: #1ca97b;
-      color: #fff;
-      padding: 13px 32px;
-      border-radius: 16px;
-      font-size: 1.1em;
-      font-weight: 700;
-      opacity: 0;
-      z-index: 9999;
-      transition: opacity 0.24s, transform 0.19s;
-      box-shadow: 0 3px 16px #13c1e340;
-      pointer-events: none;
-    }
-    .mini-notification.show {
-      opacity: 1;
-      transform: translateX(-50%) scale(1.04);
-    }
-    .mini-notification.error {
-      background: #ee4747;
-    }
-    /* --- Подтверждение удаления --- */
-    .confirm-delete-block {
-      padding: 22px 0 10px 0;
-      text-align: center;
-    }
-    /* --- Мобильные стили --- */
-    @media (max-width: 600px) {
-      .item-card { min-height: 138px; padding: 11px 10px 13px 10px;}
-      .card-list { gap: 10px; }
-      .menu button { padding: 13px 0; }
-      .backbtn { font-size: 0.98em; padding: 10px 0;}
-      h2 { font-size: 1.07em; }
-      .mini-notification { font-size: 0.98em; padding: 10px 14px;}
-    }
-    @media (max-width: 420px) {
-      .item-card { min-height: 117px; font-size: 0.98em;}
-      .menu button { font-size: 0.98em; }
-      .backbtn { font-size: 0.93em; }
-      .mini-notification { font-size: 0.93em; }
-    }
-    body.dark {
-      --main-bg: #151c24;
-      --card-bg: #232b33;
-      --accent: #62b0ff;
-      --accent-dark: #1c7ed6;
-      --text: #f1f1f1;
-      --shadow: 0 4px 32px rgba(0,0,0,0.40);
-      --input-bg: #22303b;
-      --input-border: #3e4b5a;
-      --input-focus: #62b0ff;
-      --input-label: #b9dbff;
-      --card-gradient: linear-gradient(120deg, #243041 0%, #1d2530 100%);
-      --card-badge: #17334e;
-    }
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -620,6 +591,7 @@
         <span class="theme-label" id="themeText">Тёмная тема</span>
       </button>
     </div>
+    <img src="" id="userAvatar" class="user-avatar" style="display:none;" alt="Аватар">
     <h2 id="pageTitle">Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span></h2>
     <div id="main"></div>
   </div>
@@ -664,13 +636,20 @@
     let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
     let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
     let username = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "";
+    let userPhoto = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : "";
     const backend = "https://bar-backend-production.up.railway.app";
     const botLink = "https://t.me/BarHelperAB_bot";
     if (tg && tg.expand) tg.expand();
 
+    // --- Аватар ---
+    if (userPhoto) {
+      const avatar = document.getElementById('userAvatar');
+      avatar.src = userPhoto;
+      avatar.style.display = 'block';
+    }
+
     // --- Закрытие клавиатуры по тапу на пустое место ---
     document.getElementById('wrap').addEventListener('touchstart', function(e) {
-      // Если клик был не по input/textarea/select и не по кнопке, снять фокус
       if (!e.target.closest('input, textarea, select, button')) {
         const active = document.activeElement;
         if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
@@ -902,15 +881,15 @@
         items.forEach(r => {
           cards += `
             <div class="item-card">
-              <div class="card-actions">
-                <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Редактировать</button>
-                <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
-              </div>
               <div class="card-badge">${r.category}</div>
               <div class="card-title" title="${r.name}">${r.name}</div>
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
+              <div class="card-actions-bottom">
+                <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Редактировать</button>
+                <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+              </div>
             </div>
           `;
         });
@@ -975,6 +954,21 @@
         </div>
       `));
     }
+    function showNotification(msg, isError = false) {
+      // Удалить предыдущий оверлей если есть
+      let old = document.getElementById('notifOverlay');
+      if (old) old.remove();
+      let overlay = document.createElement('div');
+      overlay.className = 'notif-overlay';
+      overlay.id = 'notifOverlay';
+      overlay.innerHTML = `<div class="notif-popup${isError?' error':''}">${msg}</div>`;
+      document.body.appendChild(overlay);
+      setTimeout(() => { overlay.querySelector('.notif-popup').style.opacity = 1; }, 10);
+      setTimeout(() => {
+        overlay.style.opacity = 0;
+        setTimeout(()=>overlay.remove(), 400);
+      }, 1500);
+    }
     async function deleteItem(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       let resp = await fetch(`${backend}/delete`, {
@@ -984,20 +978,12 @@
       });
       let data = await resp.json();
       if (data.ok) {
-        showMiniNotification("Позиция удалена!");
+        showNotification("Позиция удалена!");
         showEditPage();
       } else {
-        showMiniNotification("Ошибка удаления: " + data.error, true);
+        showNotification("Ошибка удаления: " + data.error, true);
         showEditPage();
       }
-    }
-    function showMiniNotification(msg, isError = false) {
-      let notif = document.createElement('div');
-      notif.className = "mini-notification" + (isError ? " error" : "");
-      notif.innerHTML = msg;
-      document.body.appendChild(notif);
-      setTimeout(() => { notif.classList.add('show'); }, 10);
-      setTimeout(() => { notif.classList.remove('show'); setTimeout(()=>notif.remove(),350); }, 1900);
     }
 
     async function startApp() {
