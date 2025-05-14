@@ -31,14 +31,15 @@
       background: var(--card-bg, #fff);
       border-radius: 0;
       padding: 0;
-      position: absolute;
-      inset: 0;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
       overflow-y: auto;
       z-index: 1;
       box-sizing: border-box;
+      touch-action: manipulation;
     }
     .content-inner {
       width: 100%;
@@ -49,6 +50,7 @@
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
+      min-height: 0;
     }
     @media (max-width: 700px) {
       .content-inner {
@@ -240,6 +242,10 @@
       margin-bottom: 10px;
       width: 100%;
       box-sizing: border-box;
+      overflow-y: auto;
+      padding-bottom: 170px;
+      min-height: 60vh;
+      will-change: transform;
     }
     label {
       font-size: 1em;
@@ -843,6 +849,10 @@
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
         scrollInputIntoView(e.target);
       }
+      document.body.classList.add('keyboard-opened');
+    });
+    document.body.addEventListener('focusout', function() {
+      document.body.classList.remove('keyboard-opened');
     });
     function showAddPage() {
       setPageTitle('Добавить позицию');
