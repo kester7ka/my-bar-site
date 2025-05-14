@@ -32,6 +32,7 @@
       letter-spacing: 0.01em;
       margin: 0;
       padding: 0;
+      overflow: hidden;
     }
     body {
       min-height: 100vh;
@@ -51,6 +52,7 @@
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      height: 100vh;
     }
     @media (max-width: 600px) {
       .wrap { min-height: 100vh; max-width: 100vw; margin: 0; border-radius: 0; }
@@ -758,21 +760,21 @@
     }
     themeBtn.addEventListener('click', () => setTheme(!document.body.classList.contains('dark')));
     ensureTheme();
-
     let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
     let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
     let username = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "";
     let userPhoto = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : "";
     const backend = "https://bar-backend-production.up.railway.app";
     const botLink = "https://t.me/BarHelperAB_bot";
+    function forceExpand() {
+      if (tg && tg.expand) tg.expand();
+    }
     if (tg && tg.expand) tg.expand();
-
     if (userPhoto) {
       const avatar = document.getElementById('userAvatar');
       avatar.src = userPhoto;
       avatar.style.display = 'block';
     }
-
     document.getElementById('wrap').addEventListener('touchstart', function(e) {
       if (!e.target.closest('input, textarea, select, button')) {
         const active = document.activeElement;
@@ -781,7 +783,6 @@
         }
       }
     });
-
     if (!userId) {
       document.getElementById('main').innerHTML = `
         <div style="padding:22px 0;text-align:center" class="error">
@@ -790,7 +791,6 @@
         </div>`;
       throw new Error("Not in Telegram Mini App");
     }
-
     window.showMenu = showMenu;
     window.showAddPage = showAddPage;
     window.showExpiredPage = showExpiredPage;
@@ -799,22 +799,20 @@
     window.openReopenForm = openReopenForm;
     window.confirmDelete = confirmDelete;
     window.deleteItem = deleteItem;
-
     function setPageTitle(title) {
       document.getElementById('pageTitle').innerHTML = title;
     }
-
     function showPage(contentHtml) {
       const el = document.getElementById("main");
       el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
       ensureTheme();
       window.scrollTo({top: 0, behavior: 'smooth'});
+      forceExpand();
     }
     function addBackButton(html) {
       return `<button class="backbtn" onclick="showMenu()">Назад</button>` + html;
     }
     function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${m}</div>`)); }
-
     let USER = null;
     function welcomeGreeting() {
       const now = new Date();
@@ -963,7 +961,7 @@
           resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
           return;
         }
-        let cards = `<div class="card-list">`;
+        let cards = `<div class="card-list" style="animation:none">`;
         items.forEach(r => {
           cards += `
             <div class="item-card">
