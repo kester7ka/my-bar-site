@@ -30,7 +30,8 @@
       width: 100vw;
       background: var(--card-bg, #fff);
       border-radius: 0;
-      padding: 0;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 28px);
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px));
       position: absolute;
       inset: 0;
       display: flex;
@@ -51,14 +52,17 @@
       box-sizing: border-box;
     }
     @media (max-width: 700px) {
+      .wrap {
+        padding-top: calc(env(safe-area-inset-top, 0px) + 18px);
+      }
       .content-inner {
         max-width: 100vw;
-        padding: 0 16px;
+        padding: 0 8px;
       }
     }
     @media (max-width: 400px) {
       .content-inner {
-        padding: 0 8px;
+        padding: 0 4px;
       }
     }
     .user-avatar {
@@ -219,10 +223,7 @@
       box-shadow: 0 2px 14px #0077ff33, 0 2px 1.5px #fff7 inset;
       cursor: pointer;
       outline: none;
-      transition: 
-        box-shadow 0.23s cubic-bezier(.4,0,.2,1),
-        background 0.23s cubic-bezier(.4,0,.2,1),
-        transform 0.16s cubic-bezier(.4,0,.2,1);
+      transition: box-shadow 0.23s cubic-bezier(.4,0,.2,1), background 0.23s cubic-bezier(.4,0,.2,1), transform 0.16s cubic-bezier(.4,0,.2,1);
       position: relative;
       overflow: hidden;
       width: 100%;
@@ -233,27 +234,91 @@
       transform: scale(0.98);
       box-shadow: 0 1.5px 8px #0077ff22, 0 1.5px 1.5px #fff7 inset;
     }
+    .switch-toggle {
+      width: 60px;
+      height: 32px;
+      background: #eaf2ff;
+      border-radius: 20px;
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      transition: background 0.22s;
+      border: 2px solid #e3e6ef;
+      margin: 0 0 18px 0;
+      vertical-align: middle;
+    }
+    .switch-toggle.checked {
+      background: #13c1e3;
+      border-color: #13c1e3;
+    }
+    .switch-slider {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 26px;
+      height: 26px;
+      background: #fff;
+      border-radius: 50%;
+      transition: left 0.24s cubic-bezier(.4,0,.2,1), background 0.2s;
+      box-shadow: 0 1px 6px #0077ff1a;
+    }
+    .switch-toggle.checked .switch-slider {
+      left: 31px;
+      background: #62b0ff;
+    }
+    .switch-label {
+      margin-left: 13px;
+      font-size: 1.07em;
+      font-weight: 700;
+      color: var(--accent-dark, #0051b3);
+      transition: color 0.22s;
+      user-select: none;
+    }
+    .switch-toggle.checked .switch-label {
+      color: #13c1e3;
+    }
+    body.dark .switch-toggle {
+      background: #22303b;
+      border-color: #3e4b5a;
+    }
+    body.dark .switch-toggle.checked {
+      background: #0051b3;
+      border-color: #62b0ff;
+    }
+    body.dark .switch-slider {
+      background: #b9dbff;
+    }
+    body.dark .switch-toggle.checked .switch-slider {
+      background: #1c7ed6;
+    }
     .form-block {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 12px;
       margin-bottom: 10px;
       width: 100%;
       box-sizing: border-box;
+      background: var(--card-bg, #fff);
+      border-radius: 18px;
+      box-shadow: 0 2px 12px #0077ff0c;
+      padding: 24px 16px 16px 16px;
+      margin-top: 8px;
+      margin-bottom: 22px;
+      animation: fadeIn 0.7s;
     }
-    label {
+    .form-block label {
       font-size: 1em;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--input-label, #223b5a);
-      margin-bottom: 2px;
+      margin-bottom: 4px;
       display: block;
       letter-spacing: 0.01em;
       transition: color 0.23s cubic-bezier(.4,0,.2,1);
     }
-    input, select {
+    .form-block input, .form-block select {
       width: 100%;
-      padding: 13px 10px;
-      margin: 8px 0 18px 0;
+      padding: 14px 12px;
+      margin: 0 0 0 0;
       border: 1.5px solid var(--input-border, #e3e6ef);
       border-radius: 9px;
       box-sizing: border-box;
@@ -270,28 +335,27 @@
       from { opacity: 0; transform: translateY(16px);}
       to   { opacity: 1; transform: none;}
     }
-    input:focus, select:focus {
+    .form-block input:focus, .form-block select:focus {
       border: 1.5px solid var(--input-focus, #006eff);
       background: #fff;
     }
-    body.dark input,
-    body.dark select {
+    body.dark .form-block input,
+    body.dark .form-block select {
       background: #22303b !important;
       color: #f1f1f1 !important;
       border: 1.5px solid #3e4b5a;
     }
-    body.dark input:focus,
-    body.dark select:focus {
+    body.dark .form-block input:focus,
+    body.dark .form-block select:focus {
       background: #232b33 !important;
       color: #f1f1f1 !important;
       border: 1.5px solid #62b0ff;
     }
-    body.dark label      { color: #b9dbff; }
-    body.dark .form-block label { color: #b9dbff; }
-    input::placeholder,
-    select::placeholder { color: #a4b1c5; opacity: 1;}
-    body.dark input::placeholder,
-    body.dark select::placeholder { color: #b9dbff; opacity: 0.85; }
+    body.dark .form-block label      { color: #b9dbff; }
+    .form-block input::placeholder,
+    .form-block select::placeholder { color: #a4b1c5; opacity: 1;}
+    body.dark .form-block input::placeholder,
+    body.dark .form-block select::placeholder { color: #b9dbff; opacity: 0.85; }
     .btns {
       display: flex;
       gap: 12px;
@@ -854,6 +918,12 @@
             <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
             <option value="📦 Прочее">📦 Прочее</option>
           </select>
+          <div style="display:flex;align-items:center;">
+            <div id="switchOpen" class="switch-toggle" tabindex="0" role="checkbox" aria-checked="true">
+              <div class="switch-slider"></div>
+              <span class="switch-label" id="switchLabel">Открыто</span>
+            </div>
+          </div>
           <label for="tob">TOB (6 цифр)</label>
           <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456">
           <label for="name">Название</label>
@@ -877,9 +947,35 @@
           });
         });
       }, 100);
+      const switchOpen = document.getElementById('switchOpen');
+      const switchLabel = document.getElementById('switchLabel');
+      let opened = true;
+      function updateSwitch() {
+        if(opened){
+          switchOpen.classList.add('checked');
+          switchOpen.setAttribute('aria-checked', 'true');
+          switchLabel.textContent = 'Открыто';
+        } else {
+          switchOpen.classList.remove('checked');
+          switchOpen.setAttribute('aria-checked', 'false');
+          switchLabel.textContent = 'Закрыто';
+        }
+      }
+      switchOpen.addEventListener('click', ()=>{
+        opened = !opened;
+        updateSwitch();
+      });
+      switchOpen.addEventListener('keydown', (e)=>{
+        if(e.key === " " || e.key === "Enter"){
+          opened = !opened;
+          updateSwitch();
+        }
+      });
+      updateSwitch();
       document.getElementById('addf').onsubmit = async function(e){
         e.preventDefault();
         let d = Object.fromEntries(new FormData(this));
+        d.opened = opened ? 1 : 0;
         let resp = await fetch(`${backend}/add`, {
           method: "POST",
           headers: {"Content-Type":"application/json"},
@@ -896,13 +992,26 @@
     }
     function showExpiredPage() {
       setPageTitle('Проверка сроков');
-      showPage(addBackButton(`<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`));
+      showPage(addBackButton(`<div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div><div id="expiredCards"></div>`));
       ensureTheme();
       fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
         .then(r=>r.json())
         .then(d=>{
-          if(!d.ok) return msg("Ошибка: "+d.error,"error");
-          if(!d.results.length) return msg("Нет просроченных позиций!","success");
+          const title = document.getElementById('expiredTitle');
+          const cardsDiv = document.getElementById('expiredCards');
+          if(!d.ok) {
+            title.innerHTML = "Ошибка: "+d.error;
+            cardsDiv.innerHTML = "";
+            return;
+          }
+          if(!d.results.length) {
+            title.innerHTML = "Нет просроченных позиций!";
+            title.className = "success";
+            cardsDiv.innerHTML = "";
+            return;
+          }
+          title.innerHTML = "Просроченные позиции:";
+          title.className = "";
           let cards = `<div class="card-list">`;
           d.results.forEach(x=>{
             cards += `
@@ -916,7 +1025,7 @@
             `;
           });
           cards += `</div>`;
-          showPage(addBackButton(cards));
+          cardsDiv.innerHTML = cards;
           ensureTheme();
         });
     }
