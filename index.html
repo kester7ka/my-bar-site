@@ -43,8 +43,25 @@
       overflow-y: auto;
       z-index: 1;
     }
-    @media (max-width: 800px) {
-      .wrap { border-radius: 0; }
+    .content-inner {
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 0 14px;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    @media (max-width: 700px) {
+      .content-inner {
+        max-width: 100vw;
+        padding: 0 8px;
+      }
+    }
+    @media (max-width: 400px) {
+      .content-inner {
+        padding: 0 2px;
+      }
     }
     .user-avatar {
       position: absolute;
@@ -189,7 +206,7 @@
       gap: 14px;
       margin-bottom: 22px;
       animation: fadeIn 0.5s;
-      padding: 0 12px;
+      width: 100%;
     }
     .menu button {
       background: linear-gradient(90deg, #006eff 60%, #13c1e3 100%);
@@ -224,7 +241,6 @@
       gap: 4px;
       margin-bottom: 10px;
       width: 100%;
-      padding: 0 12px;
     }
     label {
       font-size: 1em;
@@ -241,6 +257,7 @@
       margin: 8px 0 18px 0;
       border: 1.5px solid var(--input-border, #e3e6ef);
       border-radius: 9px;
+      box-sizing: border-box;
       box-shadow: 0 1.5px 7px #006eff07;
       font-size: 1em;
       font-family: inherit;
@@ -382,9 +399,15 @@
       margin-top: 8px;
       margin-bottom: 12px;
       animation: fadeIn 0.45s;
+      padding: 0 0.5em;
+      box-sizing: border-box;
+      width: 100%;
     }
-    @media (max-width: 800px) {
-      .card-list { grid-template-columns: 1fr; }
+    @media (max-width: 700px) {
+      .card-list { grid-template-columns: 1fr; padding: 0 0.3em; }
+    }
+    @media (max-width: 400px) {
+      .card-list { padding: 0 2px; }
     }
     .item-card {
       min-width: 0;
@@ -696,8 +719,10 @@
       </button>
     </div>
     <img src="" id="userAvatar" class="user-avatar" style="display:none;" alt="Аватар">
-    <h2 id="pageTitle">Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span></h2>
-    <div id="main"></div>
+    <div class="content-inner">
+      <h2 id="pageTitle">Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span></h2>
+      <div id="main"></div>
+    </div>
   </div>
   <div class="global-loader-overlay" id="globalLoader" style="display:none;">
     <div class="global-loader-spinner"></div>
