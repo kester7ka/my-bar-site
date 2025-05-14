@@ -38,8 +38,8 @@
       transition: background var(--transition), color var(--transition);
     }
     .wrap {
-      min-height: 100vh;
-      height: 100%;
+      height: 100dvh;
+      min-height: 100dvh;
       max-width: 480px;
       margin: 0 auto;
       background: var(--card-bg);
@@ -51,7 +51,7 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      overflow-y: auto;
     }
     @media (max-width: 600px) {
       .wrap { max-width: 100vw; margin: 0; padding: 10px 1vw 12px 1vw; border-radius: 0 0 18px 18px;}
@@ -247,7 +247,7 @@
       width: 100%;
       padding: 13px 10px;
       margin: 8px 0 18px 0;
-      border: 1px solid var(--input-border);
+      border: 1.5px solid var(--input-border);
       border-radius: 9px;
       box-shadow: 0 1.5px 7px #006eff07;
       font-size: 1em;
@@ -360,23 +360,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 200px;
+      min-height: 80px;
       animation: fadeIn 0.7s;
       margin-bottom: 12px;
-    }
-    .welcome-loader {
-      width: 38px;
-      height: 38px;
-      border: 4px solid #e3eaff;
-      border-top: 4px solid var(--accent);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin-bottom: 22px;
-      margin-top: 12px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0);}
-      100% { transform: rotate(360deg);}
     }
     .welcome-greet {
       font-size: 1.16em;
@@ -751,41 +737,24 @@
     <div class="global-loader-spinner"></div>
     <div class="global-loader-text">Загрузка...</div>
   </div>
-    <script>
+  <script>
     const themeBtn = document.getElementById('themeToggle');
     const themeText = document.getElementById('themeText');
-    function setTheme(dark, animate=true) {
-      if(dark) {
-        document.body.classList.add('dark');
-        themeText.textContent = "Светлая тема";
-      } else {
-        document.body.classList.remove('dark');
-        themeText.textContent = "Тёмная тема";
-      }
-      if(animate) {
-        document.body.animate([
-          { opacity: 0.7 },
-          { opacity: 1 }
-        ], {
-          duration: 320,
-          easing: 'cubic-bezier(.4,0,.2,1)'
-        });
-      }
-      localStorage.setItem('theme', dark ? 'dark' : 'light');
-    }
-    function toggleTheme() {
-      const dark = !document.body.classList.contains('dark');
-      setTheme(dark);
-    }
-    themeBtn.addEventListener('click', toggleTheme);
-    (function initTheme() {
+    function ensureTheme() {
       let theme = localStorage.getItem('theme');
       if(!theme) {
         if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
         else theme = 'light';
       }
-      setTheme(theme === 'dark', false);
-    })();
+      document.body.classList.toggle('dark', theme === 'dark');
+      themeText.textContent = theme === 'dark' ? "Светлая тема" : "Тёмная тема";
+    }
+    function setTheme(dark) {
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      ensureTheme();
+    }
+    themeBtn.addEventListener('click', () => setTheme(!document.body.classList.contains('dark')));
+    ensureTheme();
 
     let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
     let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
@@ -835,6 +804,7 @@
     function showPage(contentHtml) {
       const el = document.getElementById("main");
       el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
+      ensureTheme();
       window.scrollTo({top: 0, behavior: 'smooth'});
     }
     function addBackButton(html) {
@@ -851,29 +821,21 @@
       if (h >= 18 && h < 23) return "Добрый вечер";
       return "Доброй ночи";
     }
-    function showWelcome(isLoad = true) {
+    function showMenu() {
       setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
       showPage(`
         <div class="welcome-block">
-          ${isLoad ? `<div class="welcome-loader"></div>` : ""}
           <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
           ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
         </div>
+        <div class="menu fadeIn" id="menuBlock">
+          <button onclick="showAddPage()">Добавить позицию</button>
+          <button onclick="showExpiredPage()">Проверить сроки</button>
+          <button onclick="showSearchPage()">Поиск</button>
+          <button onclick="showEditPage()">Переоткрыть (редактировать)</button>
+        </div>
       `);
-    }
-    function showMenu() {
-      setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
-      showWelcome(false);
-      setTimeout(() => {
-        document.getElementById("main").querySelector('.page-anim').innerHTML += `
-          <div class="menu fadeIn" id="menuBlock">
-            <button onclick="showAddPage()">Добавить позицию</button>
-            <button onclick="showExpiredPage()">Проверить сроки</button>
-            <button onclick="showSearchPage()">Поиск</button>
-            <button onclick="showEditPage()">Переоткрыть (редактировать)</button>
-          </div>
-        `;
-      }, 200);
+      ensureTheme();
     }
     function showAddPage() {
       setPageTitle('Добавить позицию');
@@ -899,6 +861,7 @@
           </div>
         </form>
       `));
+      ensureTheme();
       document.getElementById('addf').onsubmit = async function(e){
         e.preventDefault();
         let d = Object.fromEntries(new FormData(this));
@@ -917,6 +880,7 @@
     function showExpiredPage() {
       setPageTitle('Проверка сроков');
       showPage(addBackButton(`<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`));
+      ensureTheme();
       fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
         .then(r=>r.json())
         .then(d=>{
@@ -936,6 +900,7 @@
           });
           cards += `</div>`;
           showPage(addBackButton(cards));
+          ensureTheme();
         });
     }
     function showSearchPage() {
@@ -946,6 +911,7 @@
           <div id="searchResults" style="min-height:90px;"></div>
         </div>
       `));
+      ensureTheme();
       const input = document.getElementById('searchInput');
       let allItems = [];
       const resultsDiv = document.getElementById('searchResults');
@@ -999,6 +965,7 @@
           <div id="editResults" style="min-height:90px;"></div>
         </div>
       `));
+      ensureTheme();
       const input = document.getElementById('editSearchInput');
       let allItems = [];
       const resultsDiv = document.getElementById('editResults');
@@ -1070,6 +1037,7 @@
           </div>
         </form>
       `));
+      ensureTheme();
       document.getElementById('reopenf').onsubmit = async function(e){
         e.preventDefault();
         let d = Object.fromEntries(new FormData(this));
@@ -1109,6 +1077,7 @@
         </div>
       `;
       document.body.appendChild(overlay);
+      ensureTheme();
     }
     function closeDeleteModal() {
       let overlay = document.querySelector('.modal-overlay');
@@ -1137,7 +1106,6 @@
         }
       }, 220);
     }
-
     function showNotification(msg, isError = false) {
       let old = document.getElementById('notifOverlay');
       if (old) old.remove();
@@ -1152,7 +1120,6 @@
         setTimeout(()=>overlay.remove(), 400);
       }, 1500);
     }
-
     function showGlobalLoader(show = true) {
       const loader = document.getElementById('globalLoader');
       const wrap = document.getElementById('wrap');
@@ -1168,12 +1135,17 @@
         }, 370);
       }
     }
-
     async function startApp() {
       showGlobalLoader(true);
       const MIN_LOAD = 3200 + Math.floor(Math.random()*800);
       let t0 = Date.now();
-      showWelcome(true);
+      showPage(`
+        <div class="welcome-block">
+          <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
+          ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
+        </div>
+      `);
+      ensureTheme();
       try {
         let r = await fetch("https://bar-backend-production.up.railway.app/userinfo", {
           method: "POST",
@@ -1193,6 +1165,7 @@
               <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
             </div>
           `);
+          ensureTheme();
           return;
         }
         USER = { username: d.username, bar_name: d.bar_name };
@@ -1201,6 +1174,7 @@
         showGlobalLoader(false);
         setPageTitle('Ошибка');
         showPage('<div class="error">Не удалось подключиться к серверу.<br>' + e + '</div>');
+        ensureTheme();
       }
     }
     startApp();
