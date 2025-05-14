@@ -6,6 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --main-bg: #f1f3f7;
+      --card-bg: #fff;
+      --accent: #006eff;
+      --accent-dark: #0051b3;
+      --text: #222;
+      --shadow: 0 4px 32px rgba(0,0,0,0.40);
+      --input-bg: #f7f9fc;
+      --input-border: #e3e6ef;
+      --input-focus: #006eff;
+      --input-label: #223b5a;
+      --card-gradient: linear-gradient(120deg, #eaf6ff 0%, #f1f3fa 100%);
+      --card-badge: #e5f3ff;
+    }
+    body.dark {
+      --main-bg: #151c24;
+      --card-bg: #232b33;
+      --accent: #62b0ff;
+      --accent-dark: #1c7ed6;
+      --text: #f1f1f1;
+      --input-bg: #22303b;
+      --input-border: #3e4b5a;
+      --input-focus: #62b0ff;
+      --input-label: #b9dbff;
+      --card-gradient: linear-gradient(120deg, #243041 0%, #1d2530 100%);
+      --card-badge: #17334e;
+    }
     html, body {
       min-height: 100vh;
       width: 100vw;
@@ -13,33 +40,33 @@
       padding: 0;
       overflow-x: hidden;
       overflow-y: auto;
-      background: var(--main-bg, #f1f3f7);
-      font-family: 'Montserrat', Arial, sans-serif;
-      color: var(--text, #222);
-      letter-spacing: 0.01em;
       box-sizing: border-box;
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: var(--main-bg);
+      color: var(--text);
+      letter-spacing: 0.01em;
     }
     body {
-      min-height: 100vh;
       min-width: 100vw;
+      min-height: 100vh;
       position: relative;
-      transition: background 0.23s cubic-bezier(.4,0,.2,1), color 0.23s cubic-bezier(.4,0,.2,1);
+      transition: background 0.23s, color 0.23s;
     }
     .wrap {
-      min-height: 100dvh;
+      height: 100dvh;
+      min-height: 100vh;
       width: 100vw;
-      background: var(--card-bg, #fff);
-      border-radius: 0;
-      padding: 0;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--card-bg);
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
-      overflow-y: auto;
-      z-index: 1;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
       box-sizing: border-box;
-      touch-action: manipulation;
+      overflow: hidden;
+      padding-bottom: env(safe-area-inset-bottom, 24px);
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
     }
     .content-inner {
       width: 100%;
@@ -55,12 +82,12 @@
     @media (max-width: 700px) {
       .content-inner {
         max-width: 100vw;
-        padding: 0 16px;
+        padding: 0 10px;
       }
     }
     @media (max-width: 400px) {
       .content-inner {
-        padding: 0 8px;
+        padding: 0 3px;
       }
     }
     .user-avatar {
@@ -84,7 +111,7 @@
       align-items: center;
       justify-content: flex-start;
       min-height: 42px;
-      margin-bottom: 0.3em;
+      margin-bottom: 0.7em;
       position: relative;
       z-index: 2;
       padding: 7px 12px 0 12px;
@@ -115,9 +142,8 @@
     .theme-toggle .icon {
       width: 26px;
       height: 26px;
-      display: block;
       position: relative;
-      transition: transform 0.36s cubic-bezier(.4,0,.2,1), opacity 0.23s;
+      transition: transform 0.36s, opacity 0.23s;
       top: 0;
     }
     .theme-toggle .icon.sun,
@@ -125,45 +151,40 @@
       position: absolute;
       left: 0; top: 0;
       width: 26px; height: 26px;
-      transition: opacity 0.23s, transform 0.36s cubic-bezier(.4,0,.2,1);
-      will-change: opacity, transform;
+      transition: opacity 0.23s, transform 0.36s;
       display: block;
     }
     .theme-toggle .icon.sun {
       color: #ffbe34;
       filter: drop-shadow(0 1px 2px #f1c40f33);
       opacity: 1;
-      transform: scale(1) translateY(0);
+      transform: scale(1);
       z-index: 2;
     }
     .theme-toggle .icon.moon {
       color: #8ecaff;
       filter: drop-shadow(0 2px 7px #4dabf7a0);
       opacity: 0;
-      transform: scale(0.6) translateY(0);
+      transform: scale(0.6);
       z-index: 1;
     }
     body.dark .theme-toggle .icon.sun {
       opacity: 0;
-      transform: scale(0.6) translateY(0);
+      transform: scale(0.6);
     }
     body.dark .theme-toggle .icon.moon {
       opacity: 1;
-      transform: scale(1) translateY(0);
+      transform: scale(1);
     }
     .theme-toggle .theme-label {
       font-size: 0.98em;
       font-weight: 700;
-      color: var(--accent-dark, #0051b3);
-      letter-spacing: 0.01em;
+      color: var(--accent-dark);
       opacity: 0.78;
       margin-left: 30px;
-      margin-right: 0;
-      line-height: 1.1;
-      min-width: 110px;
+      min-width: 100px;
       text-align: left;
-      transition: color 0.23s cubic-bezier(.4,0,.2,1);
-      user-select: none;
+      transition: color 0.23s;
       white-space: nowrap;
     }
     body.dark .theme-toggle .theme-label {
@@ -175,7 +196,7 @@
         font-size: 0.91em;
         min-width: 0;
         margin-left: 30px;
-        max-width: 85vw;
+        max-width: 70vw;
         overflow: hidden;
         text-overflow: ellipsis;
       }
@@ -187,19 +208,19 @@
     }
     h2 {
       text-align: center;
-      margin: 0 0 18px 0;
+      margin: 0 0 20px 0;
       font-weight: 700;
       font-size: 1.37em;
       letter-spacing: 0.02em;
-      color: var(--accent-dark, #0051b3);
+      color: var(--accent-dark);
       text-shadow: 0 3px 12px #006eff0a;
       animation: popIn 0.8s;
-      transition: color 0.23s cubic-bezier(.4,0,.2,1);
+      transition: color 0.23s;
       position: relative;
       z-index: 1;
       min-height: 1.7em;
     }
-    body.dark h2 { color: var(--accent, #62b0ff); }
+    body.dark h2 { color: var(--accent);}
     .menu {
       display: flex;
       flex-direction: column;
@@ -213,18 +234,15 @@
       color: #fff;
       border: none;
       border-radius: 24px;
-      padding: 15px 0;
-      font-size: 1.06em;
+      padding: 17px 0;
+      font-size: 1.09em;
       font-family: inherit;
       font-weight: 700;
       letter-spacing: 0.03em;
       box-shadow: 0 2px 14px #0077ff33, 0 2px 1.5px #fff7 inset;
       cursor: pointer;
       outline: none;
-      transition: 
-        box-shadow 0.23s cubic-bezier(.4,0,.2,1),
-        background 0.23s cubic-bezier(.4,0,.2,1),
-        transform 0.16s cubic-bezier(.4,0,.2,1);
+      transition: box-shadow 0.23s, background 0.23s, transform 0.16s;
       position: relative;
       overflow: hidden;
       width: 100%;
@@ -235,10 +253,37 @@
       transform: scale(0.98);
       box-shadow: 0 1.5px 8px #0077ff22, 0 1.5px 1.5px #fff7 inset;
     }
+    .welcome-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      animation: fadeIn 0.7s;
+      margin-bottom: 12px;
+    }
+    .welcome-greet {
+      font-size: 1.17em;
+      font-weight: 700;
+      color: var(--accent-dark);
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .welcome-bar {
+      font-size: 0.99em;
+      color: #4b8be8;
+      background: #eaf2ff;
+      padding: 6px 18px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      display: inline-block;
+      text-align: center;
+    }
     .form-block {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 7px;
       margin-bottom: 10px;
       width: 100%;
       box-sizing: border-box;
@@ -250,26 +295,26 @@
     label {
       font-size: 1em;
       font-weight: 500;
-      color: var(--input-label, #223b5a);
+      color: var(--input-label);
       margin-bottom: 2px;
       display: block;
       letter-spacing: 0.01em;
-      transition: color 0.23s cubic-bezier(.4,0,.2,1);
+      transition: color 0.23s;
     }
     input, select {
       width: 100%;
       padding: 13px 10px;
       margin: 8px 0 18px 0;
-      border: 1.5px solid var(--input-border, #e3e6ef);
+      border: 1.5px solid var(--input-border);
       border-radius: 9px;
       box-sizing: border-box;
       box-shadow: 0 1.5px 7px #006eff07;
       font-size: 1em;
       font-family: inherit;
-      background: var(--input-bg, #f7f9fc);
-      transition: border 0.22s, background 0.23s cubic-bezier(.4,0,.2,1), color 0.23s cubic-bezier(.4,0,.2,1);
+      background: var(--input-bg);
+      transition: border 0.22s, background 0.23s, color 0.23s;
       outline: none;
-      color: var(--text, #222);
+      color: var(--text);
       animation: fadeInInput 0.44s;
     }
     @keyframes fadeInInput {
@@ -277,7 +322,7 @@
       to   { opacity: 1; transform: none;}
     }
     input:focus, select:focus {
-      border: 1.5px solid var(--input-focus, #006eff);
+      border: 1.5px solid var(--input-focus);
       background: #fff;
     }
     body.dark input,
@@ -293,7 +338,6 @@
       border: 1.5px solid #62b0ff;
     }
     body.dark label      { color: #b9dbff; }
-    body.dark .form-block label { color: #b9dbff; }
     input::placeholder,
     select::placeholder { color: #a4b1c5; opacity: 1;}
     body.dark input::placeholder,
@@ -308,7 +352,7 @@
       border-radius: 13px;
       font-size: 1em;
       padding: 11px 0;
-      background: var(--accent, #006eff);
+      background: var(--accent);
       color: #fff;
       font-weight: 600;
       border: none;
@@ -322,7 +366,7 @@
       color: #4a4a4a;
     }
     .btns button:active {
-      background: var(--accent-dark, #0051b3);
+      background: var(--accent-dark);
       transform: scale(0.98);
     }
     .btns button.cancel:active {
@@ -352,34 +396,6 @@
       color: #006eff;
       transform: scale(0.98);
       box-shadow: 0 1px 4px #b9dbff33;
-    }
-    .welcome-block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 80px;
-      animation: fadeIn 0.7s;
-      margin-bottom: 12px;
-    }
-    .welcome-greet {
-      font-size: 1.16em;
-      font-weight: 700;
-      color: var(--accent-dark, #0051b3);
-      margin-bottom: 6px;
-      letter-spacing: 0.01em;
-      text-align: center;
-    }
-    .welcome-bar {
-      font-size: 0.98em;
-      color: #4b8be8;
-      background: #eaf2ff;
-      padding: 5px 15px;
-      border-radius: 11px;
-      margin-bottom: 8px;
-      font-weight: 600;
-      display: inline-block;
-      text-align: center;
     }
     .result {
       margin: 14px 0 0 0;
@@ -417,7 +433,7 @@
       display: flex;
       flex-direction: column;
       position: relative;
-      background: linear-gradient(120deg, #eaf6ff 0%, #f1f3fa 100%);
+      background: var(--card-gradient);
       border-radius: 20px;
       box-shadow: 0 3px 16px #0077ff1a, 0 1.5px 6px #b9dbff44;
       padding: 14px 18px 16px 18px;
@@ -432,7 +448,7 @@
       font-weight: 700;
       font-size: 1.03em;
       margin-bottom: 4px;
-      color: var(--accent-dark, #0051b3);
+      color: var(--accent-dark);
       word-break: break-all;
       max-width: 80%;
       overflow: hidden;
@@ -456,7 +472,7 @@
     }
     .item-card .card-badge {
       display: inline-block;
-      background: #e5f3ff;
+      background: var(--card-badge);
       color: #2179ba;
       font-weight: 700;
       font-size: 0.93em;
@@ -526,7 +542,7 @@
       min-width: 220px;
       min-height: 60px;
       text-align: center;
-      animation: notifPopupIn .3s cubic-bezier(.4,0,.2,1) forwards;
+      animation: notifPopupIn .3s;
       position: relative;
     }
     .modal-dialog .modal-title {
@@ -548,12 +564,6 @@
       box-shadow: 0 1px 6px #ffbaba30;
       transition: background 0.22s, color 0.22s;
     }
-    body.dark .modal-dialog .delete-item-name {
-      color: #ff4f4f;
-      background: #3a1d1d;
-      border-color: #ff4f4f;
-      box-shadow: 0 1px 6px #ff4f4f33;
-    }
     .modal-dialog .modal-buttons {
       margin-top: 18px;
       display: flex;
@@ -564,7 +574,7 @@
       border-radius: 13px;
       font-size: 1em;
       padding: 11px 0;
-      background: var(--accent, #006eff);
+      background: var(--accent);
       color: #fff;
       font-weight: 600;
       border: none;
@@ -578,7 +588,7 @@
       color: #4a4a4a;
     }
     .modal-dialog button:active {
-      background: var(--accent-dark, #0051b3);
+      background: var(--accent-dark);
       transform: scale(0.98);
     }
     .modal-dialog button.cancel:active {
@@ -600,7 +610,7 @@
       color: #f1f1f1;
     }
     .modal-overlay.hide {
-      animation: fadeOut 0.22s cubic-bezier(.4,0,.2,1) forwards;
+      animation: fadeOut 0.22s;
     }
     @keyframes fadeOut {
       from { opacity: 1; }
@@ -626,7 +636,7 @@
       width: 54px;
       height: 54px;
       border: 6px solid #e3eaff;
-      border-top: 6px solid var(--accent, #006eff);
+      border-top: 6px solid var(--accent);
       border-radius: 50%;
       animation: spin 0.9s linear infinite;
       margin-bottom: 22px;
@@ -639,12 +649,12 @@
     .global-loader-text {
       font-size: 1.18em;
       font-weight: 700;
-      color: var(--accent-dark, #0051b3);
+      color: var(--accent-dark);
       text-align: center;
       letter-spacing: 0.01em;
     }
     body.dark .global-loader-text {
-      color: var(--accent, #62b0ff);
+      color: var(--accent);
     }
     @keyframes notifPopupIn {
       from { opacity: 0; transform: scale(0.93);}
@@ -659,53 +669,33 @@
       to   { opacity:1; transform: scale(1);}
     }
     @media (max-width: 600px) {
-      .notif-popup { font-size: 1em; padding: 15px 10vw; min-width: 0; }
       .item-card { min-height: 120px; padding: 11px 10px 13px 10px;}
       .card-list { gap: 10px; }
       .menu button { padding: 13px 0; }
       .backbtn { font-size: 0.98em; padding: 10px 0;}
       h2 { font-size: 1.07em; }
-      .mini-notification { font-size: 0.98em; padding: 10px 14px;}
       .modal-dialog { padding: 18px 7vw 18px 7vw; min-width: 0; }
       .item-card { padding: 11px 10px 13px 10px;}
       .content-inner { padding: 0 8px; }
       .card-list { padding: 0;}
     }
     @media (max-width: 400px) {
-      .notif-popup { font-size: 0.98em; padding: 12px 2vw;}
       .modal-dialog { padding: 12px 2vw 12px 2vw;}
       .content-inner { padding: 0 4px; }
     }
-    body.dark {
-      --main-bg: #151c24;
-      --card-bg: #232b33;
-      --accent: #62b0ff;
-      --accent-dark: #1c7ed6;
-      --text: #f1f1f1;
-      --shadow: 0 4px 32px rgba(0,0,0,0.40);
-      --input-bg: #22303b;
-      --input-border: #3e4b5a;
-      --input-focus: #62b0ff;
-      --input-label: #b9dbff;
-      --card-gradient: linear-gradient(120deg, #243041 0%, #1d2530 100%);
-      --card-badge: #17334e;
+    .bottom-safe-gradient {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: calc(34px + env(safe-area-inset-bottom));
+      pointer-events: none;
+      z-index: 100;
+      background: linear-gradient(180deg, rgba(35,44,52,0) 0%, #232c34 92%);
+      border-bottom-left-radius: max(0px, env(safe-area-inset-left));
+      border-bottom-right-radius: max(0px, env(safe-area-inset-right));
+      opacity: 0.42;
     }
-    body.dark .notif-popup { background: #232b33; color: #1ca97b;}
-    body.dark .notif-popup.error { color: #ee4747;}
-    body.dark .item-card { background: linear-gradient(120deg, #243041 0%, #1d2530 100%); outline: 1.5px solid #3a4e68;}
-    body.dark .item-card .card-title { color: #62b0ff; }
-    body.dark .item-card .card-row { color: #b9dbff; }
-    body.dark .item-card .card-badge { background: #17334e; color: #b9dbff;}
-    body.dark .editbtn {
-      background: #17334e;
-      color: #62b0ff;
-    }
-    body.dark .editbtn:active { background: #23436b; color: #b9dbff; }
-    body.dark .deletebtn {
-      background: #3a1d1d;
-      color: #ff9595;
-    }
-    body.dark .deletebtn:active { background: #522626; color: #ff4f4f; }
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -727,6 +717,7 @@
       <h2 id="pageTitle">Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span></h2>
       <div id="main"></div>
     </div>
+    <div class="bottom-safe-gradient"></div>
   </div>
   <div class="global-loader-overlay" id="globalLoader" style="display:none;">
     <div class="global-loader-spinner"></div>
@@ -774,11 +765,7 @@
       }
     });
     if (!userId) {
-      document.getElementById('main').innerHTML = `
-        <div style="padding:22px 0;text-align:center" class="error">
-          Откройте сайт через Telegram-бота, чтобы пользоваться баром.<br><br>
-          <a href="${botLink}" style="color:#007aff;font-weight:bold" target="_blank">Открыть бота</a>
-        </div>`;
+      document.getElementById('main').innerHTML = `<div style="padding:22px 0;text-align:center" class="error">Откройте сайт через Telegram-бота, чтобы пользоваться баром.<br><br><a href="${botLink}" style="color:#007aff;font-weight:bold" target="_blank">Открыть бота</a></div>`;
       throw new Error("Not in Telegram Mini App");
     }
     window.showMenu = showMenu;
@@ -1171,18 +1158,6 @@
         }, 370);
       }
     }
-    function fixIOSHeight() {
-      const wrap = document.getElementById('wrap');
-      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        wrap.style.height = window.innerHeight + 'px';
-      } else {
-        wrap.style.height = '';
-      }
-    }
-    window.addEventListener('resize', fixIOSHeight);
-    window.addEventListener('focusin', fixIOSHeight);
-    window.addEventListener('focusout', fixIOSHeight);
-    fixIOSHeight();
     async function startApp() {
       showGlobalLoader(true);
       const MIN_LOAD = 3200 + Math.floor(Math.random()*800);
