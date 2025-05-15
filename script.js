@@ -1,367 +1,862 @@
-import os
-import threading
-from datetime import datetime, timedelta
-import sqlite3
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from telegram import Update
-from telegram.ext import (
-    ApplicationBuilder, CommandHandler, MessageHandler, ConversationHandler,
-    ContextTypes, filters
-)
-from dotenv import load_dotenv
+document.addEventListener('touchstart', function preventZoom(e) {
+  if(e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+let lastTouch = 0;
+document.addEventListener('touchend', function(e){
+  const now = Date.now();
+  if(now - lastTouch <= 350){
+    e.preventDefault();
+  }
+  lastTouch = now;
+}, { passive: false });
 
-load_dotenv()
+const themeBtn = document.getElementById('themeToggle');
+const themeText = document.getElementById('themeText');
+function ensureTheme() {
+  let theme = localStorage.getItem('theme');
+  if(!theme) {
+    if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+    else theme = 'light';
+  }
+  document.body.classList.toggle('dark', theme === 'dark');
+  themeText.textContent = theme === 'dark' ? "Светлая тема" : "Тёмная тема";
+}
+function setTheme(dark) {
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+  ensureTheme();
+}
+themeBtn.addEventListener('click', () => setTheme(!document.body.classList.contains('dark')));
+ensureTheme();
 
-SQLITE_DB = os.getenv("SQLITE_DB", "your_bot_db.sqlite")
-USERS_TABLE = 'users'
-INVITES_TABLE = 'invites'
-BARS = ['АВОШ59', 'АВПМ97', 'АВЯР01', 'АВКОСМ04', 'АВКО04', 'АВДШ02', 'АВКШ78', 'АВПМ58', 'АВЛБ96']
-CATEGORIES = ["🍯 Сиропы", "🥕 Ингредиенты", "📦 Прочее"]
-REG_WAIT_CODE = 0
+let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+let username = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "";
+let userPhoto = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : "";
+const backend = "https://bar-backend-production.up.railway.app";
+const botLink = "https://t.me/BarHelperAB_bot";
 
-app = Flask(__name__)
-CORS(app, origins=["https://kester7ka.github.io", "https://kester7ka.github.io/my-bar-site"], supports_credentials=True)
+function forceExpand() {
+  if (tg && tg.expand) tg.expand();
+}
+if (tg && tg.expand) tg.expand();
+if (userPhoto) {
+  const avatar = document.getElementById('userAvatar');
+  avatar.src = userPhoto;
+  avatar.style.display = 'block';
+}
+document.getElementById('wrap').addEventListener('touchstart', function(e) {
+  if (!e.target.closest('input, textarea, select, button')) {
+    const active = document.activeElement;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
+      active.blur();
+    }
+  }
+});
 
-def ensure_bar_table(bar_name):
-    if bar_name not in BARS:
-        raise Exception("Неизвестный бар")
-    with sqlite3.connect(SQLITE_DB) as conn:
-        cursor = conn.cursor()
-        cursor.execute(f"""
-        CREATE TABLE IF NOT EXISTS {bar_name} (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT,
-            tob TEXT,
-            name TEXT,
-            opened_at TEXT,
-            shelf_life_days INTEGER,
-            expiry_at TEXT,
-            opened INTEGER DEFAULT 1
-        )
-        """)
-        conn.commit()
+if (!userId) {
+  document.getElementById('main').innerHTML = `
+    <div style="padding:22px 0;text-align:center" class="error">
+      Откройте сайт через Telegram-бота, чтобы пользоваться баром.<br><br>
+      <a href="${botLink}" style="color:#007aff;font-weight:bold" target="_blank">Открыть бота</a>
+    </div>`;
+  throw new Error("Not in Telegram Mini App");
+}
 
-def migrate_all_bars():
-    for bar in BARS:
-        ensure_bar_table(bar)
+window.showMenu = showMenu;
+window.showAddPage = showAddPage;
+window.showExpiredPage = showExpiredPage;
+window.showSearchPage = showSearchPage;
+window.showEditPage = showEditPage;
+window.openReopenForm = openReopenForm;
+window.confirmDelete = confirmDelete;
+window.deleteItem = deleteItem;
+window.openCardActionsModal = openCardActionsModal;
+window.showStatsPage = showStatsPage;
+window.showExportPage = showExportPage;
 
-def db_query(sql, params=(), fetch=False):
-    try:
-        if not os.path.exists(SQLITE_DB):
-            raise Exception(f"Файл базы не найден: {SQLITE_DB}")
-        with sqlite3.connect(SQLITE_DB) as conn:
-            cursor = conn.cursor()
-            cursor.execute(sql, params)
-            if fetch:
-                return cursor.fetchall()
-            conn.commit()
-            return None
-    except Exception as e:
-        raise
+function setPageTitle(title) {
+  document.getElementById('pageTitle').innerHTML = title;
+}
+function showPage(contentHtml) {
+  const el = document.getElementById("main");
+  el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
+  ensureTheme();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  forceExpand();
+}
+function addBackButton(html) {
+  return `<button class="backbtn" onclick="showMenu()">Назад</button>` + html;
+}
+function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${m}</div>`)); }
+let USER = null;
+function welcomeGreeting() {
+  const now = new Date();
+  const h = now.getHours();
+  if (h >= 5 && h < 12) return "Доброе утро";
+  if (h >= 12 && h < 18) return "Добрый день";
+  if (h >= 18 && h < 23) return "Добрый вечер";
+  return "Доброй ночи";
+}
+function showMenu() {
+  setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
+  showPage(`
+    <div class="welcome-block">
+      <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
+    </div>
+    <div class="menu fadeIn" id="menuBlock">
+      <button class="menu-btn" onclick="showAddPage()"><span class="menu-icon">➕</span> Добавить позицию</button>
+      <button class="menu-btn" onclick="showExpiredPage()"><span class="menu-icon">⏱️</span> Проверить сроки</button>
+      <button class="menu-btn" onclick="showSearchPage()"><span class="menu-icon">🔍</span> Поиск</button>
+      <button class="menu-btn" onclick="showStatsPage()"><span class="menu-icon">📊</span> Статистика бара</button>
+      <button class="menu-btn" onclick="showExportPage()"><span class="menu-icon">📤</span> Печать/экспорт</button>
+      <button class="menu-btn" onclick="showEditPage()"><span class="menu-icon">🔄</span> Редактировать/переоткрыть</button>
+    </div>
+  `);
+  ensureTheme();
+}
+function vibrate(ms = 30) {
+  if (window.navigator && window.navigator.vibrate) {
+    window.navigator.vibrate(ms);
+  }
+  if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+    try {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    } catch (e) {}
+  }
+}
+function scrollInputIntoView(input) {
+  setTimeout(() => {
+    if (input && typeof input.scrollIntoView === "function") {
+      input.scrollIntoView({behavior: "smooth", block: "center"});
+    }
+  }, 120);
+}
+document.body.addEventListener('focusin', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+    scrollInputIntoView(e.target);
+  }
+});
 
-def get_user_bar(user_id):
-    try:
-        res = db_query(f"SELECT bar_name FROM {USERS_TABLE} WHERE user_id=?", (user_id,), fetch=True)
-        return res[0][0] if res else None
-    except Exception as e:
-        return None
+function showStatsPage() {
+  setPageTitle('Статистика бара');
+  showPage(addBackButton(`<div class="stat-block" id="statBlock"><div style="text-align:center;color:#aaa;">Загрузка...</div></div>`));
+  fetch(`${backend}/search`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, query: ""})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) {
+      document.getElementById('statBlock').innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+      return;
+    }
+    let total = data.results.length;
+    let opened = data.results.filter(x=>x.opened==1).length;
+    let closed = data.results.filter(x=>x.opened==0).length;
+    let expired = data.results.filter(x=>x.expiry_at && new Date(x.expiry_at) < new Date()).length;
+    document.getElementById('statBlock').innerHTML = `
+      <div class="stat-row"><span class="stat-label">Всего позиций:</span> <span class="stat-value blue">${total}</span></div>
+      <div class="stat-row"><span class="stat-label">Открытых:</span> <span class="stat-value">${opened}</span></div>
+      <div class="stat-row"><span class="stat-label">Закрытых:</span> <span class="stat-value gray">${closed}</span></div>
+      <div class="stat-row"><span class="stat-label">Просрочено:</span> <span class="stat-value red">${expired}</span></div>
+    `;
+  });
+}
 
-def check_user_access(user_id):
-    try:
-        return get_user_bar(user_id) is not None
-    except Exception as e:
-        return False
+function showExportPage() {
+  setPageTitle('Печать / экспорт');
+  showPage(addBackButton(`<div class="export-block">
+    <div class="export-info">Скачать все позиции в формате Excel или PDF</div>
+    <button class="export-btn" onclick="exportPositions('csv')">Скачать Excel (CSV)</button>
+    <button class="export-btn" onclick="exportPositions('pdf')">Скачать PDF</button>
+    <div class="export-info" style="font-size:0.93em;color:#888;">Список включает все открытые и закрытые позиции вашего бара.</div>
+  </div>`));
+}
+function exportPositions(type) {
+  fetch(`${backend}/search`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, query: ""})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) {
+      showNotification("Ошибка экспорта: " + data.error, true);
+      return;
+    }
+    if (type === "csv") {
+      let rows = [["Категория","TOB","Название","Дата открытия","Срок хранения (дней)","Годен до","Статус"]];
+      data.results.forEach(x=>{
+        rows.push([
+          x.category, x.tob, x.name, x.opened_at, x.shelf_life_days, x.expiry_at, x.opened==1?"Открыто":"Закрыто"
+        ]);
+      });
+      let csv = rows.map(r=>r.map(s=>`"${s}"`).join(";")).join("\n");
+      let blob = new Blob([csv], {type: "text/csv"});
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "bar-export.csv";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } else if (type === "pdf") {
+      let html = `<table border="1" cellpadding="6" style="font-size:12px;border-collapse:collapse;"><tr><th>Категория</th><th>TOB</th><th>Название</th><th>Дата открытия</th><th>Срок (дней)</th><th>Годен до</th><th>Статус</th></tr>`;
+      data.results.forEach(x=>{
+        html+=`<tr><td>${x.category}</td><td>${x.tob}</td><td>${x.name}</td><td>${x.opened_at}</td><td>${x.shelf_life_days}</td><td>${x.expiry_at}</td><td>${x.opened==1?"Открыто":"Закрыто"}</td></tr>`;
+      });
+      html+="</table>";
+      let win = window.open("", "_blank");
+      win.document.write(`<h2>Список позиций</h2>${html}`);
+      win.print();
+    }
+  });
+}
 
-def get_bar_table(user_id):
-    bar_name = get_user_bar(user_id)
-    if bar_name in BARS:
-        ensure_bar_table(bar_name)
-        return bar_name
-    return None
+function showAddPage() {
+  setPageTitle('Добавить позицию');
+  showPage(addBackButton(`
+    <form id="addf" class="beautiful-form" autocomplete="off">
+      <div class="field-row">
+        <label class="field-label" for="category">Категория</label>
+        <select name="category" id="category" required>
+          <option value="🍯 Сиропы">🍯 Сиропы</option>
+          <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
+          <option value="📦 Прочее">📦 Прочее</option>
+        </select>
+      </div>
+      <div class="status-toggle-bar" id="statusToggleBar">
+        <button type="button" class="status-toggle-btn opened selected" id="btnOpened">Открыто</button>
+        <button type="button" class="status-toggle-btn closed" id="btnClosed">Закрыто</button>
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="tob">TOB (6 цифр)</label>
+        <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456" autocomplete="off">
+        <div id="tobWarning" style="display:none"></div>
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="name">Название</label>
+        <input name="name" id="name" required placeholder="Название позиции">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="shelf_life_days">Срок хранения (дней)</label>
+        <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="30">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="opened_at">Дата открытия</label>
+        <input name="opened_at" id="opened_at" type="date" required>
+      </div>
+      <div class="btns">
+        <button type="submit" id="addSubmitBtn" disabled>Добавить</button>
+      </div>
+    </form>
+  `));
+  ensureTheme();
+  setTimeout(() => {
+    let inputs = document.querySelectorAll('.beautiful-form input, .beautiful-form select');
+    inputs.forEach(inp => {
+      inp.addEventListener('focus', function() {
+        scrollInputIntoView(this);
+      });
+    });
+  }, 100);
 
-@app.route('/userinfo', methods=['POST'])
-def api_userinfo():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    try:
-        if not user_id:
-            return jsonify(ok=False, error="Нет user_id")
-        res = db_query(f"SELECT username, bar_name FROM {USERS_TABLE} WHERE user_id=?", (user_id,), fetch=True)
-        if res:
-            username, bar_name = res[0]
-            return jsonify(ok=True, username=username, bar_name=bar_name)
-        return jsonify(ok=False, error="Пользователь не найден")
-    except Exception as e:
-        return jsonify(ok=False, error=str(e))
+  let opened = true;
+  const btnOpened = document.getElementById('btnOpened');
+  const btnClosed = document.getElementById('btnClosed');
+  function updateStatusButtons() {
+    if (opened) {
+      btnOpened.classList.add("selected", "opened");
+      btnClosed.classList.remove("selected", "closed");
+    } else {
+      btnOpened.classList.remove("selected", "opened");
+      btnClosed.classList.add("selected", "closed");
+    }
+  }
+  btnOpened.onclick = function() {
+    opened = true;
+    updateStatusButtons();
+    validateForm();
+  };
+  btnClosed.onclick = function() {
+    opened = false;
+    updateStatusButtons();
+    validateForm();
+  };
+  updateStatusButtons();
 
-@app.route('/add', methods=['POST'])
-def api_add():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    try:
-        if not user_id or not check_user_access(user_id):
-            return jsonify(ok=False, error="Нет доступа")
-        bar_table = get_bar_table(user_id)
-        d = data
-        opened = int(d.get('opened', 1))
-        opened_at = d['opened_at']
-        shelf_life_days = int(d['shelf_life_days'])
-        expiry_at = (datetime.strptime(opened_at, '%Y-%m-%d') + timedelta(days=shelf_life_days)).strftime('%Y-%m-%d')
-        with sqlite3.connect(SQLITE_DB) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                f"INSERT INTO {bar_table} (category, tob, name, opened_at, shelf_life_days, expiry_at, opened) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (
-                    d['category'],
-                    d['tob'],
-                    d['name'],
-                    opened_at,
-                    shelf_life_days,
-                    expiry_at,
-                    opened
-                )
-            )
-            new_id = cursor.lastrowid
-            conn.commit()
-        return jsonify(ok=True, id=new_id)
-    except Exception as e:
-        return jsonify(ok=False, error=str(e))
+  let allItems = [];
+  let fetchedItems = false;
+  let openTobExists = false;
+  const tobInput = document.getElementById('tob');
+  const tobWarning = document.getElementById('tobWarning');
+  const nameInput = document.getElementById('name');
+  const shelfInput = document.getElementById('shelf_life_days');
+  const dateInput = document.getElementById('opened_at');
+  const catInput = document.getElementById('category');
+  const submitBtn = document.getElementById('addSubmitBtn');
 
-@app.route('/open', methods=['POST'])
-def api_open():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    try:
-        if not user_id or not check_user_access(user_id):
-            return jsonify(ok=False, error="Нет доступа")
-        bar_table = get_bar_table(user_id)
-        tob = data['tob']
-        category = data['category']
-        name = data['name']
-        today = datetime.now().strftime('%Y-%m-%d')
-        res = db_query(f"SELECT id, shelf_life_days FROM {bar_table} WHERE tob=? AND opened=1", (tob,), fetch=True)
-        if res:
-            old_id, shelf_life_days = res[0]
-            db_query(f"UPDATE {bar_table} SET opened=0 WHERE id=?", (old_id,))
-            expiry_at = (datetime.now() + timedelta(days=int(shelf_life_days))).strftime('%Y-%m-%d')
-            with sqlite3.connect(SQLITE_DB) as conn:
-                cursor = conn.cursor()
-                cursor.execute(
-                    f"INSERT INTO {bar_table} (category, tob, name, opened_at, shelf_life_days, expiry_at, opened) VALUES (?, ?, ?, ?, ?, ?, 1)",
-                    (category, tob, name, today, shelf_life_days, expiry_at)
-                )
-                new_id = cursor.lastrowid
-                conn.commit()
-            return jsonify(ok=True, replaced=True, id=new_id)
-        else:
-            shelf_life_days = int(data['shelf_life_days'])
-            expiry_at = (datetime.now() + timedelta(days=shelf_life_days)).strftime('%Y-%m-%d')
-            with sqlite3.connect(SQLITE_DB) as conn:
-                cursor = conn.cursor()
-                cursor.execute(
-                    f"INSERT INTO {bar_table} (category, tob, name, opened_at, shelf_life_days, expiry_at, opened) VALUES (?, ?, ?, ?, ?, ?, 1)",
-                    (category, tob, name, today, shelf_life_days, expiry_at)
-                )
-                new_id = cursor.lastrowid
-                conn.commit()
-            return jsonify(ok=True, replaced=False, id=new_id)
-    except Exception as e:
-        return jsonify(ok=False, error=str(e))
+  function validateForm() {
+    let allOk = true;
+    if (!catInput.value) allOk = false;
+    if (!tobInput.value.match(/^\d{6}$/)) allOk = false;
+    if (!nameInput.value.trim()) allOk = false;
+    if (!shelfInput.value || parseInt(shelfInput.value) < 1) allOk = false;
+    if (!dateInput.value) allOk = false;
+    if (opened && openTobExists) allOk = false;
+    submitBtn.disabled = !allOk;
+  }
 
-@app.route('/expired', methods=['POST'])
-def api_expired():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    try:
-        if not user_id or not check_user_access(user_id):
-            return jsonify(ok=False, error="Нет доступа")
-        bar_table = get_bar_table(user_id)
-        now = datetime.now().strftime('%Y-%m-%d')
-        rows = db_query(
-            f"SELECT id, category, tob, name, expiry_at, opened FROM {bar_table} WHERE expiry_at <= ?", (now,), fetch=True
-        )
-        results = []
-        for row_id, cat, tob, name, exp, opened in rows:
-            results.append({
-                'id': row_id, 'category': cat, 'tob': tob, 'name': name, 'expiry_at': str(exp), 'opened': opened
-            })
-        return jsonify(ok=True, results=results)
-    except Exception as e:
-        return jsonify(ok=False, error=str(e))
+  async function fetchItemsOnce() {
+    if (fetchedItems) return;
+    fetchedItems = true;
+    let resp = await fetch(`${backend}/search`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId, query: ""})
+    });
+    let data = await resp.json();
+    if (data.ok && Array.isArray(data.results)) {
+      allItems = data.results;
+    }
+  }
 
-@app.route('/search', methods=['POST'])
-def api_search():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    try:
-        if not user_id or not check_user_access(user_id):
-            return jsonify(ok=False, error="Нет доступа")
-        bar_table = get_bar_table(user_id)
-        query = data.get('query', '').strip().lower()
-        select_columns = "id, category, tob, name, opened_at, shelf_life_days, expiry_at, opened"
-        if not query:
-            rows = db_query(
-                f"SELECT {select_columns} FROM {bar_table}", (), fetch=True
-            )
-        elif query.isdigit() and len(query) == 6:
-            rows = db_query(
-                f"SELECT {select_columns} FROM {bar_table} WHERE tob=?", (query,), fetch=True
-            )
-        else:
-            rows = db_query(
-                f"SELECT {select_columns} FROM {bar_table} WHERE LOWER(name) LIKE ?", (f"%{query}%",), fetch=True
-            )
-        results = []
-        for r in rows:
-            results.append({
-                'id': r[0], 'category': r[1], 'tob': r[2], 'name': r[3],
-                'opened_at': str(r[4]), 'shelf_life_days': r[5],
-                'expiry_at': str(r[6]), 'opened': r[7]
-            })
-        if query and query.isdigit() and len(query) == 6:
-            opened_items = [x for x in results if x['opened'] == 1]
-            closed_items = [x for x in results if x['opened'] == 0]
-            closed_items.sort(key=lambda x: abs((datetime.strptime(x['expiry_at'], '%Y-%m-%d') - datetime.now()).days))
-            results = opened_items + closed_items
-        return jsonify(ok=True, results=results)
-    except Exception as e:
-        return jsonify(ok=False, error=str(e))
+  function checkTob() {
+    let tobVal = tobInput.value;
+    openTobExists = false;
+    tobWarning.style.display = "none";
+    tobWarning.innerHTML = "";
+    if (tobVal.length === 6) {
+      let exists = allItems.find(x => x.tob === tobVal && x.opened == 1);
+      if (exists) {
+        openTobExists = true;
+        tobWarning.innerHTML = `<span class="tob-warning">Позиция с этим TOB уже <b>открыта</b>. Можете добавить только закрытую позицию, либо сначала закройте открытую.</span>`;
+        tobWarning.style.display = "block";
+      }
+    }
+    validateForm();
+  }
 
-@app.route('/reopen', methods=['POST'])
-def api_reopen():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    try:
-        if not user_id or not check_user_access(user_id):
-            return jsonify(ok=False, error="Нет доступа")
-        bar_table = get_bar_table(user_id)
-        item_id = data['id']
-        opened_at = data['opened_at']
-        shelf_life_days = int(data['shelf_life_days'])
-        expiry_at = (datetime.strptime(opened_at, '%Y-%m-%d') + timedelta(days=shelf_life_days)).strftime('%Y-%m-%d')
-        db_query(
-            f"UPDATE {bar_table} SET opened_at=?, shelf_life_days=?, expiry_at=? WHERE id=?",
-            (opened_at, shelf_life_days, expiry_at, item_id)
-        )
-        return jsonify(ok=True)
-    except Exception as e:
-        return jsonify(ok=False, error=str(e))
+  tobInput.addEventListener('input', async function() {
+    await fetchItemsOnce();
+    checkTob();
+  });
+  nameInput.addEventListener('input', validateForm);
+  shelfInput.addEventListener('input', validateForm);
+  dateInput.addEventListener('input', validateForm);
+  catInput.addEventListener('change', validateForm);
 
-@app.route('/delete', methods=['POST'])
-def api_delete():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    try:
-        if not user_id or not check_user_access(user_id):
-            return jsonify(ok=False, error="Нет доступа")
-        bar_table = get_bar_table(user_id)
-        item_id = data.get('id')
-        if not item_id:
-            return jsonify(ok=False, error="Не указан id позиции для удаления")
-        res = db_query(f"SELECT id FROM {bar_table} WHERE id=?", (item_id,), fetch=True)
-        if not res:
-            return jsonify(ok=False, error="Позиция с указанным id не найдена")
-        db_query(f"DELETE FROM {bar_table} WHERE id=?", (item_id,))
-        return jsonify(ok=True)
-    except Exception as e:
-        return jsonify(ok=False, error=str(e))
+  document.getElementById('addf').onsubmit = async function(e){
+    e.preventDefault();
+    let d = Object.fromEntries(new FormData(this));
+    d.opened = opened ? 1 : 0;
+    if (opened) {
+      let req = {
+        user_id: userId,
+        category: d.category,
+        tob: d.tob,
+        name: d.name,
+        shelf_life_days: d.shelf_life_days
+      };
+      let resp = await fetch(`${backend}/open`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(req)
+      });
+      let data = await resp.json();
+      if (data.ok) {
+        vibrate();
+        if (data.replaced)
+          msg("Открытая позиция заменена на новую!", "success");
+        else
+          msg("Позиция открыта!", "success");
+      } else {
+        msg("Ошибка: " + data.error, "error");
+      }
+    } else {
+      let resp = await fetch(`${backend}/add`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({user_id: userId, ...d})
+      });
+      let data = await resp.json();
+      if (data.ok) {
+        vibrate();
+        msg("Позиция добавлена!", "success");
+      } else {
+        msg("Ошибка: " + data.error, "error");
+      }
+    }
+  };
+}
 
-async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
-    import traceback
-    tb = ''.join(traceback.format_exception(None, context.error, context.error.__traceback__))
-    try:
-        if update and hasattr(update, "message") and update.message:
-            await update.message.reply_text(
-                f"❌ Произошла ошибка:\n<code>{context.error}</code>\n\n"
-                f"<b>Детали:</b>\n<code>{tb[-1500:]}</code>",
-                parse_mode="HTML"
-            )
-    except Exception as e:
-        pass
+function renderCard(r, actions = true) {
+  let badgeCol = `<div class="card-header-col">
+    <div class="card-badge">${r.category}</div>
+    <div class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</div>
+  </div>`;
+  let title = `<div class="card-title" title="${r.name}">${r.name}</div>`;
+  let rows = `
+    <div class="card-row"><b>TOB:</b> ${r.tob}</div>
+    <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
+    <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
+  `;
+  let buttons = "";
+  if (actions) {
+    if (r.opened == 1) {
+      buttons = `<div class="card-actions-bottom">
+        <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
+        <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+      </div>`;
+    } else {
+      buttons = `<div class="card-actions-bottom">
+        <button class="openbtn" onclick="openCardActionsModal('${encodeURIComponent(JSON.stringify(r))}');return false;">Открыть</button>
+        <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+      </div>`;
+    }
+  }
+  return `<div class="item-card">${badgeCol}${title}${rows}${buttons}</div>`;
+}
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    try:
-        if not check_user_access(user_id):
-            await update.message.reply_text("🔑 Введите ваш пригласительный код для регистрации:")
-            return REG_WAIT_CODE
-        res = db_query(f"SELECT bar_name, registered_at FROM {USERS_TABLE} WHERE user_id=?", (user_id,), fetch=True)
-        if res:
-            bar, reg = res[0]
-            await update.message.reply_text(
-                f"👤 Вы зарегистрированы в баре: <b>{bar}</b>\n"
-                f"Дата регистрации: {reg}", parse_mode="HTML"
-            )
-        else:
-            await update.message.reply_text("Данные пользователя не найдены. Зарегистрируйтесь с помощью кода.")
-        return ConversationHandler.END
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка при проверке регистрации: {e}")
+function showSearchPage() {
+  setPageTitle('Поиск');
+  showPage(addBackButton(`
+    <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
+      <input id="searchInput" type="text" placeholder="Поиск по TOB или названию" style="margin-bottom:7px;">
+      <div class="filter-bar-wrap">
+        <div class="filter-bar-section" id="categoryFilterBar"></div>
+        <div class="filter-bar-section" id="statusFilterBar"></div>
+      </div>
+      <div id="searchResults" style="min-height:90px;"></div>
+    </div>
+  `));
+  ensureTheme();
 
-async def reg_wait_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    code = update.message.text.strip()
-    user_id = update.effective_user.id
-    username = update.effective_user.username or ""
-    try:
-        invites = db_query(
-            f"SELECT bar_name FROM {INVITES_TABLE} WHERE code=? AND used='нет'", (code,), fetch=True
-        )
-        if not invites:
-            await update.message.reply_text("❌ Код не найден или уже использован! Попробуйте снова или обратитесь к администратору.")
-            return REG_WAIT_CODE
-        user_exists = db_query(
-            f"SELECT user_id FROM {USERS_TABLE} WHERE user_id=?", (user_id,), fetch=True
-        )
-        if user_exists:
-            await update.message.reply_text("✅ Вы уже зарегистрированы.")
-            return ConversationHandler.END
-        bar_name = invites[0][0]
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        db_query(
-            f"INSERT INTO {USERS_TABLE} (user_id, username, bar_name, registered_at) VALUES (?, ?, ?, ?)",
-            (user_id, username, bar_name, now)
-        )
-        db_query(
-            f"UPDATE {INVITES_TABLE} SET used='да' WHERE code=?", (code,)
-        )
-        ensure_bar_table(bar_name)
-        await update.message.reply_text(f"✅ Добро пожаловать в {bar_name}!\nТеперь вы можете пользоваться мини-приложением (сайтом).")
-        return ConversationHandler.END
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка при регистрации: {e}")
+  const categories = [
+    { value: "", label: "Все категории", icon: "" },
+    { value: "🍯 Сиропы", label: "Сиропы", icon: "🍯" },
+    { value: "🥕 Ингредиенты", label: "Ингредиенты", icon: "🥕" },
+    { value: "📦 Прочее", label: "Прочее", icon: "📦" }
+  ];
+  const statuses = [
+    { value: "", label: "Все статусы" },
+    { value: "1", label: "Открыто" },
+    { value: "0", label: "Закрыто" }
+  ];
+  let filterCategory = "";
+  let filterOpened = "";
 
-async def whoami(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    try:
-        res = db_query(f"SELECT bar_name, registered_at FROM {USERS_TABLE} WHERE user_id=?", (user_id,), fetch=True)
-        if res:
-            bar, reg = res[0]
-            await update.message.reply_text(
-                f"👤 Вы зарегистрированы в баре: <b>{bar}</b>\n"
-                f"Дата регистрации: {reg}", parse_mode="HTML"
-            )
-        else:
-            await update.message.reply_text("Данные пользователя не найдены. Зарегистрируйтесь с помощью кода.")
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка при получении информации о пользователе: {e}")
+  function renderCategoryBar() {
+    const bar = document.getElementById('categoryFilterBar');
+    bar.innerHTML = '';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.className = "filter-btn" + (filterCategory === cat.value ? " selected" : "");
+      btn.innerHTML = (cat.icon ? cat.icon + ' ' : '') + cat.label;
+      btn.onclick = () => {
+        filterCategory = cat.value;
+        renderCategoryBar();
+        renderList();
+      };
+      bar.appendChild(btn);
+    });
+  }
+  function renderStatusBar() {
+    const bar = document.getElementById('statusFilterBar');
+    bar.innerHTML = '';
+    statuses.forEach(status => {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.className = "filter-btn status" + (filterOpened === status.value ? " selected" : "");
+      btn.innerHTML = status.label;
+      btn.onclick = () => {
+        filterOpened = status.value;
+        renderStatusBar();
+        renderList();
+      };
+      bar.appendChild(btn);
+    });
+  }
+  renderCategoryBar();
+  renderStatusBar();
 
-def run_flask():
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+  const input = document.getElementById('searchInput');
+  let allItems = [];
+  const resultsDiv = document.getElementById('searchResults');
+  resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
+  fetch(`${backend}/search`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, query: ""})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+    allItems = data.results;
+    renderList();
+  });
+  function renderList() {
+    let filter = (input.value||"").trim().toLowerCase();
+    let items = allItems;
+    if (filterCategory) items = items.filter(x=>x.category === filterCategory);
+    if (filterOpened !== '') items = items.filter(x=>String(x.opened)==filterOpened);
+    if (filter) {
+      items = items.filter(
+        x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
+      );
+      let openedArr = items.filter(i => i.opened == 1);
+      let closedArr = items.filter(i => i.opened == 0);
+      closedArr.sort((a, b) => {
+        let ea = new Date(a.expiry_at), eb = new Date(b.expiry_at);
+        return Math.abs(ea - Date.now()) - Math.abs(eb - Date.now());
+      });
+      items = [...openedArr, ...closedArr];
+    }
+    if (!items.length) {
+      resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
+      return;
+    }
+    let cards = `<div class="card-list" style="animation:none">`;
+    items.forEach(r => {
+      cards += renderCard(r);
+    });
+    cards += `</div>`;
+    resultsDiv.innerHTML = cards;
+  }
+  input.addEventListener('input', renderList);
+}
 
-if __name__ == '__main__':
-    migrate_all_bars()
-    threading.Thread(target=run_flask, daemon=True).start()
-    token = os.getenv('BOT_TOKEN')
-    if not token:
-        exit(1)
-    bot_app = ApplicationBuilder().token(token).build()
-    bot_app.add_handler(ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-        states={REG_WAIT_CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, reg_wait_code)]},
-        fallbacks=[]
-    ))
-    bot_app.add_handler(CommandHandler('whoami', whoami))
-    bot_app.add_error_handler(error_handler)
-    bot_app.run_polling()
+function openCardActionsModal(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  let old = document.querySelector('.modal-overlay');
+  if (old) old.classList.add('hide');
+  setTimeout(() => {
+    if (old) old.remove();
+    let overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-dialog">
+        <div class="modal-title">Что сделать с позицией?</div>
+        <div class="modal-buttons-row">
+          <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
+          <button class="modal-btn edit" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
+        </div>
+        <button class="modal-btn cancel-full" onclick="closeDeleteModal()">Отмена</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    ensureTheme();
+  }, 370);
+}
+
+async function autoOpen(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  closeDeleteModal();
+  let today = new Date().toISOString().slice(0,10);
+
+  let req = {
+    user_id: userId,
+    category: r.category,
+    tob: r.tob,
+    name: r.name,
+    shelf_life_days: r.shelf_life_days
+  };
+  let resp = await fetch(`${backend}/open`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(req)
+  });
+  let data = await resp.json();
+  if (data.ok) {
+    showNotification(data.replaced ? "Открытая позиция заменена на новую!" : "Позиция открыта!", false);
+    showSearchPage();
+  } else {
+    showNotification("Ошибка открытия: "+data.error, true);
+    showSearchPage();
+  }
+}
+
+function confirmDelete(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  let old = document.querySelector('.modal-overlay');
+  if (old) old.classList.add('hide');
+  setTimeout(() => {
+    if (old) old.remove();
+    let overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-dialog">
+        <div class="modal-title">
+          Вы действительно хотите удалить <span class="delete-item-name">${r.name}</span>?
+        </div>
+        <div class="modal-buttons-row">
+          <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+          <button class="modal-btn edit" onclick="closeDeleteModal()">Отмена</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    ensureTheme();
+  }, 370);
+}
+function closeDeleteModal() {
+  let overlay = document.querySelector('.modal-overlay');
+  if (!overlay) return;
+  overlay.classList.add('hide');
+  setTimeout(() => overlay.remove(), 370);
+}
+async function deleteItem(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  let overlay = document.querySelector('.modal-overlay');
+  if(overlay) overlay.classList.add('hide');
+  setTimeout(async () => {
+    if(overlay) overlay.remove();
+    let resp = await fetch(`${backend}/delete`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId, id: r.id})
+    });
+    let data = await resp.json();
+    if (data.ok) {
+      vibrate();
+      showNotification("Позиция удалена!");
+      showSearchPage();
+    } else {
+      showNotification("Ошибка удаления: " + data.error, true);
+      showSearchPage();
+    }
+  }, 370);
+}
+function showNotification(msg, isError = false) {
+  let old = document.getElementById('notifOverlay');
+  if (old) {
+    old.classList.add('hide');
+    setTimeout(()=>old.remove(),370);
+  }
+  let overlay = document.createElement('div');
+  overlay.className = 'notif-overlay';
+  overlay.id = 'notifOverlay';
+  overlay.innerHTML = `<div class="notif-popup${isError?' error':''}">${msg}</div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => { overlay.querySelector('.notif-popup').style.opacity = 1; }, 10);
+  setTimeout(() => {
+    let popup = overlay.querySelector('.notif-popup');
+    if (popup) popup.classList.add('hide');
+    setTimeout(()=>overlay.remove(), 370);
+  }, 1700);
+}
+function showExpiredPage() {
+  setPageTitle('Проверка сроков');
+  showPage(addBackButton(`<div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div><div id="expiredCards"></div>`));
+  ensureTheme();
+  fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
+    .then(r=>r.json())
+    .then(d=>{
+      const title = document.getElementById('expiredTitle');
+      const cardsDiv = document.getElementById('expiredCards');
+      if(!d.ok) {
+        title.innerHTML = "Ошибка: "+d.error;
+        cardsDiv.innerHTML = "";
+        return;
+      }
+      if(!d.results.length) {
+        title.innerHTML = "Нет просроченных позиций!";
+        title.className = "success";
+        cardsDiv.innerHTML = "";
+        return;
+      }
+      title.innerHTML = "Просроченные позиции:";
+      title.className = "";
+      let cards = `<div class="card-list">`;
+      d.results.forEach(x=>{
+        cards += renderCard(x, false);
+      });
+      cards += `</div>`;
+      cardsDiv.innerHTML = cards;
+      ensureTheme();
+    });
+}
+function showEditPage() {
+  setPageTitle('Редактирование позиций');
+  showPage(addBackButton(`
+    <div id="editBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
+      <input id="editSearchInput" type="text" placeholder="Поиск по TOB или названию">
+      <div id="editResults" style="min-height:90px;"></div>
+    </div>
+  `));
+  ensureTheme();
+  const input = document.getElementById('editSearchInput');
+  let allItems = [];
+  const resultsDiv = document.getElementById('editResults');
+  resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
+  fetch(`${backend}/search`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, query: ""})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+    allItems = data.results;
+    renderEditList("");
+  });
+  input.addEventListener('input', e => {
+    renderEditList(e.target.value);
+  });
+  function renderEditList(filter) {
+    filter = (filter||"").trim().toLowerCase();
+    let items = allItems;
+    if(filter)
+      items = allItems.filter(
+        x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
+      );
+    if (!items.length) {
+      resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
+      return;
+    }
+    let cards = `<div class="card-list">`;
+    items.forEach(r => {
+      cards += renderCard(r);
+    });
+    cards += `</div>`;
+    resultsDiv.innerHTML = cards;
+  }
+}
+function openReopenForm(rJson) {
+  setPageTitle('Редактирование позиции');
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  const today = new Date().toISOString().slice(0,10);
+  showPage(addBackButton(`
+    <form id="reopenf" class="beautiful-form" autocomplete="off">
+      <div class="field-row">
+        <label class="field-label">Категория</label>
+        <input value="${r.category}" readonly>
+      </div>
+      <div class="field-row">
+        <label class="field-label">TOB</label>
+        <input value="${r.tob}" readonly>
+      </div>
+      <div class="field-row">
+        <label class="field-label">Название</label>
+        <input name="name" required value="${r.name}">
+      </div>
+      <div class="field-row">
+        <label class="field-label">Срок хранения (дней)</label>
+        <input name="shelf_life_days" type="number" min="1" required value="${r.shelf_life_days}">
+      </div>
+      <div class="field-row">
+        <label class="field-label">Дата открытия</label>
+        <input name="opened_at" type="date" value="${today}" required>
+      </div>
+      <div class="btns">
+        <button type="submit">Сохранить</button>
+      </div>
+    </form>
+  `));
+  ensureTheme();
+  setTimeout(() => {
+    let inputs = document.querySelectorAll('.beautiful-form input, .beautiful-form select');
+    inputs.forEach(inp => {
+      inp.addEventListener('focus', function() {
+        scrollInputIntoView(this);
+      });
+    });
+  }, 100);
+  document.getElementById('reopenf').onsubmit = async function(e){
+    e.preventDefault();
+    let d = Object.fromEntries(new FormData(this));
+    let req = {
+      user_id: userId,
+      id: r.id,
+      name: d.name,
+      opened_at: d.opened_at,
+      shelf_life_days: d.shelf_life_days
+    };
+    let resp = await fetch(`${backend}/reopen`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(req)
+    });
+    let data = await resp.json();
+    if (data.ok)
+      msg("Позиция успешно переоткрыта!", "success");
+    else
+      msg("Ошибка: " + data.error, "error");
+  };
+}
+function showGlobalLoader(show = true) {
+  const loader = document.getElementById('globalLoader');
+  const wrap = document.getElementById('wrap');
+  if (show) {
+    loader.style.display = 'flex';
+    wrap.style.display = 'none';
+    setTimeout(() => loader.style.opacity = "1", 10);
+  } else {
+    loader.style.opacity = "0";
+    setTimeout(() => {
+      loader.style.display = 'none';
+      wrap.style.display = '';
+    }, 370);
+  }
+}
+function fixIOSHeight() {
+  const wrap = document.getElementById('wrap');
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    wrap.style.height = window.innerHeight + 'px';
+    setTimeout(() => {
+      wrap.style.height = window.innerHeight + 'px';
+    }, 200);
+  } else {
+    wrap.style.height = '';
+  }
+}
+window.addEventListener('resize', fixIOSHeight);
+window.addEventListener('focusin', fixIOSHeight);
+window.addEventListener('focusout', fixIOSHeight);
+window.addEventListener('orientationchange', fixIOSHeight);
+fixIOSHeight();
+async function startApp() {
+  showGlobalLoader(true);
+  const MIN_LOAD = 1200 + Math.floor(Math.random()*500);
+  let t0 = Date.now();
+  showPage(`
+    <div class="welcome-block">
+      <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
+    </div>
+  `);
+  ensureTheme();
+  try {
+    let r = await fetch("https://bar-backend-production.up.railway.app/userinfo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: userId })
+    });
+    let d = await r.json();
+    let dt = Date.now() - t0;
+    if (dt < MIN_LOAD) await new Promise(res => setTimeout(res, MIN_LOAD - dt));
+    showGlobalLoader(false);
+    if (!d.ok) {
+      setPageTitle('Добро пожаловать');
+      showPage(`
+        <div class="welcome-block">
+          <div class="welcome-greet">${welcomeGreeting()}, гость!</div>
+          <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
+          <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
+        </div>
+      `);
+      ensureTheme();
+      return;
+    }
+    USER = { username: d.username, bar_name: d.bar_name };
+    showMenu();
+  } catch (e) {
+    showGlobalLoader(false);
+    setPageTitle('Ошибка');
+    showPage('<div class="error">Не удалось подключиться к серверу.<br>' + e + '</div>');
+    ensureTheme();
+  }
+}
+startApp();
