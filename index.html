@@ -285,9 +285,9 @@
     }
     .status-toggle-btn {
       flex: 1 1 0;
-      font-size: 1.08em;
+      font-size: 1.15em;
       font-weight: 700;
-      padding: 14px 0;
+      padding: 17px 0;
       border: none;
       outline: none;
       transition: background 0.19s, color 0.18s, box-shadow 0.21s;
@@ -298,6 +298,8 @@
       border-radius: 0;
       position: relative;
       z-index: 1;
+      margin: 0 2px;
+      letter-spacing: 0.03em;
     }
     .status-toggle-btn:first-child { border-right: 1.5px solid #e3e6ef;}
     .status-toggle-btn.selected.opened {
@@ -449,8 +451,8 @@
       margin-top: 10px;
     }
     .beautiful-form .btns button {
-      font-size: 1.06em;
-      padding: 13px 0;
+      font-size: 1.15em;
+      padding: 16px 0;
       border-radius: 14px;
       background: linear-gradient(90deg, #006eff 60%, #13c1e3 100%);
       color: #fff;
@@ -461,6 +463,9 @@
       transition: background 0.25s, transform 0.17s;
       animation: popIn 0.33s;
       flex: 1;
+      width: 100%;
+      margin: 0;
+      letter-spacing: 0.03em;
     }
     .beautiful-form .btns button:active {
       background: linear-gradient(90deg, #0051b3 60%, #13c1e3 100%);
@@ -533,6 +538,50 @@
     }
     @keyframes fadeIn { from { opacity:0; transform: translateY(32px);} to   { opacity:1; transform: none;}}
     @keyframes popIn { from { opacity:0; transform: scale(0.95);} to   { opacity:1; transform: scale(1);}}
+    @keyframes loaderSpin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    .global-loader-overlay {
+      position: fixed;
+      z-index: 4000;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(241,243,247,0.92);
+      opacity: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.36s;
+      flex-direction: column;
+      pointer-events: all;
+      animation: fadeIn 0.33s;
+    }
+    .global-loader-spinner {
+      width: 72px;
+      height: 72px;
+      border: 7px solid #e3eaff;
+      border-top: 7px solid #19c37d;
+      border-radius: 50%;
+      animation: loaderSpin 0.8s linear infinite;
+      margin-bottom: 24px;
+      margin-top: 8px;
+      box-shadow: 0 3px 16px #13c1e330;
+      background: transparent;
+      display: block;
+    }
+    .global-loader-text {
+      font-size: 1.22em;
+      font-weight: 700;
+      color: var(--accent-dark, #0051b3);
+      text-align: center;
+      letter-spacing: 0.01em;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    body.dark .global-loader-overlay { background: rgba(21,28,36,0.93);}
+    body.dark .global-loader-spinner { border: 7px solid #3e4b5a; border-top: 7px solid #23c882;}
+    body.dark .global-loader-text { color: var(--accent, #62b0ff);}
     @media (max-width: 600px) {
       .beautiful-form {padding: 18px 3vw 10px 3vw;}
       .card-badge {font-size: 0.87em;}
@@ -602,7 +651,6 @@
     <div class="global-loader-text">Загрузка...</div>
   </div>
   <script>
-    // Отключение double-tap zoom на всех устройствах
     document.addEventListener('touchstart', function preventZoom(e) {
       if(e.touches.length > 1) e.preventDefault();
     }, { passive: false });
@@ -1101,11 +1149,10 @@
         let data = await resp.json();
         if (data.ok) {
           vibrate();
-          showNotification("Позиция удалена!");
-          showEditPage();
+          showMenu();
         } else {
           showNotification("Ошибка удаления: " + data.error, true);
-          showEditPage();
+          showMenu();
         }
       }, 220);
     }
