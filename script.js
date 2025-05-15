@@ -105,11 +105,12 @@ function showMenu() {
       ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
     </div>
     <div class="menu fadeIn" id="menuBlock">
-      <button class="menu-btn" onclick="showAddPage()">Добавить позицию</button>
-      <button class="menu-btn" onclick="showExpiredPage()">Проверить сроки</button>
-      <button class="menu-btn" onclick="showSearchPage()">Поиск</button>
-      <button class="menu-btn" onclick="showStatsPage()">Статистика бара</button>
-      <button class="menu-btn" onclick="showExportPage()">Печать/экспорт</button>
+      <button class="menu-btn" onclick="showAddPage()"><span class="menu-icon">➕</span> Добавить позицию</button>
+      <button class="menu-btn" onclick="showExpiredPage()"><span class="menu-icon">⏱️</span> Проверить сроки</button>
+      <button class="menu-btn" onclick="showSearchPage()"><span class="menu-icon">🔍</span> Поиск</button>
+      <button class="menu-btn" onclick="showStatsPage()"><span class="menu-icon">📊</span> Статистика бара</button>
+      <button class="menu-btn" onclick="showExportPage()"><span class="menu-icon">📤</span> Печать/экспорт</button>
+      <button class="menu-btn" onclick="showEditPage()"><span class="menu-icon">🔄</span> Редактировать/переоткрыть</button>
     </div>
   `);
   ensureTheme();
@@ -151,15 +152,55 @@ function showStatsPage() {
       document.getElementById('statBlock').innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
       return;
     }
-    let total = data.results.length;
-    let opened = data.results.filter(x=>x.opened==1).length;
-    let closed = data.results.filter(x=>x.opened==0).length;
-    let expired = data.results.filter(x=>x.expiry_at && new Date(x.expiry_at) < new Date()).length;
+    let stats = {};
+    let CATEGORY_LABELS = [
+      { label: "🍯 Сиропы", emoji: "🍯" },
+      { label: "🥕 Ингредиенты", emoji: "🥕" },
+      { label: "📦 Прочее", emoji: "📦" }
+    ];
+    CATEGORY_LABELS.forEach(c => stats[c.label] = { total: 0, opened: 0, closed: 0 });
+    data.results.forEach(x => {
+      if (stats[x.category]) {
+        stats[x.category].total += 1;
+        if (x.opened == 1) stats[x.category].opened += 1;
+        if (x.opened == 0) stats[x.category].closed += 1;
+      }
+    });
+    let rows = CATEGORY_LABELS.map(({label, emoji}) =>
+      `<tr>
+        <td><span class="cat-emoji">${emoji}</span>${label.replace(/^[^ ]+ /, "")}</td>
+        <td>${stats[label].total}</td>
+        <td>${stats[label].opened}</td>
+        <td>${stats[label].closed}</td>
+      </tr>`
+    ).join('');
     document.getElementById('statBlock').innerHTML = `
-      <div class="stat-row"><span class="stat-label">Всего позиций:</span> <span class="stat-value blue">${total}</span></div>
-      <div class="stat-row"><span class="stat-label">Открытых:</span> <span class="stat-value">${opened}</span></div>
-      <div class="stat-row"><span class="stat-label">Закрытых:</span> <span class="stat-value gray">${closed}</span></div>
-      <div class="stat-row"><span class="stat-label">Просрочено:</span> <span class="stat-value red">${expired}</span></div>
+      <div class="stats-animate">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Категория</th>
+              <th>Всего</th>
+              <th>Открыто</th>
+              <th>Закрыто</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+        <div class="export-btns-row">
+          <button class="export-excel-btn" onclick="exportPositions('excel')">
+            <svg viewBox="0 0 24 24" width="21" height="21"><rect fill="#1ecb51" width="24" height="24" rx="5"/><path fill="#fff" d="M7.4 8h1.3l1.3 2.3L11.3 8h1.3l-1.7 2.9L12.8 14h-1.3l-1.2-2.1L9 14H7.7l1.7-3.1L7.4 8zm4.6 0h4v1.1h-2.8v1.3h2.4v1.1h-2.4v1.4H17V14h-5V8z"/></svg>
+            Excel (в ЛС)
+          </button>
+          <button class="export-pdf-btn" onclick="exportPositions('pdf')">
+            <svg viewBox="0 0 24 24" width="21" height="21"><rect fill="#ee4747" width="24" height="24" rx="5"/><path fill="#fff" d="M8 8h8v8H8V8zm1 1v6h6V9H9z"/></svg>
+            PDF (в ЛС)
+          </button>
+        </div>
+        <div class="export-info" style="font-size:0.93em;color:#888;">Файл придёт вам в Telegram-бота.<br>Список включает все открытые и закрытые позиции вашего бара.</div>
+      </div>
     `;
   });
 }
@@ -167,53 +208,35 @@ function showStatsPage() {
 function showExportPage() {
   setPageTitle('Печать / экспорт');
   showPage(addBackButton(`<div class="export-block">
-    <div class="export-info">Скачать все позиции в формате Excel или PDF</div>
-    <button class="export-btn" onclick="exportPositions('csv')">Скачать Excel (CSV)</button>
-    <button class="export-btn" onclick="exportPositions('pdf')">Скачать PDF</button>
-    <div class="export-info" style="font-size:0.93em;color:#888;">Список включает все открытые и закрытые позиции вашего бара.</div>
+    <div class="export-info">Экспортировать все позиции в формате Excel или PDF</div>
+    <div class="export-btns-row">
+      <button class="export-excel-btn" onclick="exportPositions('excel')">
+        <svg viewBox="0 0 24 24" width="21" height="21"><rect fill="#1ecb51" width="24" height="24" rx="5"/><path fill="#fff" d="M7.4 8h1.3l1.3 2.3L11.3 8h1.3l-1.7 2.9L12.8 14h-1.3l-1.2-2.1L9 14H7.7l1.7-3.1L7.4 8zm4.6 0h4v1.1h-2.8v1.3h2.4v1.1h-2.4v1.4H17V14h-5V8z"/></svg>
+        Excel (в ЛС)
+      </button>
+      <button class="export-pdf-btn" onclick="exportPositions('pdf')">
+        <svg viewBox="0 0 24 24" width="21" height="21"><rect fill="#ee4747" width="24" height="24" rx="5"/><path fill="#fff" d="M8 8h8v8H8V8zm1 1v6h6V9H9z"/></svg>
+        PDF (в ЛС)
+      </button>
+    </div>
+    <div class="export-info" style="font-size:0.93em;color:#888;">Файл придёт вам в Telegram-бота.<br>Список включает все открытые и закрытые позиции вашего бара.</div>
   </div>`));
 }
 function exportPositions(type) {
-  fetch(`${backend}/search`, {
+  fetch(`${backend}/export`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, query: ""})
+    body: JSON.stringify({user_id: userId, type: type})
   })
   .then(r => r.json())
   .then(data => {
-    if (!data.ok) {
-      showNotification("Ошибка экспорта: " + data.error, true);
-      return;
+    if (data.ok) {
+      showNotification("Файл отправлен вам в Telegram-бот!");
+    } else {
+      showNotification("Ошибка экспорта: " + (data.error || "Неизвестная ошибка"), true);
     }
-    if (type === "csv") {
-      let rows = [["Категория","TOB","Название","Дата открытия","Срок хранения (дней)","Годен до","Статус"]];
-      data.results.forEach(x=>{
-        rows.push([
-          x.category, x.tob, x.name, x.opened_at, x.shelf_life_days, x.expiry_at, x.opened==1?"Открыто":"Закрыто"
-        ]);
-      });
-      let csv = rows.map(r=>r.map(s=>`"${s}"`).join(";")).join("\n");
-      let blob = new Blob([csv], {type: "text/csv"});
-      let link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "bar-export.csv";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } else if (type === "pdf") {
-      let html = `<table border="1" cellpadding="6" style="font-size:12px;border-collapse:collapse;"><tr><th>Категория</th><th>TOB</th><th>Название</th><th>Дата открытия</th><th>Срок (дней)</th><th>Годен до</th><th>Статус</th></tr>`;
-      data.results.forEach(x=>{
-        html+=`<tr><td>${x.category}</td><td>${x.tob}</td><td>${x.name}</td><td>${x.opened_at}</td><td>${x.shelf_life_days}</td><td>${x.expiry_at}</td><td>${x.opened==1?"Открыто":"Закрыто"}</td></tr>`;
-      });
-      html+="</table>";
-      let blob = new Blob([`<h2>Список позиций</h2>${html}`], {type: "text/html"});
-      let link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "bar-export.html";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    }
+  }).catch(() => {
+    showNotification("Ошибка экспорта: не удалось соединиться с сервером", true);
   });
 }
 
@@ -224,9 +247,9 @@ function showAddPage() {
       <div class="field-row">
         <label class="field-label" for="category">Категория</label>
         <select name="category" id="category" required>
-          <option value="Сиропы">Сиропы</option>
-          <option value="Ингредиенты">Ингредиенты</option>
-          <option value="Прочее">Прочее</option>
+          <option value="🍯 Сиропы">🍯 Сиропы</option>
+          <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
+          <option value="📦 Прочее">📦 Прочее</option>
         </select>
       </div>
       <div class="status-toggle-bar" id="statusToggleBar">
@@ -414,9 +437,9 @@ function showSearchPage() {
 
   const categories = [
     { value: "", label: "Все категории", icon: "" },
-    { value: "Сиропы", label: "Сиропы", icon: "" },
-    { value: "Ингредиенты", label: "Ингредиенты", icon: "" },
-    { value: "Прочее", label: "Прочее", icon: "" }
+    { value: "🍯 Сиропы", label: "🍯 Сиропы", icon: "🍯" },
+    { value: "🥕 Ингредиенты", label: "🥕 Ингредиенты", icon: "🥕" },
+    { value: "📦 Прочее", label: "📦 Прочее", icon: "📦" }
   ];
   const statuses = [
     { value: "", label: "Все статусы" },
@@ -433,7 +456,7 @@ function showSearchPage() {
       const btn = document.createElement('button');
       btn.type = "button";
       btn.className = "filter-btn" + (filterCategory === cat.value ? " selected" : "");
-      btn.innerHTML = (cat.icon ? cat.icon + ' ' : '') + cat.label;
+      btn.innerHTML = (cat.icon ? cat.icon + ' ' : '') + cat.label.replace(/^[^ ]+ /, "");
       btn.onclick = () => {
         filterCategory = cat.value;
         renderCategoryBar();
