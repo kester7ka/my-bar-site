@@ -778,30 +778,36 @@
     .notif-popup.error { color: #ee4747;}
     body.dark .notif-popup { background: #232b33; color: #1ca97b;}
     body.dark .notif-popup.error { color: #ee4747;}
+    .filter-bar-wrap {
+      border: 2px solid #eaf2ff;
+      background: #f7f9fc;
+      border-radius: 18px;
+      padding: 10px 7px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
     .filter-bar {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 12px;
       width: 100%;
     }
     .filter-btn {
       display: flex;
       align-items: center;
       padding: 8px 18px;
-      background: #232b33;
-      color: #b9dbff;
+      background: #eaf2ff;
+      color: #2179ba;
       border-radius: 18px;
-      border: 2px solid #3e4b5a;
+      border: 2px solid #eaf2ff;
       font-size: 1em;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.22s, color 0.2s, border 0.2s;
       margin: 0;
       outline: none;
-      background: #eaf2ff;
-      color: #2179ba;
-      border: 2px solid #eaf2ff;
     }
     .filter-btn.selected {
       background: #19c37d;
@@ -812,6 +818,10 @@
       background: #ee4747;
       color: #fff;
       border: 2px solid #ee4747;
+    }
+    body.dark .filter-bar-wrap {
+      border: 2px solid #22303b;
+      background: #1d2530;
     }
     body.dark .filter-btn {
       background: #22303b;
@@ -831,6 +841,30 @@
     .filter-btn:active {
       opacity: 0.93;
       transform: scale(0.98);
+    }
+    .tob-warning {
+      margin-top: 6px;
+      background: #fff7e6;
+      color: #cc9800;
+      border-radius: 9px;
+      padding: 7px 13px;
+      font-size: 0.98em;
+      font-weight: 600;
+      box-shadow: 0 1px 6px #ffe39933;
+      opacity: 0.97;
+      transition: opacity 0.23s;
+      animation: fadeIn 0.4s;
+      display: block;
+    }
+    body.dark .tob-warning {
+      background: #2a271e;
+      color: #ffd369;
+      box-shadow: 0 1px 6px #ffb80033;
+    }
+    .beautiful-form .btns button:disabled {
+      opacity: 0.6;
+      filter: grayscale(0.6);
+      cursor: not-allowed;
     }
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -1013,7 +1047,8 @@
           </div>
           <div class="field-row">
             <label class="field-label" for="tob">TOB (6 цифр)</label>
-            <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456">
+            <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456" autocomplete="off">
+            <div id="tobWarning" style="display:none"></div>
           </div>
           <div class="field-row">
             <label class="field-label" for="name">Название</label>
@@ -1028,7 +1063,7 @@
             <input name="opened_at" id="opened_at" type="date" required>
           </div>
           <div class="btns">
-            <button type="submit">Добавить</button>
+            <button type="submit" id="addSubmitBtn" disabled>Добавить</button>
           </div>
         </form>
       `));
@@ -1057,17 +1092,81 @@
       btnOpened.onclick = function() {
         opened = true;
         updateStatusButtons();
+        validateForm();
       };
       btnClosed.onclick = function() {
         opened = false;
         updateStatusButtons();
+        validateForm();
       };
       updateStatusButtons();
+
+      let allItems = [];
+      let fetchedItems = false;
+      let openTobExists = false;
+      const tobInput = document.getElementById('tob');
+      const tobWarning = document.getElementById('tobWarning');
+      const nameInput = document.getElementById('name');
+      const shelfInput = document.getElementById('shelf_life_days');
+      const dateInput = document.getElementById('opened_at');
+      const catInput = document.getElementById('category');
+      const submitBtn = document.getElementById('addSubmitBtn');
+
+      function validateForm() {
+        let allOk = true;
+        if (!catInput.value) allOk = false;
+        if (!tobInput.value.match(/^\d{6}$/)) allOk = false;
+        if (!nameInput.value.trim()) allOk = false;
+        if (!shelfInput.value || parseInt(shelfInput.value) < 1) allOk = false;
+        if (!dateInput.value) allOk = false;
+        if (opened && openTobExists) allOk = false;
+        submitBtn.disabled = !allOk;
+      }
+
+      async function fetchItemsOnce() {
+        if (fetchedItems) return;
+        fetchedItems = true;
+        let resp = await fetch(`${backend}/search`, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({user_id: userId, query: ""})
+        });
+        let data = await resp.json();
+        if (data.ok && Array.isArray(data.results)) {
+          allItems = data.results;
+        }
+      }
+
+      function checkTob() {
+        let tobVal = tobInput.value;
+        openTobExists = false;
+        tobWarning.style.display = "none";
+        tobWarning.innerHTML = "";
+        if (tobVal.length === 6) {
+          let exists = allItems.find(x => x.tob === tobVal && x.opened == 1);
+          if (exists) {
+            openTobExists = true;
+            tobWarning.innerHTML = `<span class="tob-warning">Позиция с этим TOB уже <b>открыта</b>. Можете добавить только закрытую позицию, либо сначала закройте открытую.</span>`;
+            tobWarning.style.display = "block";
+          }
+        }
+        validateForm();
+      }
+
+      tobInput.addEventListener('input', async function() {
+        await fetchItemsOnce();
+        checkTob();
+      });
+      nameInput.addEventListener('input', validateForm);
+      shelfInput.addEventListener('input', validateForm);
+      dateInput.addEventListener('input', validateForm);
+      catInput.addEventListener('change', validateForm);
 
       document.getElementById('addf').onsubmit = async function(e){
         e.preventDefault();
         let d = Object.fromEntries(new FormData(this));
         d.opened = opened ? 1 : 0;
+        if (opened && openTobExists) return;
         let resp = await fetch(`${backend}/add`, {
           method: "POST",
           headers: {"Content-Type":"application/json"},
@@ -1115,8 +1214,10 @@
       setPageTitle('Поиск');
       showPage(addBackButton(`
         <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
-          <div class="filter-bar" id="filterBar"></div>
-          <input id="searchInput" type="text" placeholder="Поиск по TOB или названию">
+          <input id="searchInput" type="text" placeholder="Поиск по TOB или названию" style="margin-bottom:7px;">
+          <div class="filter-bar-wrap">
+            <div class="filter-bar" id="filterBar"></div>
+          </div>
           <div id="searchResults" style="min-height:90px;"></div>
         </div>
       `));
@@ -1235,6 +1336,31 @@
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       closeDeleteModal();
       let today = new Date().toISOString().slice(0,10);
+
+      // Удаляем все закрытые позиции с этим TOB и этим opened_at (точно ту, что выбрал пользователь)
+      await fetch(`${backend}/delete`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({user_id: userId, tob: r.tob, opened: r.opened, opened_at: r.opened_at})
+      });
+
+      // Проверяем, есть ли уже открытая позиция с этим TOB (не даём дубликатов)
+      let respSearch = await fetch(`${backend}/search`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({user_id: userId, query: r.tob})
+      });
+      let dataSearch = await respSearch.json();
+      let alreadyOpened = false;
+      if (dataSearch.ok && Array.isArray(dataSearch.results)) {
+        alreadyOpened = dataSearch.results.some(x => x.tob === r.tob && x.opened == 1);
+      }
+      if (alreadyOpened) {
+        showNotification("Уже есть открытая позиция с этим TOB!", true);
+        showSearchPage();
+        return;
+      }
+
       let reqAdd = {
         user_id: userId,
         category: r.category,
@@ -1244,11 +1370,6 @@
         shelf_life_days: r.shelf_life_days,
         opened: 1
       };
-      await fetch(`${backend}/delete`, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({user_id: userId, tob: r.tob, opened: r.opened, opened_at: r.opened_at})
-      });
       let resp = await fetch(`${backend}/add`, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
@@ -1323,7 +1444,7 @@
       setTimeout(() => {
         overlay.style.opacity = 0;
         setTimeout(()=>overlay.remove(), 400);
-      }, 1500);
+      }, 1700);
     }
     function showExpiredPage() {
       setPageTitle('Проверка сроков');
