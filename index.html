@@ -560,6 +560,12 @@
       justify-content: center;
       animation: fadeIn 0.22s;
       transition: opacity 0.24s;
+      opacity: 1;
+    }
+    .modal-overlay.hide {
+      animation: fadeOut 0.36s cubic-bezier(.4,0,.2,1) forwards;
+      opacity: 0;
+      pointer-events: none;
     }
     .modal-dialog {
       background: #fff;
@@ -673,10 +679,7 @@
     }
     @keyframes fadeIn { from { opacity:0; transform: translateY(32px);} to   { opacity:1; transform: none;}}
     @keyframes popIn { from { opacity:0; transform: scale(0.95);} to   { opacity:1; transform: scale(1);}}
-    @keyframes loaderSpin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
+    @keyframes notifFadeOut { from { opacity:1; transform: translateY(0);} to { opacity:0; transform: translateY(-30px);} }
     .global-loader-overlay {
       position: fixed;
       z-index: 4000;
@@ -775,6 +778,10 @@
       transition: opacity 0.33s;
       animation: popIn 0.33s;
     }
+    .notif-popup.hide {
+      animation: notifFadeOut 0.36s cubic-bezier(.4,0,.2,1) forwards;
+      opacity: 0;
+    }
     .notif-popup.error { color: #ee4747;}
     body.dark .notif-popup { background: #232b33; color: #1ca97b;}
     body.dark .notif-popup.error { color: #ee4747;}
@@ -788,6 +795,17 @@
       flex-direction: column;
       gap: 7px;
     }
+    .filter-bar-section {
+      border: 2px solid #eaf2ff;
+      border-radius: 14px;
+      padding: 5px 5px;
+      margin-bottom: 7px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #fff;
+    }
+    .filter-bar-section:last-child { margin-bottom: 0;}
     .filter-bar {
       display: flex;
       flex-wrap: wrap;
@@ -822,6 +840,10 @@
     body.dark .filter-bar-wrap {
       border: 2px solid #22303b;
       background: #1d2530;
+    }
+    body.dark .filter-bar-section {
+      border: 2px solid #22303b;
+      background: #232b33;
     }
     body.dark .filter-btn {
       background: #22303b;
@@ -1197,7 +1219,7 @@
       if (actions) {
         if (r.opened == 1) {
           buttons = `<div class="card-actions-bottom">
-            <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Редактировать</button>
+            <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
             <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
           </div>`;
         } else {
@@ -1216,7 +1238,8 @@
         <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
           <input id="searchInput" type="text" placeholder="Поиск по TOB или названию" style="margin-bottom:7px;">
           <div class="filter-bar-wrap">
-            <div class="filter-bar" id="filterBar"></div>
+            <div class="filter-bar-section" id="categoryFilterBar"></div>
+            <div class="filter-bar-section" id="statusFilterBar"></div>
           </div>
           <div id="searchResults" style="min-height:90px;"></div>
         </div>
@@ -1236,8 +1259,9 @@
       ];
       let filterCategory = "";
       let filterOpened = "";
-      function renderFilterBar() {
-        const bar = document.getElementById('filterBar');
+
+      function renderCategoryBar() {
+        const bar = document.getElementById('categoryFilterBar');
         bar.innerHTML = '';
         categories.forEach(cat => {
           const btn = document.createElement('button');
@@ -1246,11 +1270,15 @@
           btn.innerHTML = (cat.icon ? cat.icon + ' ' : '') + cat.label;
           btn.onclick = () => {
             filterCategory = cat.value;
-            renderFilterBar();
+            renderCategoryBar();
             renderList();
           };
           bar.appendChild(btn);
         });
+      }
+      function renderStatusBar() {
+        const bar = document.getElementById('statusFilterBar');
+        bar.innerHTML = '';
         statuses.forEach(status => {
           const btn = document.createElement('button');
           btn.type = "button";
@@ -1258,13 +1286,14 @@
           btn.innerHTML = status.label;
           btn.onclick = () => {
             filterOpened = status.value;
-            renderFilterBar();
+            renderStatusBar();
             renderList();
           };
           bar.appendChild(btn);
         });
       }
-      renderFilterBar();
+      renderCategoryBar();
+      renderStatusBar();
 
       const input = document.getElementById('searchInput');
       let allItems = [];
@@ -1315,21 +1344,24 @@
     function openCardActionsModal(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       let old = document.querySelector('.modal-overlay');
-      if (old) old.remove();
-      let overlay = document.createElement('div');
-      overlay.className = 'modal-overlay';
-      overlay.innerHTML = `
-        <div class="modal-dialog">
-          <div class="modal-title">Что сделать с позицией?</div>
-          <div class="modal-buttons-row">
-            <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
-            <button class="modal-btn edit" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Редактировать</button>
+      if (old) old.classList.add('hide');
+      setTimeout(() => {
+        if (old) old.remove();
+        let overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal-dialog">
+            <div class="modal-title">Что сделать с позицией?</div>
+            <div class="modal-buttons-row">
+              <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
+              <button class="modal-btn edit" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
+            </div>
+            <button class="modal-btn cancel-full" onclick="closeDeleteModal()">Отмена</button>
           </div>
-          <button class="modal-btn cancel-full" onclick="closeDeleteModal()">Отмена</button>
-        </div>
-      `;
-      document.body.appendChild(overlay);
-      ensureTheme();
+        `;
+        document.body.appendChild(overlay);
+        ensureTheme();
+      }, 370);
     }
 
     async function autoOpen(rJson) {
@@ -1337,14 +1369,12 @@
       closeDeleteModal();
       let today = new Date().toISOString().slice(0,10);
 
-      // Удаляем все закрытые позиции с этим TOB и этим opened_at (точно ту, что выбрал пользователь)
       await fetch(`${backend}/delete`, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({user_id: userId, tob: r.tob, opened: r.opened, opened_at: r.opened_at})
       });
 
-      // Проверяем, есть ли уже открытая позиция с этим TOB (не даём дубликатов)
       let respSearch = await fetch(`${backend}/search`, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
@@ -1387,28 +1417,31 @@
     function confirmDelete(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       let old = document.querySelector('.modal-overlay');
-      if (old) old.remove();
-      let overlay = document.createElement('div');
-      overlay.className = 'modal-overlay';
-      overlay.innerHTML = `
-        <div class="modal-dialog">
-          <div class="modal-title">
-            Вы действительно хотите удалить <span class="delete-item-name">${r.name}</span>?
+      if (old) old.classList.add('hide');
+      setTimeout(() => {
+        if (old) old.remove();
+        let overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal-dialog">
+            <div class="modal-title">
+              Вы действительно хотите удалить <span class="delete-item-name">${r.name}</span>?
+            </div>
+            <div class="modal-buttons-row">
+              <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+              <button class="modal-btn edit" onclick="closeDeleteModal()">Отмена</button>
+            </div>
           </div>
-          <div class="modal-buttons-row">
-            <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
-            <button class="modal-btn edit" onclick="closeDeleteModal()">Отмена</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(overlay);
-      ensureTheme();
+        `;
+        document.body.appendChild(overlay);
+        ensureTheme();
+      }, 370);
     }
     function closeDeleteModal() {
       let overlay = document.querySelector('.modal-overlay');
       if (!overlay) return;
       overlay.classList.add('hide');
-      setTimeout(() => overlay.remove(), 220);
+      setTimeout(() => overlay.remove(), 370);
     }
     async function deleteItem(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
@@ -1430,11 +1463,14 @@
           showNotification("Ошибка удаления: " + data.error, true);
           showSearchPage();
         }
-      }, 220);
+      }, 370);
     }
     function showNotification(msg, isError = false) {
       let old = document.getElementById('notifOverlay');
-      if (old) old.remove();
+      if (old) {
+        old.classList.add('hide');
+        setTimeout(()=>old.remove(),370);
+      }
       let overlay = document.createElement('div');
       overlay.className = 'notif-overlay';
       overlay.id = 'notifOverlay';
@@ -1442,8 +1478,9 @@
       document.body.appendChild(overlay);
       setTimeout(() => { overlay.querySelector('.notif-popup').style.opacity = 1; }, 10);
       setTimeout(() => {
-        overlay.style.opacity = 0;
-        setTimeout(()=>overlay.remove(), 400);
+        let popup = overlay.querySelector('.notif-popup');
+        if (popup) popup.classList.add('hide');
+        setTimeout(()=>overlay.remove(), 370);
       }, 1700);
     }
     function showExpiredPage() {
