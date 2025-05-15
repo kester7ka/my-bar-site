@@ -539,34 +539,28 @@ async function autoOpen(rJson) {
     body: JSON.stringify({user_id: userId, query: r.tob})
   });
   let dataSearch = await respSearch.json();
-  let openedItem = null;
-  let closedItem = null;
-  if (dataSearch.ok && Array.isArray(dataSearch.results)) {
-    openedItem = dataSearch.results.find(x => x.tob === r.tob && x.opened == 1);
-    closedItem = dataSearch.results.find(x => x.tob === r.tob && x.opened == 0 && x.opened_at === r.opened_at);
-  }
-  if (!openedItem || !closedItem) {
-    showNotification("Ошибка: не найдена закрытая или открытая позиция!", true);
-    showSearchPage();
-    return;
+  let openedItem = dataSearch.ok && Array.isArray(dataSearch.results)
+    ? dataSearch.results.find(x => x.tob === r.tob && x.opened == 1)
+    : null;
+  if (openedItem) {
+    await fetch(`${backend}/delete`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId, tob: openedItem.tob, opened: 1, opened_at: openedItem.opened_at})
+    });
   }
   await fetch(`${backend}/delete`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, tob: openedItem.tob, opened: 1, opened_at: openedItem.opened_at})
-  });
-  await fetch(`${backend}/delete`, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, tob: closedItem.tob, opened: 0, opened_at: closedItem.opened_at})
+    body: JSON.stringify({user_id: userId, tob: r.tob, opened: 0, opened_at: r.opened_at})
   });
   let reqAdd = {
     user_id: userId,
-    category: closedItem.category,
-    tob: closedItem.tob,
-    name: closedItem.name,
+    category: r.category,
+    tob: r.tob,
+    name: r.name,
     opened_at: today,
-    shelf_life_days: closedItem.shelf_life_days,
+    shelf_life_days: r.shelf_life_days,
     opened: 1
   };
   let resp = await fetch(`${backend}/add`, {
