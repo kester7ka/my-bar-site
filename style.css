@@ -427,14 +427,6 @@ body.dark .status-toggle-btn.closed { background: #c94b4b; color: #fff; border: 
   text-align: center;
   transition: background 0.23s, color 0.23s;
 }
-.card-badge {
-  background: #e0e2e7 !important;
-  color: #6c7684 !important;
-}
-body.dark .card-badge {
-  background: #2b2d32 !important;
-  color: #b9bfc7 !important;
-}
 .card-status-badge.opened {
   background: #19c37d;
   color: #fff;
@@ -443,6 +435,7 @@ body.dark .card-badge {
   background: #ffeaea;
   color: #ee4747;
 }
+body.dark .card-badge,
 body.dark .card-status-badge.opened {
   background: #23c882;
   color: #fff;
