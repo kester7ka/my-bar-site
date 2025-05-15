@@ -193,18 +193,14 @@ body.dark h2 { color: var(--accent, #62b0ff); }
   gap: 12px;
   justify-content: center;
 }
+.menu .menu-btn .menu-icon {
+  font-size: 1.3em;
+  vertical-align: middle;
+}
 .menu .menu-btn:active {
   background: linear-gradient(90deg, #0051b3 60%, #13c1e3 100%);
   transform: scale(0.98);
   box-shadow: 0 1.5px 8px #0077ff22, 0 1.5px 1.5px #fff7 inset;
-}
-.card-badge {
-  background: #e3e6ef !important;
-  color: #666 !important;
-}
-body.dark .card-badge {
-  background: #232b33 !important;
-  color: #aaa !important;
 }
 .stat-block {
   padding: 23px 14px;
@@ -412,7 +408,7 @@ body.dark input[type="date"]::-webkit-calendar-picker-indicator {
 body.dark .status-toggle-btn { background: #22303b; color: #19c37d; border: 2px solid #22303b;}
 body.dark .status-toggle-btn.opened { background: #23c882; color: #fff; border: 2px solid #23c882;}
 body.dark .status-toggle-btn.closed { background: #c94b4b; color: #fff; border: 2px solid #c94b4b;}
-.card-status-badge {
+.card-badge, .card-status-badge {
   display: inline-block;
   font-weight: 700;
   font-size: 0.93em;
@@ -430,6 +426,14 @@ body.dark .status-toggle-btn.closed { background: #c94b4b; color: #fff; border: 
   margin-top: 0;
   text-align: center;
   transition: background 0.23s, color 0.23s;
+}
+.card-badge {
+  background: #e0e2e7 !important;
+  color: #6c7684 !important;
+}
+body.dark .card-badge {
+  background: #2b2d32 !important;
+  color: #b9bfc7 !important;
 }
 .card-status-badge.opened {
   background: #19c37d;
@@ -639,11 +643,11 @@ body.dark .card-status-badge.closed {
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.22s;
-  transition: opacity 0.18s;
+  transition: opacity 0.24s;
   opacity: 1;
 }
 .modal-overlay.hide {
-  animation: fadeOut 0.18s cubic-bezier(.4,0,.2,1) forwards;
+  animation: fadeOut 0.36s cubic-bezier(.4,0,.2,1) forwards;
   opacity: 0;
   pointer-events: none;
 }
