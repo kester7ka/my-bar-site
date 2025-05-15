@@ -66,13 +66,7 @@ window.showMenu = showMenu;
 window.showAddPage = showAddPage;
 window.showExpiredPage = showExpiredPage;
 window.showSearchPage = showSearchPage;
-window.showEditPage = showEditPage;
-window.openReopenForm = openReopenForm;
-window.confirmDelete = confirmDelete;
-window.deleteItem = deleteItem;
-window.openCardActionsModal = openCardActionsModal;
 window.showStatsPage = showStatsPage;
-window.showExportPage = showExportPage;
 
 function setPageTitle(title) {
   document.getElementById('pageTitle').innerHTML = title;
@@ -105,12 +99,10 @@ function showMenu() {
       ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
     </div>
     <div class="menu fadeIn" id="menuBlock">
-      <button class="menu-btn" onclick="showAddPage()"><span class="menu-icon">➕</span> Добавить позицию</button>
-      <button class="menu-btn" onclick="showExpiredPage()"><span class="menu-icon">⏱️</span> Проверить сроки</button>
-      <button class="menu-btn" onclick="showSearchPage()"><span class="menu-icon">🔍</span> Поиск</button>
-      <button class="menu-btn" onclick="showStatsPage()"><span class="menu-icon">📊</span> Статистика бара</button>
-      <button class="menu-btn" onclick="showExportPage()"><span class="menu-icon">📤</span> Печать/экспорт</button>
-      <button class="menu-btn" onclick="showEditPage()"><span class="menu-icon">🔄</span> Редактировать/переоткрыть</button>
+      <button class="menu-btn" onclick="showAddPage()">Добавить позицию</button>
+      <button class="menu-btn" onclick="showExpiredPage()">Проверить сроки</button>
+      <button class="menu-btn" onclick="showSearchPage()">Поиск</button>
+      <button class="menu-btn" onclick="showStatsPage()">Статистика бара</button>
     </div>
   `);
   ensureTheme();
@@ -140,7 +132,7 @@ document.body.addEventListener('focusin', function(e) {
 
 function showStatsPage() {
   setPageTitle('Статистика бара');
-  showPage(addBackButton(`<div class="stat-block" id="statBlock"><div style="text-align:center;color:#aaa;">Загрузка...</div></div>`));
+  showPage(addBackButton(`<div class="stat-block fadeIn" id="statBlock"><div style="text-align:center;color:#aaa;">Загрузка...</div></div>`));
   fetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
@@ -162,55 +154,6 @@ function showStatsPage() {
       <div class="stat-row"><span class="stat-label">Закрытых:</span> <span class="stat-value gray">${closed}</span></div>
       <div class="stat-row"><span class="stat-label">Просрочено:</span> <span class="stat-value red">${expired}</span></div>
     `;
-  });
-}
-
-function showExportPage() {
-  setPageTitle('Печать / экспорт');
-  showPage(addBackButton(`<div class="export-block">
-    <div class="export-info">Скачать все позиции в формате Excel или PDF</div>
-    <button class="export-btn" onclick="exportPositions('csv')">Скачать Excel (CSV)</button>
-    <button class="export-btn" onclick="exportPositions('pdf')">Скачать PDF</button>
-    <div class="export-info" style="font-size:0.93em;color:#888;">Список включает все открытые и закрытые позиции вашего бара.</div>
-  </div>`));
-}
-function exportPositions(type) {
-  fetch(`${backend}/search`, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, query: ""})
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (!data.ok) {
-      showNotification("Ошибка экспорта: " + data.error, true);
-      return;
-    }
-    if (type === "csv") {
-      let rows = [["Категория","TOB","Название","Дата открытия","Срок хранения (дней)","Годен до","Статус"]];
-      data.results.forEach(x=>{
-        rows.push([
-          x.category, x.tob, x.name, x.opened_at, x.shelf_life_days, x.expiry_at, x.opened==1?"Открыто":"Закрыто"
-        ]);
-      });
-      let csv = rows.map(r=>r.map(s=>`"${s}"`).join(";")).join("\n");
-      let blob = new Blob([csv], {type: "text/csv"});
-      let link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "bar-export.csv";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } else if (type === "pdf") {
-      let html = `<table border="1" cellpadding="6" style="font-size:12px;border-collapse:collapse;"><tr><th>Категория</th><th>TOB</th><th>Название</th><th>Дата открытия</th><th>Срок (дней)</th><th>Годен до</th><th>Статус</th></tr>`;
-      data.results.forEach(x=>{
-        html+=`<tr><td>${x.category}</td><td>${x.tob}</td><td>${x.name}</td><td>${x.opened_at}</td><td>${x.shelf_life_days}</td><td>${x.expiry_at}</td><td>${x.opened==1?"Открыто":"Закрыто"}</td></tr>`;
-      });
-      html+="</table>";
-      let win = window.open("", "_blank");
-      win.document.write(`<h2>Список позиций</h2>${html}`);
-      win.print();
-    }
   });
 }
 
@@ -393,7 +336,7 @@ function showAddPage() {
 
 function renderCard(r, actions = true) {
   let badgeCol = `<div class="card-header-col">
-    <div class="card-badge">${r.category}</div>
+    <div class="card-badge category-badge">${r.category}</div>
     <div class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</div>
   </div>`;
   let title = `<div class="card-title" title="${r.name}">${r.name}</div>`;
@@ -406,13 +349,12 @@ function renderCard(r, actions = true) {
   if (actions) {
     if (r.opened == 1) {
       buttons = `<div class="card-actions-bottom">
-        <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
-        <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+        <button class="deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
       </div>`;
     } else {
       buttons = `<div class="card-actions-bottom">
-        <button class="openbtn" onclick="openCardActionsModal('${encodeURIComponent(JSON.stringify(r))}');return false;">Открыть</button>
-        <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+        <button class="openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}');return false;">Открыть</button>
+        <button class="deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
       </div>`;
     }
   }
@@ -435,9 +377,9 @@ function showSearchPage() {
 
   const categories = [
     { value: "", label: "Все категории", icon: "" },
-    { value: "🍯 Сиропы", label: "Сиропы", icon: "🍯" },
-    { value: "🥕 Ингредиенты", label: "Ингредиенты", icon: "🥕" },
-    { value: "📦 Прочее", label: "Прочее", icon: "📦" }
+    { value: "🍯 Сиропы", label: "🍯 Сиропы", icon: "" },
+    { value: "🥕 Ингредиенты", label: "🥕 Ингредиенты", icon: "" },
+    { value: "📦 Прочее", label: "📦 Прочее", icon: "" }
   ];
   const statuses = [
     { value: "", label: "Все статусы" },
@@ -454,7 +396,7 @@ function showSearchPage() {
       const btn = document.createElement('button');
       btn.type = "button";
       btn.className = "filter-btn" + (filterCategory === cat.value ? " selected" : "");
-      btn.innerHTML = (cat.icon ? cat.icon + ' ' : '') + cat.label;
+      btn.innerHTML = cat.label;
       btn.onclick = () => {
         filterCategory = cat.value;
         renderCategoryBar();
@@ -528,32 +470,8 @@ function showSearchPage() {
   input.addEventListener('input', renderList);
 }
 
-function openCardActionsModal(rJson) {
-  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-  let old = document.querySelector('.modal-overlay');
-  if (old) old.classList.add('hide');
-  setTimeout(() => {
-    if (old) old.remove();
-    let overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-dialog">
-        <div class="modal-title">Что сделать с позицией?</div>
-        <div class="modal-buttons-row">
-          <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
-          <button class="modal-btn edit" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
-        </div>
-        <button class="modal-btn cancel-full" onclick="closeDeleteModal()">Отмена</button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    ensureTheme();
-  }, 370);
-}
-
 async function autoOpen(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-  closeDeleteModal();
   let today = new Date().toISOString().slice(0,10);
 
   let req = {
@@ -578,56 +496,22 @@ async function autoOpen(rJson) {
   }
 }
 
-function confirmDelete(rJson) {
-  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-  let old = document.querySelector('.modal-overlay');
-  if (old) old.classList.add('hide');
-  setTimeout(() => {
-    if (old) old.remove();
-    let overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-dialog">
-        <div class="modal-title">
-          Вы действительно хотите удалить <span class="delete-item-name">${r.name}</span>?
-        </div>
-        <div class="modal-buttons-row">
-          <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
-          <button class="modal-btn edit" onclick="closeDeleteModal()">Отмена</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    ensureTheme();
-  }, 370);
-}
-function closeDeleteModal() {
-  let overlay = document.querySelector('.modal-overlay');
-  if (!overlay) return;
-  overlay.classList.add('hide');
-  setTimeout(() => overlay.remove(), 370);
-}
 async function deleteItem(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-  let overlay = document.querySelector('.modal-overlay');
-  if(overlay) overlay.classList.add('hide');
-  setTimeout(async () => {
-    if(overlay) overlay.remove();
-    let resp = await fetch(`${backend}/delete`, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({user_id: userId, id: r.id})
-    });
-    let data = await resp.json();
-    if (data.ok) {
-      vibrate();
-      showNotification("Позиция удалена!");
-      showSearchPage();
-    } else {
-      showNotification("Ошибка удаления: " + data.error, true);
-      showSearchPage();
-    }
-  }, 370);
+  let resp = await fetch(`${backend}/delete`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, id: r.id})
+  });
+  let data = await resp.json();
+  if (data.ok) {
+    vibrate();
+    showNotification("Позиция удалена!");
+    showSearchPage();
+  } else {
+    showNotification("Ошибка удаления: " + data.error, true);
+    showSearchPage();
+  }
 }
 function showNotification(msg, isError = false) {
   let old = document.getElementById('notifOverlay');
@@ -677,114 +561,6 @@ function showExpiredPage() {
       cardsDiv.innerHTML = cards;
       ensureTheme();
     });
-}
-function showEditPage() {
-  setPageTitle('Редактирование позиций');
-  showPage(addBackButton(`
-    <div id="editBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
-      <input id="editSearchInput" type="text" placeholder="Поиск по TOB или названию">
-      <div id="editResults" style="min-height:90px;"></div>
-    </div>
-  `));
-  ensureTheme();
-  const input = document.getElementById('editSearchInput');
-  let allItems = [];
-  const resultsDiv = document.getElementById('editResults');
-  resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
-  fetch(`${backend}/search`, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, query: ""})
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
-    allItems = data.results;
-    renderEditList("");
-  });
-  input.addEventListener('input', e => {
-    renderEditList(e.target.value);
-  });
-  function renderEditList(filter) {
-    filter = (filter||"").trim().toLowerCase();
-    let items = allItems;
-    if(filter)
-      items = allItems.filter(
-        x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
-      );
-    if (!items.length) {
-      resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
-      return;
-    }
-    let cards = `<div class="card-list">`;
-    items.forEach(r => {
-      cards += renderCard(r);
-    });
-    cards += `</div>`;
-    resultsDiv.innerHTML = cards;
-  }
-}
-function openReopenForm(rJson) {
-  setPageTitle('Редактирование позиции');
-  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-  const today = new Date().toISOString().slice(0,10);
-  showPage(addBackButton(`
-    <form id="reopenf" class="beautiful-form" autocomplete="off">
-      <div class="field-row">
-        <label class="field-label">Категория</label>
-        <input value="${r.category}" readonly>
-      </div>
-      <div class="field-row">
-        <label class="field-label">TOB</label>
-        <input value="${r.tob}" readonly>
-      </div>
-      <div class="field-row">
-        <label class="field-label">Название</label>
-        <input name="name" required value="${r.name}">
-      </div>
-      <div class="field-row">
-        <label class="field-label">Срок хранения (дней)</label>
-        <input name="shelf_life_days" type="number" min="1" required value="${r.shelf_life_days}">
-      </div>
-      <div class="field-row">
-        <label class="field-label">Дата открытия</label>
-        <input name="opened_at" type="date" value="${today}" required>
-      </div>
-      <div class="btns">
-        <button type="submit">Сохранить</button>
-      </div>
-    </form>
-  `));
-  ensureTheme();
-  setTimeout(() => {
-    let inputs = document.querySelectorAll('.beautiful-form input, .beautiful-form select');
-    inputs.forEach(inp => {
-      inp.addEventListener('focus', function() {
-        scrollInputIntoView(this);
-      });
-    });
-  }, 100);
-  document.getElementById('reopenf').onsubmit = async function(e){
-    e.preventDefault();
-    let d = Object.fromEntries(new FormData(this));
-    let req = {
-      user_id: userId,
-      id: r.id,
-      name: d.name,
-      opened_at: d.opened_at,
-      shelf_life_days: d.shelf_life_days
-    };
-    let resp = await fetch(`${backend}/reopen`, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(req)
-    });
-    let data = await resp.json();
-    if (data.ok)
-      msg("Позиция успешно переоткрыта!", "success");
-    else
-      msg("Ошибка: " + data.error, "error");
-  };
 }
 function showGlobalLoader(show = true) {
   const loader = document.getElementById('globalLoader');
