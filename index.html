@@ -308,7 +308,7 @@
     body.dark .status-toggle-btn.selected.opened { background: #23c882; color: #fff;}
     body.dark .status-toggle-btn.selected.closed { background: #c94b4b; color: #fff;}
     body.dark .status-toggle-btn:not(.selected):active { background: #18304a; color: #62b0ff;}
-    .card-badge {
+    .card-badge, .card-status-badge {
       display: inline-block;
       background: #e5f3ff;
       color: #2179ba;
@@ -316,7 +316,7 @@
       font-size: 0.93em;
       border-radius: 13px 13px 13px 0;
       padding: 4px 10px 4px 10px;
-      margin: 0 0 9px 0;
+      margin: 0 0 8px 0;
       letter-spacing: 0.01em;
       box-shadow: 0 1px 8px #b9dbff0a;
       min-width: 88px;
@@ -325,31 +325,26 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       z-index: 2;
-      margin-bottom: 6px;
       margin-top: 0;
       text-align: center;
+      transition: background 0.23s, color 0.23s;
     }
-    .card-status-badge {
-      display: inline-block;
-      font-weight: 700;
-      font-size: 0.93em;
-      border-radius: 13px 0 13px 13px;
-      padding: 4px 14px 4px 14px;
-      letter-spacing: 0.01em;
-      box-shadow: 0 1px 8px #b9dbff0a;
-      background: #19c37d;
-      color: #fff;
-      min-width: 88px;
-      margin-bottom: 13px;
-      margin-top: 0;
-      margin-left: 0;
-      margin-right: 0;
-      position: relative;
-      text-align: center;
+    .card-status-badge.opened {
+      background: #e5f3ff;
+      color: #2179ba;
     }
     .card-status-badge.closed {
-      background: #ee4747;
-      color: #fff;
+      background: #ffeaea;
+      color: #ee4747;
+    }
+    body.dark .card-badge,
+    body.dark .card-status-badge.opened {
+      background: #17334e;
+      color: #b9dbff;
+    }
+    body.dark .card-status-badge.closed {
+      background: #3a1d1d;
+      color: #ff9595;
     }
     .item-card {
       min-width: 0;
@@ -429,6 +424,8 @@
       cursor: pointer;
       transition: background 0.17s, color 0.17s;
       animation: popIn 0.33s;
+      width: 100%;
+      margin: 0;
     }
     .editbtn { background: #eaf2ff; color: #2179ba;}
     .editbtn:active { background: #d4e3f7; color: #006eff;}
@@ -549,42 +546,29 @@
       animation: popIn 0.3s cubic-bezier(.4,0,.2,1) forwards;
       position: relative;
       max-width: 92vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .modal-dialog .modal-title {
       color: #222;
       font-weight: 700;
       font-size: 1.08em;
       margin-bottom: 16px;
+      width: 100%;
+      text-align: center;
     }
-    .modal-dialog .delete-item-name {
-      font-weight: 700;
-      color: #ee4747;
-      font-size: 1.16em;
-      display: inline-block;
-      margin: 0 3px;
-      background: #ffeaea;
-      border-radius: 7px;
-      padding: 2px 10px;
-      border: 1.5px solid #ee4747;
-      box-shadow: 0 1px 6px #ffbaba30;
-      transition: background 0.22s, color 0.22s;
-    }
-    body.dark .modal-dialog .delete-item-name {
-      color: #ff4f4f;
-      background: #3a1d1d;
-      border-color: #ff4f4f;
-      box-shadow: 0 1px 6px #ff4f4f33;
-    }
-    .modal-dialog .modal-buttons {
-      margin-top: 18px;
+    .modal-dialog .modal-buttons-row {
       display: flex;
-      gap: 12px;
+      gap: 14px;
+      width: 100%;
+      margin-bottom: 10px;
     }
-    .modal-dialog button {
+    .modal-dialog .modal-btn {
       flex: 1;
-      border-radius: 13px;
       font-size: 1em;
       padding: 11px 0;
+      border-radius: 13px;
       background: var(--accent, #006eff);
       color: #fff;
       font-weight: 600;
@@ -593,22 +577,41 @@
       cursor: pointer;
       transition: background 0.25s, transform 0.18s;
       animation: popIn 0.33s;
+      width: 100%;
+      margin: 0;
     }
-    .modal-dialog button.cancel {
-      background: #e2e6ee;
-      color: #4a4a4a;
-    }
-    .modal-dialog button:active {
+    .modal-dialog .modal-btn:active {
       background: var(--accent-dark, #0051b3);
       transform: scale(0.98);
     }
-    .modal-dialog button.cancel:active {
+    .modal-dialog .modal-btn.edit {
+      background: #eaf2ff;
+      color: #2179ba;
+    }
+    .modal-dialog .modal-btn.edit:active {
+      background: #d4e3f7;
+      color: #006eff;
+    }
+    .modal-dialog .modal-btn.cancel-full {
+      background: #e2e6ee;
+      color: #4a4a4a;
+      width: 100%;
+      margin-top: 12px;
+      border-radius: 13px;
+      font-size: 1em;
+      padding: 13px 0;
+      font-weight: 600;
+      box-shadow: 0 1px 5px #0077ff22;
+      animation: popIn 0.33s;
+    }
+    .modal-dialog .modal-btn.cancel-full:active {
       background: #c9ccd5;
     }
     body.dark .modal-dialog { background: #232b33; color: #b9dbff;}
     body.dark .modal-dialog .modal-title { color: #b9dbff;}
-    body.dark .modal-dialog button { background: #62b0ff; color: #232b33;}
-    body.dark .modal-dialog button.cancel { background: #3a4e68; color: #f1f1f1;}
+    body.dark .modal-dialog .modal-btn { background: #62b0ff; color: #232b33;}
+    body.dark .modal-dialog .modal-btn.edit { background: #17334e; color: #62b0ff;}
+    body.dark .modal-dialog .modal-btn.cancel-full { background: #3a4e68; color: #f1f1f1;}
     .modal-overlay.hide { animation: fadeOut 0.22s cubic-bezier(.4,0,.2,1) forwards; opacity: 0;}
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; }}
     @keyframes fadeInInput {
@@ -663,8 +666,7 @@
     body.dark .global-loader-text { color: var(--accent, #62b0ff);}
     @media (max-width: 600px) {
       .beautiful-form {padding: 18px 3vw 10px 3vw;}
-      .card-badge {font-size: 0.87em;}
-      .card-status-badge {font-size: 0.87em;}
+      .card-badge, .card-status-badge {font-size: 0.87em;}
       .item-card {padding: 7px 6px 7px 7px;}
       .card-list { gap: 10px; }
       .menu button { padding: 13px 0; }
@@ -696,15 +698,33 @@
     body.dark .item-card { background: linear-gradient(120deg, #243041 0%, #1d2530 100%); outline: 1.5px solid #3a4e68;}
     body.dark .item-card .card-title { color: #62b0ff; }
     body.dark .item-card .card-row { color: #b9dbff; }
-    body.dark .item-card .card-badge { background: #17334e; color: #b9dbff;}
-    body.dark .item-card .card-status-badge.opened { background: #23c882;}
-    body.dark .item-card .card-status-badge.closed { background: #c94b4b;}
-    body.dark .editbtn { background: #17334e; color: #62b0ff;}
-    body.dark .editbtn:active { background: #23436b; color: #b9dbff;}
-    body.dark .deletebtn { background: #3a1d1d; color: #ff9595;}
-    body.dark .deletebtn:active { background: #522626; color: #ff4f4f;}
-    body.dark .openbtn { background: #23c882;}
-    body.dark .openbtn:active { background: #179a62;}
+    .notif-overlay {
+      position: fixed;
+      z-index: 5000;
+      left: 0; right: 0; top: 0;
+      width: 100vw;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      animation: fadeIn 0.22s;
+    }
+    .notif-popup {
+      background: #fff;
+      color: #1ca97b;
+      font-weight: 700;
+      font-size: 1.04em;
+      border-radius: 16px;
+      box-shadow: 0 1px 8px #13c1e340;
+      margin: 18px 0 0 0;
+      padding: 17px 32px;
+      opacity: 1;
+      transition: opacity 0.33s;
+      animation: popIn 0.33s;
+    }
+    .notif-popup.error { color: #ee4747;}
+    body.dark .notif-popup { background: #232b33; color: #1ca97b;}
+    body.dark .notif-popup.error { color: #ee4747;}
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -976,7 +996,7 @@
           </div>`;
         } else {
           buttons = `<div class="card-actions-bottom">
-            <button class="openbtn" onclick="openCardActionsModal('${encodeURIComponent(JSON.stringify(r))}');return false;">Автоматически открыть</button>
+            <button class="openbtn" onclick="openCardActionsModal('${encodeURIComponent(JSON.stringify(r))}');return false;">Открыть</button>
             <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
           </div>`;
         }
@@ -1061,12 +1081,12 @@
       overlay.className = 'modal-overlay';
       overlay.innerHTML = `
         <div class="modal-dialog">
-          <div class="modal-title">Перед открытием выберите действие</div>
-          <div class="modal-buttons">
-            <button onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Автоматически открыть</button>
-            <button onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Редактировать</button>
-            <button class="cancel" onclick="closeDeleteModal()">Отмена</button>
+          <div class="modal-title">Что сделать с позицией?</div>
+          <div class="modal-buttons-row">
+            <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
+            <button class="modal-btn edit" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Редактировать</button>
           </div>
+          <button class="modal-btn cancel-full" onclick="closeDeleteModal()">Отмена</button>
         </div>
       `;
       document.body.appendChild(overlay);
@@ -1116,9 +1136,9 @@
           <div class="modal-title">
             Вы действительно хотите удалить <span class="delete-item-name">${r.name}</span>?
           </div>
-          <div class="modal-buttons">
-            <button onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
-            <button class="cancel" onclick="closeDeleteModal()">Отмена</button>
+          <div class="modal-buttons-row">
+            <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+            <button class="modal-btn edit" onclick="closeDeleteModal()">Отмена</button>
           </div>
         </div>
       `;
