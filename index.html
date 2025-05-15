@@ -273,51 +273,42 @@
       display: flex;
       align-items: center;
       justify-content: stretch;
-      margin-bottom: 4px;
-      gap: 0;
+      margin: 16px 0 4px 0;
+      gap: 13px;
       border-radius: 14px;
-      overflow: hidden;
+      overflow: visible;
       box-shadow: 0 2px 10px #bffedb1a;
-      border: 1.5px solid #e3e6ef;
-      background: #f2f9f3;
-      margin-top: 10px;
-      margin-bottom: 10px;
+      background: none;
+      border: none;
     }
     .status-toggle-btn {
       flex: 1 1 0;
-      font-size: 1.15em;
+      font-size: 1.13em;
       font-weight: 700;
-      padding: 17px 0;
+      padding: 14px 0;
+      margin: 0;
       border: none;
       outline: none;
-      transition: background 0.19s, color 0.18s, box-shadow 0.21s;
       cursor: pointer;
       background: #eaf2ff;
       color: #006eff;
-      box-shadow: none;
-      border-radius: 0;
-      position: relative;
-      z-index: 1;
-      margin: 0 2px;
+      transition: background 0.19s, color 0.18s, box-shadow 0.21s;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px #b9dbff29;
       letter-spacing: 0.03em;
     }
-    .status-toggle-btn:first-child { border-right: 1.5px solid #e3e6ef;}
     .status-toggle-btn.selected.opened {
       background: #19c37d;
       color: #fff;
-      box-shadow: 0 2px 8px #3be87b40;
-      z-index: 2;
+      box-shadow: 0 2px 12px #3be87b60;
     }
     .status-toggle-btn.selected.closed {
       background: #ee4747;
       color: #fff;
-      box-shadow: 0 2px 8px #ee474733;
-      z-index: 2;
+      box-shadow: 0 2px 12px #ee4747a6;
     }
     .status-toggle-btn:not(.selected):active { background: #d3e5f8; color: #0051b3;}
-    body.dark .status-toggle-bar { border-color: #3e4b5a; background: #17252b;}
     body.dark .status-toggle-btn { background: #22303b; color: #62b0ff;}
-    body.dark .status-toggle-btn:first-child { border-right: 1.5px solid #3e4b5a;}
     body.dark .status-toggle-btn.selected.opened { background: #23c882; color: #fff;}
     body.dark .status-toggle-btn.selected.closed { background: #c94b4b; color: #fff;}
     body.dark .status-toggle-btn:not(.selected):active { background: #18304a; color: #62b0ff;}
@@ -352,7 +343,7 @@
       box-shadow: 0 1px 8px #b9dbff0a;
       background: #19c37d;
       color: #fff;
-      margin-top: 13px;
+      margin-top: 14px;
       margin-bottom: 0;
       margin-left: 0;
       margin-right: 0;
@@ -382,6 +373,26 @@
       animation: popIn 0.43s;
       align-self: stretch;
     }
+    .item-card .card-badge {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      left: auto;
+      bottom: auto;
+      border-top-right-radius: 18px;
+      border-bottom-left-radius: 0;
+      z-index: 2;
+    }
+    .item-card .card-status-badge {
+      margin-top: 0;
+      margin-bottom: 14px;
+      margin-left: 0;
+      margin-right: 0;
+      align-self: flex-start;
+      position: relative;
+      top: 38px;
+      left: 0;
+    }
     .item-card .card-title {
       font-weight: 700;
       font-size: 1.03em;
@@ -408,21 +419,6 @@
       font-weight: 700;
       color: #006eff;
       margin-right: 4px;
-    }
-    .item-card .card-badge {
-      position: absolute;
-      right: 12px;
-      top: 12px;
-      left: auto;
-      bottom: auto;
-      border-top-right-radius: 18px;
-      border-bottom-left-radius: 0;
-    }
-    .item-card .card-status-badge {
-      margin-top: 18px;
-      margin-left: 0;
-      margin-right: 0;
-      align-self: flex-start;
     }
     .card-actions-bottom {
       margin-top: auto;
@@ -832,11 +828,11 @@
       const btnClosed = document.getElementById('btnClosed');
       function updateStatusButtons() {
         if (opened) {
-          btnOpened.classList.add("selected");
-          btnClosed.classList.remove("selected");
+          btnOpened.classList.add("selected", "opened");
+          btnClosed.classList.remove("selected", "closed");
         } else {
-          btnOpened.classList.remove("selected");
-          btnClosed.classList.add("selected");
+          btnOpened.classList.remove("selected", "opened");
+          btnClosed.classList.add("selected", "closed");
         }
       }
       btnOpened.onclick = function() {
@@ -894,12 +890,12 @@
             cards += `
               <div class="item-card">
                 <div class="card-badge">${x.category}</div>
+                <div class="card-status-badge ${x.opened === false || x.opened === 0 || x.opened === '0' ? 'closed' : 'opened'}" style="position: static; margin-top: 42px; margin-bottom: 10px;">
+                  ${x.opened === false || x.opened === 0 || x.opened === '0' ? 'Закрыто' : 'Открыто'}
+                </div>
                 <div class="card-title">${x.name}</div>
                 <div class="card-row"><b>TOB:</b> ${x.tob}</div>
                 <div class="card-row"><b>Годен до:</b> ${x.expiry_at}</div>
-                <div class="card-status-badge ${x.opened === false || x.opened === 0 || x.opened === '0' ? 'closed' : 'opened'}">
-                  ${x.opened === false || x.opened === 0 || x.opened === '0' ? 'Закрыто' : 'Открыто'}
-                </div>
               </div>
             `;
           });
@@ -970,13 +966,13 @@
           cards += `
             <div class="item-card">
               <div class="card-badge">${r.category}</div>
+              <div class="card-status-badge ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'closed' : 'opened'}" style="position: static; margin-top: 42px; margin-bottom: 10px;">
+                ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'Закрыто' : 'Открыто'}
+              </div>
               <div class="card-title" title="${r.name}">${r.name}</div>
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
-              <div class="card-status-badge ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'closed' : 'opened'}">
-                ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'Закрыто' : 'Открыто'}
-              </div>
             </div>
           `;
         });
@@ -1030,13 +1026,13 @@
           cards += `
             <div class="item-card">
               <div class="card-badge">${r.category}</div>
+              <div class="card-status-badge ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'closed' : 'opened'}" style="position: static; margin-top: 42px; margin-bottom: 10px;">
+                ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'Закрыто' : 'Открыто'}
+              </div>
               <div class="card-title" title="${r.name}">${r.name}</div>
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
-              <div class="card-status-badge ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'closed' : 'opened'}">
-                ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'Закрыто' : 'Открыто'}
-              </div>
               <div class="card-actions-bottom">
                 <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Редактировать</button>
                 <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
