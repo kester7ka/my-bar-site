@@ -349,12 +349,14 @@ function renderCard(r, actions = true) {
   if (actions) {
     if (r.opened == 1) {
       buttons = `<div class="card-actions-bottom">
-        <button class="deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+        <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
+        <button class="deletebtn" onclick="showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
       </div>`;
     } else {
       buttons = `<div class="card-actions-bottom">
-        <button class="openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}');return false;">Открыть</button>
-        <button class="deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+        <button class="openbtn" onclick="showOpenModal('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
+        <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
+        <button class="deletebtn" onclick="showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
       </div>`;
     }
   }
@@ -470,8 +472,51 @@ function showSearchPage() {
   input.addEventListener('input', renderList);
 }
 
+function showOpenModal(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  closeModal();
+  let overlay = document.createElement('div');
+  overlay.className = 'modal-overlay show-blur';
+  overlay.innerHTML = `
+    <div class="modal-dialog modal-action">
+      <div class="modal-title">Выберите действие</div>
+      <button class="modal-btn openbtn large" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
+      <button class="modal-btn editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
+      <button class="modal-btn cancel-full" onclick="closeModal()">Отмена</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add('visible'), 10);
+  ensureTheme();
+}
+
+function showDeleteModal(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  closeModal();
+  let overlay = document.createElement('div');
+  overlay.className = 'modal-overlay show-blur';
+  overlay.innerHTML = `
+    <div class="modal-dialog modal-delete">
+      <div class="modal-title">Вы уверены, что хотите удалить <span class="delete-item-name">${r.name}</span>?</div>
+      <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+      <button class="modal-btn cancel-full" onclick="closeModal()">Отмена</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add('visible'), 10);
+  ensureTheme();
+}
+
+function closeModal() {
+  let overlay = document.querySelector('.modal-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('visible');
+  setTimeout(() => overlay.remove(), 370);
+}
+
 async function autoOpen(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  closeModal();
   let today = new Date().toISOString().slice(0,10);
 
   let req = {
@@ -498,6 +543,7 @@ async function autoOpen(rJson) {
 
 async function deleteItem(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  closeModal();
   let resp = await fetch(`${backend}/delete`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
