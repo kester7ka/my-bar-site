@@ -55,9 +55,9 @@ document.getElementById('wrap').addEventListener('touchstart', function(e) {
 
 if (!userId) {
   document.getElementById('main').innerHTML = `
-    <div style="padding:22px 0;text-align:center" class="error">
+    <div style=\"padding:22px 0;text-align:center\" class=\"error\">
       Откройте сайт через Telegram-бота, чтобы пользоваться баром.<br><br>
-      <a href="${botLink}" style="color:#007aff;font-weight:bold" target="_blank">Открыть бота</a>
+      <a href=\"${botLink}\" style=\"color:#007aff;font-weight:bold\" target=\"_blank\">Открыть бота</a>
     </div>`;
   throw new Error("Not in Telegram Mini App");
 }
@@ -79,15 +79,15 @@ function setPageTitle(title) {
 }
 function showPage(contentHtml) {
   const el = document.getElementById("main");
-  el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
+  el.innerHTML = `<div class=\"page-anim\">${contentHtml}</div>`;
   ensureTheme();
   window.scrollTo({top: 0, behavior: 'smooth'});
   forceExpand();
 }
 function addBackButton(html) {
-  return `<button class="backbtn" onclick="showMenu()">Назад</button>` + html;
+  return `<button class=\"backbtn\" onclick=\"showMenu()\">Назад</button>` + html;
 }
-function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${m}</div>`)); }
+function msg(m, type=''){ showPage(addBackButton(`<div class=\"${type} result\">${m}</div>`)); }
 let USER = null;
 function welcomeGreeting() {
   const now = new Date();
@@ -100,17 +100,17 @@ function welcomeGreeting() {
 function showMenu() {
   setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
   showPage(`
-    <div class="welcome-block">
-      <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
-      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
+    <div class=\"welcome-block\">
+      <div class=\"welcome-greet\">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
+      ${USER && USER.bar_name ? `<span class=\"welcome-bar\">Бар: ${USER.bar_name}</span>` : ""}
     </div>
-    <div class="menu fadeIn" id="menuBlock">
-      <button class="menu-btn" onclick="showAddPage()"><span class="menu-icon">➕</span> Добавить позицию</button>
-      <button class="menu-btn" onclick="showExpiredPage()"><span class="menu-icon">⏱️</span> Проверить сроки</button>
-      <button class="menu-btn" onclick="showSearchPage()"><span class="menu-icon">🔍</span> Поиск</button>
-      <button class="menu-btn" onclick="showStatsPage()"><span class="menu-icon">📊</span> Статистика бара</button>
-      <button class="menu-btn" onclick="showExportPage()"><span class="menu-icon">📤</span> Печать/экспорт</button>
-      <button class="menu-btn" onclick="showEditPage()"><span class="menu-icon">🔄</span> Редактировать/переоткрыть</button>
+    <div class=\"menu fadeIn\" id=\"menuBlock\">
+      <button class=\"menu-btn\" onclick=\"showAddPage()\"><span class=\"menu-icon\">➕</span> Добавить позицию</button>
+      <button class=\"menu-btn\" onclick=\"showExpiredPage()\"><span class=\"menu-icon\">⏱️</span> Проверить сроки</button>
+      <button class=\"menu-btn\" onclick=\"showSearchPage()\"><span class=\"menu-icon\">🔍</span> Поиск</button>
+      <button class=\"menu-btn\" onclick=\"showStatsPage()\"><span class=\"menu-icon\">📊</span> Статистика бара</button>
+      <button class=\"menu-btn\" onclick=\"showExportPage()\"><span class=\"menu-icon\">📤</span> Печать/экспорт</button>
+      <button class=\"menu-btn\" onclick=\"showEditPage()\"><span class=\"menu-icon\">🔄</span> Редактировать/переоткрыть</button>
     </div>
   `);
   ensureTheme();
@@ -140,7 +140,7 @@ document.body.addEventListener('focusin', function(e) {
 
 function showStatsPage() {
   setPageTitle('Статистика бара');
-  showPage(addBackButton(`<div class="stat-block" id="statBlock"><div style="text-align:center;color:#aaa;">Загрузка...</div></div>`));
+  showPage(addBackButton(`<div class=\"stat-block\" id=\"statBlock\"><div style=\"text-align:center;color:#aaa;\">Загрузка...</div></div>`));
   fetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
@@ -149,132 +149,106 @@ function showStatsPage() {
   .then(r => r.json())
   .then(data => {
     if (!data.ok) {
-      document.getElementById('statBlock').innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+      document.getElementById('statBlock').innerHTML = `<div class=\"error\">Ошибка: ${data.error}</div>`;
       return;
     }
-    let stats = {};
-    let CATEGORY_LABELS = [
-      { label: "🍯 Сиропы", emoji: "🍯" },
-      { label: "🥕 Ингредиенты", emoji: "🥕" },
-      { label: "📦 Прочее", emoji: "📦" }
-    ];
-    CATEGORY_LABELS.forEach(c => stats[c.label] = { total: 0, opened: 0, closed: 0 });
-    data.results.forEach(x => {
-      if (stats[x.category]) {
-        stats[x.category].total += 1;
-        if (x.opened == 1) stats[x.category].opened += 1;
-        if (x.opened == 0) stats[x.category].closed += 1;
-      }
-    });
-    let rows = CATEGORY_LABELS.map(({label, emoji}) =>
-      `<tr>
-        <td><span class="cat-emoji">${emoji}</span>${label.replace(/^[^ ]+ /, "")}</td>
-        <td>${stats[label].total}</td>
-        <td>${stats[label].opened}</td>
-        <td>${stats[label].closed}</td>
-      </tr>`
-    ).join('');
+    let total = data.results.length;
+    let opened = data.results.filter(x=>x.opened==1).length;
+    let closed = data.results.filter(x=>x.opened==0).length;
+    let expired = data.results.filter(x=>x.expiry_at && new Date(x.expiry_at) < new Date()).length;
     document.getElementById('statBlock').innerHTML = `
-      <div class="stats-animate">
-        <table class="stats-table">
-          <thead>
-            <tr>
-              <th>Категория</th>
-              <th>Всего</th>
-              <th>Открыто</th>
-              <th>Закрыто</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-        <div class="export-btns-row">
-          <button class="export-excel-btn" onclick="exportPositions('excel')">
-            <svg viewBox="0 0 24 24" width="21" height="21"><rect fill="#1ecb51" width="24" height="24" rx="5"/><path fill="#fff" d="M7.4 8h1.3l1.3 2.3L11.3 8h1.3l-1.7 2.9L12.8 14h-1.3l-1.2-2.1L9 14H7.7l1.7-3.1L7.4 8zm4.6 0h4v1.1h-2.8v1.3h2.4v1.1h-2.4v1.4H17V14h-5V8z"/></svg>
-            Excel (в ЛС)
-          </button>
-          <button class="export-pdf-btn" onclick="exportPositions('pdf')">
-            <svg viewBox="0 0 24 24" width="21" height="21"><rect fill="#ee4747" width="24" height="24" rx="5"/><path fill="#fff" d="M8 8h8v8H8V8zm1 1v6h6V9H9z"/></svg>
-            PDF (в ЛС)
-          </button>
-        </div>
-        <div class="export-info" style="font-size:0.93em;color:#888;">Файл придёт вам в Telegram-бота.<br>Список включает все открытые и закрытые позиции вашего бара.</div>
-      </div>
+      <div class=\"stat-row\"><span class=\"stat-label\">Всего позиций:</span> <span class=\"stat-value blue\">${total}</span></div>
+      <div class=\"stat-row\"><span class=\"stat-label\">Открытых:</span> <span class=\"stat-value\">${opened}</span></div>
+      <div class=\"stat-row\"><span class=\"stat-label\">Закрытых:</span> <span class=\"stat-value gray\">${closed}</span></div>
+      <div class=\"stat-row\"><span class=\"stat-label\">Просрочено:</span> <span class=\"stat-value red\">${expired}</span></div>
     `;
   });
 }
 
 function showExportPage() {
   setPageTitle('Печать / экспорт');
-  showPage(addBackButton(`<div class="export-block">
-    <div class="export-info">Экспортировать все позиции в формате Excel или PDF</div>
-    <div class="export-btns-row">
-      <button class="export-excel-btn" onclick="exportPositions('excel')">
-        <svg viewBox="0 0 24 24" width="21" height="21"><rect fill="#1ecb51" width="24" height="24" rx="5"/><path fill="#fff" d="M7.4 8h1.3l1.3 2.3L11.3 8h1.3l-1.7 2.9L12.8 14h-1.3l-1.2-2.1L9 14H7.7l1.7-3.1L7.4 8zm4.6 0h4v1.1h-2.8v1.3h2.4v1.1h-2.4v1.4H17V14h-5V8z"/></svg>
-        Excel (в ЛС)
-      </button>
-      <button class="export-pdf-btn" onclick="exportPositions('pdf')">
-        <svg viewBox="0 0 24 24" width="21" height="21"><rect fill="#ee4747" width="24" height="24" rx="5"/><path fill="#fff" d="M8 8h8v8H8V8zm1 1v6h6V9H9z"/></svg>
-        PDF (в ЛС)
-      </button>
-    </div>
-    <div class="export-info" style="font-size:0.93em;color:#888;">Файл придёт вам в Telegram-бота.<br>Список включает все открытые и закрытые позиции вашего бара.</div>
+  showPage(addBackButton(`<div class=\"export-block\">
+    <div class=\"export-info\">Скачать все позиции в формате Excel или PDF</div>
+    <button class=\"export-btn\" onclick=\"exportPositions('csv')\">Скачать Excel (CSV)</button>
+    <button class=\"export-btn\" onclick=\"exportPositions('pdf')\">Скачать PDF</button>
+    <div class=\"export-info\" style=\"font-size:0.93em;color:#888;\">Список включает все открытые и закрытые позиции вашего бара.</div>
   </div>`));
 }
 function exportPositions(type) {
-  fetch(`${backend}/export`, {
+  fetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, type: type})
+    body: JSON.stringify({user_id: userId, query: ""})
   })
   .then(r => r.json())
   .then(data => {
-    if (data.ok) {
-      showNotification("Файл отправлен вам в Telegram-бот!");
-    } else {
-      showNotification("Ошибка экспорта: " + (data.error || "Неизвестная ошибка"), true);
+    if (!data.ok) {
+      showNotification("Ошибка экспорта: " + data.error, true);
+      return;
     }
-  }).catch(() => {
-    showNotification("Ошибка экспорта: не удалось соединиться с сервером", true);
+    if (type === "csv") {
+      let rows = [["Категория","TOB","Название","Дата открытия","Срок хранения (дней)","Годен до","Статус"]];
+      data.results.forEach(x=>{
+        rows.push([
+          x.category, x.tob, x.name, x.opened_at, x.shelf_life_days, x.expiry_at, x.opened==1?"Открыто":"Закрыто"
+        ]);
+      });
+      let csv = rows.map(r=>r.map(s=>`\"${s}\"`).join(";")).join("\n");
+      let blob = new Blob([csv], {type: "text/csv"});
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "bar-export.csv";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } else if (type === "pdf") {
+      let html = `<table border=\"1\" cellpadding=\"6\" style=\"font-size:12px;border-collapse:collapse;\"><tr><th>Категория</th><th>TOB</th><th>Название</th><th>Дата открытия</th><th>Срок (дней)</th><th>Годен до</th><th>Статус</th></tr>`;
+      data.results.forEach(x=>{
+        html+=`<tr><td>${x.category}</td><td>${x.tob}</td><td>${x.name}</td><td>${x.opened_at}</td><td>${x.shelf_life_days}</td><td>${x.expiry_at}</td><td>${x.opened==1?"Открыто":"Закрыто"}</td></tr>`;
+      });
+      html+="</table>";
+      let win = window.open("", "_blank");
+      win.document.write(`<h2>Список позиций</h2>${html}`);
+      win.print();
+    }
   });
 }
 
 function showAddPage() {
   setPageTitle('Добавить позицию');
   showPage(addBackButton(`
-    <form id="addf" class="beautiful-form" autocomplete="off">
-      <div class="field-row">
-        <label class="field-label" for="category">Категория</label>
-        <select name="category" id="category" required>
-          <option value="🍯 Сиропы">🍯 Сиропы</option>
-          <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
-          <option value="📦 Прочее">📦 Прочее</option>
+    <form id=\"addf\" class=\"beautiful-form\" autocomplete=\"off\">
+      <div class=\"field-row\">
+        <label class=\"field-label\" for=\"category\">Категория</label>
+        <select name=\"category\" id=\"category\" required>
+          <option value=\"🍯 Сиропы\">🍯 Сиропы</option>
+          <option value=\"🥕 Ингредиенты\">🥕 Ингредиенты</option>
+          <option value=\"📦 Прочее\">📦 Прочее</option>
         </select>
       </div>
-      <div class="status-toggle-bar" id="statusToggleBar">
-        <button type="button" class="status-toggle-btn opened selected" id="btnOpened">Открыто</button>
-        <button type="button" class="status-toggle-btn closed" id="btnClosed">Закрыто</button>
+      <div class=\"status-toggle-bar\" id=\"statusToggleBar\">
+        <button type=\"button\" class=\"status-toggle-btn opened selected\" id=\"btnOpened\">Открыто</button>
+        <button type=\"button\" class=\"status-toggle-btn closed\" id=\"btnClosed\">Закрыто</button>
       </div>
-      <div class="field-row">
-        <label class="field-label" for="tob">TOB (6 цифр)</label>
-        <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456" autocomplete="off">
-        <div id="tobWarning" style="display:none"></div>
+      <div class=\"field-row\">
+        <label class=\"field-label\" for=\"tob\">TOB (6 цифр)</label>
+        <input name=\"tob\" id=\"tob\" maxlength=\"6\" pattern=\"\\\\d{6}\" required placeholder=\"123456\" autocomplete=\"off\">
+        <div id=\"tobWarning\" style=\"display:none\"></div>
       </div>
-      <div class="field-row">
-        <label class="field-label" for="name">Название</label>
-        <input name="name" id="name" required placeholder="Название позиции">
+      <div class=\"field-row\">
+        <label class=\"field-label\" for=\"name\">Название</label>
+        <input name=\"name\" id=\"name\" required placeholder=\"Название позиции\">
       </div>
-      <div class="field-row">
-        <label class="field-label" for="shelf_life_days">Срок хранения (дней)</label>
-        <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="30">
+      <div class=\"field-row\">
+        <label class=\"field-label\" for=\"shelf_life_days\">Срок хранения (дней)</label>
+        <input name=\"shelf_life_days\" id=\"shelf_life_days\" type=\"number\" min=\"1\" required placeholder=\"30\">
       </div>
-      <div class="field-row">
-        <label class="field-label" for="opened_at">Дата открытия</label>
-        <input name="opened_at" id="opened_at" type="date" required>
+      <div class=\"field-row\">
+        <label class=\"field-label\" for=\"opened_at\">Дата открытия</label>
+        <input name=\"opened_at\" id=\"opened_at\" type=\"date\" required>
       </div>
-      <div class="btns">
-        <button type="submit" id="addSubmitBtn" disabled>Добавить</button>
+      <div class=\"btns\">
+        <button type=\"submit\" id=\"addSubmitBtn\" disabled>Добавить</button>
       </div>
     </form>
   `));
@@ -326,7 +300,7 @@ function showAddPage() {
   function validateForm() {
     let allOk = true;
     if (!catInput.value) allOk = false;
-    if (!tobInput.value.match(/^\d{6}$/)) allOk = false;
+    if (!tobInput.value.match(/^\\d{6}$/)) allOk = false;
     if (!nameInput.value.trim()) allOk = false;
     if (!shelfInput.value || parseInt(shelfInput.value) < 1) allOk = false;
     if (!dateInput.value) allOk = false;
@@ -344,7 +318,7 @@ function showAddPage() {
     });
     let data = await resp.json();
     if (data.ok && Array.isArray(data.results)) {
-      allItems = data.results;
+      allItems = data.results; // allItems will now contain 'id'
     }
   }
 
@@ -357,7 +331,7 @@ function showAddPage() {
       let exists = allItems.find(x => x.tob === tobVal && x.opened == 1);
       if (exists) {
         openTobExists = true;
-        tobWarning.innerHTML = `<span class="tob-warning">Позиция с этим TOB уже <b>открыта</b>. Можете добавить только закрытую позицию, либо сначала закройте открытую.</span>`;
+        tobWarning.innerHTML = `<span class=\"tob-warning\">Позиция с этим TOB уже <b>открыта</b>. Можете добавить только закрытую позицию, либо сначала закройте открытую.</span>`;
         tobWarning.style.display = "block";
       }
     }
@@ -393,53 +367,54 @@ function showAddPage() {
   };
 }
 
-function renderCard(r, actions = true) {
-  let badgeCol = `<div class="card-header-col">
-    <div class="card-badge">${r.category}</div>
-    <div class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</div>
+function renderCard(r, actions = true) { // r should contain 'id' from backend
+  let badgeCol = `<div class=\"card-header-col\">
+    <div class=\"card-badge\">${r.category}</div>
+    <div class=\"card-status-badge ${r.opened == 1 ? "opened" : "closed"}\">${r.opened == 1 ? "Открыто" : "Закрыто"}</div>
   </div>`;
-  let title = `<div class="card-title" title="${r.name}">${r.name}</div>`;
+  let title = `<div class=\"card-title\" title=\"${r.name}\">${r.name}</div>`;
   let rows = `
-    <div class="card-row"><b>TOB:</b> ${r.tob}</div>
-    <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
-    <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
+    <div class=\"card-row\"><b>TOB:</b> ${r.tob}</div>
+    <div class=\"card-row\"><b>Открыто:</b> ${r.opened_at}</div>
+    <div class=\"card-row\"><b>Годен до:</b> ${r.expiry_at}</div>
   `;
   let buttons = "";
   if (actions) {
+    // Pass the whole 'r' object which includes 'id'
     if (r.opened == 1) {
-      buttons = `<div class="card-actions-bottom">
-        <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
-        <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+      buttons = `<div class=\"card-actions-bottom\">
+        <button class=\"editbtn\" onclick=\"openReopenForm('${encodeURIComponent(JSON.stringify(r))}')\">Изменить</button>
+        <button class=\"deletebtn\" onclick=\"confirmDelete('${encodeURIComponent(JSON.stringify(r))}')\">Удалить</button>
       </div>`;
     } else {
-      buttons = `<div class="card-actions-bottom">
-        <button class="openbtn" onclick="openCardActionsModal('${encodeURIComponent(JSON.stringify(r))}');return false;">Открыть</button>
-        <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
+      buttons = `<div class=\"card-actions-bottom\">
+        <button class=\"openbtn\" onclick=\"openCardActionsModal('${encodeURIComponent(JSON.stringify(r))}')\">Открыть</button>
+        <button class=\"deletebtn\" onclick=\"confirmDelete('${encodeURIComponent(JSON.stringify(r))}')\">Удалить</button>
       </div>`;
     }
   }
-  return `<div class="item-card">${badgeCol}${title}${rows}${buttons}</div>`;
+  return `<div class=\"item-card\">${badgeCol}${title}${rows}${buttons}</div>`;
 }
 
 function showSearchPage() {
   setPageTitle('Поиск');
   showPage(addBackButton(`
-    <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
-      <input id="searchInput" type="text" placeholder="Поиск по TOB или названию" style="margin-bottom:7px;">
-      <div class="filter-bar-wrap">
-        <div class="filter-bar-section" id="categoryFilterBar"></div>
-        <div class="filter-bar-section" id="statusFilterBar"></div>
+    <div id=\"searchBlock\" class=\"beautiful-form\" style=\"gap:10px;max-width:440px;\">
+      <input id=\"searchInput\" type=\"text\" placeholder=\"Поиск по TOB или названию\" style=\"margin-bottom:7px;\">
+      <div class=\"filter-bar-wrap\">
+        <div class=\"filter-bar-section\" id=\"categoryFilterBar\"></div>
+        <div class=\"filter-bar-section\" id=\"statusFilterBar\"></div>
       </div>
-      <div id="searchResults" style="min-height:90px;"></div>
+      <div id=\"searchResults\" style=\"min-height:90px;\"></div>
     </div>
   `));
   ensureTheme();
 
   const categories = [
     { value: "", label: "Все категории", icon: "" },
-    { value: "🍯 Сиропы", label: "🍯 Сиропы", icon: "🍯" },
-    { value: "🥕 Ингредиенты", label: "🥕 Ингредиенты", icon: "🥕" },
-    { value: "📦 Прочее", label: "📦 Прочее", icon: "📦" }
+    { value: "🍯 Сиропы", label: "Сиропы", icon: "🍯" },
+    { value: "🥕 Ингредиенты", label: "Ингредиенты", icon: "🥕" },
+    { value: "📦 Прочее", label: "Прочее", icon: "📦" }
   ];
   const statuses = [
     { value: "", label: "Все статусы" },
@@ -456,7 +431,7 @@ function showSearchPage() {
       const btn = document.createElement('button');
       btn.type = "button";
       btn.className = "filter-btn" + (filterCategory === cat.value ? " selected" : "");
-      btn.innerHTML = (cat.icon ? cat.icon + ' ' : '') + cat.label.replace(/^[^ ]+ /, "");
+      btn.innerHTML = (cat.icon ? cat.icon + ' ' : '') + cat.label;
       btn.onclick = () => {
         filterCategory = cat.value;
         renderCategoryBar();
@@ -485,9 +460,9 @@ function showSearchPage() {
   renderStatusBar();
 
   const input = document.getElementById('searchInput');
-  let allItems = [];
+  let allItems = []; // Will contain 'id'
   const resultsDiv = document.getElementById('searchResults');
-  resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
+  resultsDiv.innerHTML = `<div style=\"text-align:center;color:#aaa;font-size:1.07em;\">Загрузка...</div>`;
   fetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
@@ -495,8 +470,8 @@ function showSearchPage() {
   })
   .then(r => r.json())
   .then(data => {
-    if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
-    allItems = data.results;
+    if (!data.ok) return resultsDiv.innerHTML = `<div class=\"error\">Ошибка: ${data.error}</div>`;
+    allItems = data.results; // data.results now contains 'id'
     renderList();
   });
   function renderList() {
@@ -517,12 +492,12 @@ function showSearchPage() {
       items = [...openedArr, ...closedArr];
     }
     if (!items.length) {
-      resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
+      resultsDiv.innerHTML = `<div style=\"text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;\">Ничего не найдено</div>`;
       return;
     }
-    let cards = `<div class="card-list" style="animation:none">`;
+    let cards = `<div class=\"card-list\" style=\"animation:none\">`;
     items.forEach(r => {
-      cards += renderCard(r);
+      cards += renderCard(r); // 'r' includes 'id'
     });
     cards += `</div>`;
     resultsDiv.innerHTML = cards;
@@ -531,7 +506,7 @@ function showSearchPage() {
 }
 
 function openCardActionsModal(rJson) {
-  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson; // 'r' includes 'id'
   let old = document.querySelector('.modal-overlay');
   if (old) old.classList.add('hide');
   setTimeout(() => {
@@ -539,13 +514,13 @@ function openCardActionsModal(rJson) {
     let overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-      <div class="modal-dialog">
-        <div class="modal-title">Что сделать с позицией?</div>
-        <div class="modal-buttons-row">
-          <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
-          <button class="modal-btn edit" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
+      <div class=\"modal-dialog\">
+        <div class=\"modal-title\">Что сделать с позицией?</div>
+        <div class=\"modal-buttons-row\">
+          <button class=\"modal-btn openbtn\" onclick=\"autoOpen('${encodeURIComponent(JSON.stringify(r))}')\">Открыть</button>
+          <button class=\"modal-btn edit\" onclick=\"openReopenForm('${encodeURIComponent(JSON.stringify(r))}')\">Изменить</button>
         </div>
-        <button class="modal-btn cancel-full" onclick="closeDeleteModal()">Отмена</button>
+        <button class=\"modal-btn cancel-full\" onclick=\"closeDeleteModal()\">Отмена</button>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -554,16 +529,18 @@ function openCardActionsModal(rJson) {
 }
 
 async function autoOpen(rJson) {
-  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson; // 'r' includes 'id'
   closeDeleteModal();
   let today = new Date().toISOString().slice(0,10);
 
+  // Delete the old (closed) item by its ID
   await fetch(`${backend}/delete`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, tob: r.tob, opened: r.opened, opened_at: r.opened_at})
+    body: JSON.stringify({user_id: userId, id: r.id}) // Send 'id' for deletion
   });
 
+  // Check if an item with the same TOB is already opened (this logic can remain as is or be refined)
   let respSearch = await fetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
@@ -576,10 +553,11 @@ async function autoOpen(rJson) {
   }
   if (alreadyOpened) {
     showNotification("Уже есть открытая позиция с этим TOB!", true);
-    showSearchPage();
+    showSearchPage(); // Refresh the search page to show current state
     return;
   }
 
+  // Add the item as a new opened item
   let reqAdd = {
     user_id: userId,
     category: r.category,
@@ -597,13 +575,13 @@ async function autoOpen(rJson) {
   let data = await resp.json();
   if (data.ok) {
     showNotification("Позиция открыта!", false);
-    showSearchPage();
+    showSearchPage(); // Refresh
   } else {
     showNotification("Ошибка открытия: "+data.error, true);
   }
 }
 
-function confirmDelete(rJson) {
+function confirmDelete(rJson) { // rJson contains the full item object including 'id'
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   let old = document.querySelector('.modal-overlay');
   if (old) old.classList.add('hide');
@@ -612,13 +590,13 @@ function confirmDelete(rJson) {
     let overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-      <div class="modal-dialog">
-        <div class="modal-title">
-          Вы действительно хотите удалить <span class="delete-item-name">${r.name}</span>?
+      <div class=\"modal-dialog\">
+        <div class=\"modal-title\">
+          Вы действительно хотите удалить <span class=\"delete-item-name\">${r.name}</span>?
         </div>
-        <div class="modal-buttons-row">
-          <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
-          <button class="modal-btn edit" onclick="closeDeleteModal()">Отмена</button>
+        <div class=\"modal-buttons-row\">
+          <button class=\"modal-btn deletebtn\" onclick=\"deleteItem('${encodeURIComponent(JSON.stringify(r))}')\">Удалить</button>
+          <button class=\"modal-btn edit\" onclick=\"closeDeleteModal()\">Отмена</button>
         </div>
       </div>
     `;
@@ -632,7 +610,7 @@ function closeDeleteModal() {
   overlay.classList.add('hide');
   setTimeout(() => overlay.remove(), 370);
 }
-async function deleteItem(rJson) {
+async function deleteItem(rJson) { // rJson contains the full item object including 'id'
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   let overlay = document.querySelector('.modal-overlay');
   if(overlay) overlay.classList.add('hide');
@@ -641,16 +619,16 @@ async function deleteItem(rJson) {
     let resp = await fetch(`${backend}/delete`, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({user_id: userId, tob: r.tob, opened: r.opened, opened_at: r.opened_at})
+      body: JSON.stringify({user_id: userId, id: r.id }) // Send 'id' instead of tob, opened, opened_at
     });
     let data = await resp.json();
     if (data.ok) {
       vibrate();
       showNotification("Позиция удалена!");
-      showSearchPage();
+      showSearchPage(); // Refresh the page to reflect deletion
     } else {
       showNotification("Ошибка удаления: " + data.error, true);
-      showSearchPage();
+      showSearchPage(); // Refresh even on error to ensure UI consistency or show latest data
     }
   }, 370);
 }
@@ -663,7 +641,7 @@ function showNotification(msg, isError = false) {
   let overlay = document.createElement('div');
   overlay.className = 'notif-overlay';
   overlay.id = 'notifOverlay';
-  overlay.innerHTML = `<div class="notif-popup${isError?' error':''}">${msg}</div>`;
+  overlay.innerHTML = `<div class=\"notif-popup${isError?' error':''}\">${msg}</div>`;
   document.body.appendChild(overlay);
   setTimeout(() => { overlay.querySelector('.notif-popup').style.opacity = 1; }, 10);
   setTimeout(() => {
@@ -674,7 +652,7 @@ function showNotification(msg, isError = false) {
 }
 function showExpiredPage() {
   setPageTitle('Проверка сроков');
-  showPage(addBackButton(`<div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div><div id="expiredCards"></div>`));
+  showPage(addBackButton(`<div id=\"expiredTitle\" style=\"text-align:center;color:#aaa;font-size:1.07em;\">Загрузка...</div><div id=\"expiredCards\"></div>`));
   ensureTheme();
   fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
     .then(r=>r.json())
@@ -694,9 +672,9 @@ function showExpiredPage() {
       }
       title.innerHTML = "Просроченные позиции:";
       title.className = "";
-      let cards = `<div class="card-list">`;
+      let cards = `<div class=\"card-list\">`;
       d.results.forEach(x=>{
-        cards += renderCard(x, false);
+        cards += renderCard(x, false); // 'x' includes 'id'
       });
       cards += `</div>`;
       cardsDiv.innerHTML = cards;
@@ -706,16 +684,16 @@ function showExpiredPage() {
 function showEditPage() {
   setPageTitle('Редактирование позиций');
   showPage(addBackButton(`
-    <div id="editBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
-      <input id="editSearchInput" type="text" placeholder="Поиск по TOB или названию">
-      <div id="editResults" style="min-height:90px;"></div>
+    <div id=\"editBlock\" class=\"beautiful-form\" style=\"gap:10px;max-width:440px;\">
+      <input id=\"editSearchInput\" type=\"text\" placeholder=\"Поиск по TOB или названию\">
+      <div id=\"editResults\" style=\"min-height:90px;\"></div>
     </div>
   `));
   ensureTheme();
   const input = document.getElementById('editSearchInput');
-  let allItems = [];
+  let allItems = []; // Will contain 'id'
   const resultsDiv = document.getElementById('editResults');
-  resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
+  resultsDiv.innerHTML = `<div style=\"text-align:center;color:#aaa;font-size:1.07em;\">Загрузка...</div>`;
   fetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
@@ -723,8 +701,8 @@ function showEditPage() {
   })
   .then(r => r.json())
   .then(data => {
-    if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
-    allItems = data.results;
+    if (!data.ok) return resultsDiv.innerHTML = `<div class=\"error\">Ошибка: ${data.error}</div>`;
+    allItems = data.results; // data.results now contains 'id'
     renderEditList("");
   });
   input.addEventListener('input', e => {
@@ -738,12 +716,12 @@ function showEditPage() {
         x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
       );
     if (!items.length) {
-      resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
+      resultsDiv.innerHTML = `<div style=\"text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;\">Ничего не найдено</div>`;
       return;
     }
-    let cards = `<div class="card-list">`;
+    let cards = `<div class=\"card-list\">`;
     items.forEach(r => {
-      cards += renderCard(r);
+      cards += renderCard(r); // 'r' includes 'id'
     });
     cards += `</div>`;
     resultsDiv.innerHTML = cards;
@@ -751,32 +729,32 @@ function showEditPage() {
 }
 function openReopenForm(rJson) {
   setPageTitle('Редактирование позиции');
-  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson; // 'r' includes 'id'
   const today = new Date().toISOString().slice(0,10);
   showPage(addBackButton(`
-    <form id="reopenf" class="beautiful-form" autocomplete="off">
-      <div class="field-row">
-        <label class="field-label">Категория</label>
-        <input value="${r.category}" readonly>
+    <form id=\"reopenf\" class=\"beautiful-form\" autocomplete=\"off\">
+      <div class=\"field-row\">
+        <label class=\"field-label\">Категория</label>
+        <input value=\"${r.category}\" readonly>
       </div>
-      <div class="field-row">
-        <label class="field-label">TOB</label>
-        <input value="${r.tob}" readonly>
+      <div class=\"field-row\">
+        <label class=\"field-label\">TOB</label>
+        <input value=\"${r.tob}\" readonly>
       </div>
-      <div class="field-row">
-        <label class="field-label">Название</label>
-        <input name="name" required value="${r.name}">
+      <div class=\"field-row\">
+        <label class=\"field-label\">Название</label>
+        <input name=\"name\" required value=\"${r.name}\">
       </div>
-      <div class="field-row">
-        <label class="field-label">Срок хранения (дней)</label>
-        <input name="shelf_life_days" type="number" min="1" required value="${r.shelf_life_days}">
+      <div class=\"field-row\">
+        <label class=\"field-label\">Срок хранения (дней)</label>
+        <input name=\"shelf_life_days\" type=\"number\" min=\"1\" required value=\"${r.shelf_life_days}\">
       </div>
-      <div class="field-row">
-        <label class="field-label">Дата открытия</label>
-        <input name="opened_at" type="date" value="${today}" required>
+      <div class=\"field-row\">
+        <label class=\"field-label\">Дата открытия</label>
+        <input name=\"opened_at\" type=\"date\" value=\"${today}\" required>
       </div>
-      <div class="btns">
-        <button type="submit">Сохранить</button>
+      <div class=\"btns\">
+        <button type=\"submit\">Сохранить</button>
       </div>
     </form>
   `));
@@ -792,9 +770,12 @@ function openReopenForm(rJson) {
   document.getElementById('reopenf').onsubmit = async function(e){
     e.preventDefault();
     let d = Object.fromEntries(new FormData(this));
+    // For reopen, we might need to decide if we update the existing item by ID or delete and add.
+    // The current backend /reopen updates based on TOB. If unique item editing is needed, it should also use ID.
+    // For now, focusing on delete, so leaving /reopen as is, but it's a point for future improvement if needed.
     let req = {
       user_id: userId,
-      tob: r.tob,
+      tob: r.tob, // Or r.id if /reopen is changed to use id
       name: d.name,
       opened_at: d.opened_at,
       shelf_life_days: d.shelf_life_days
@@ -822,66 +803,32 @@ function showGlobalLoader(show = true) {
     loader.style.opacity = "0";
     setTimeout(() => {
       loader.style.display = 'none';
-      wrap.style.display = '';
-    }, 370);
+      wrap.style.display = 'block';
+    }, 300);
   }
 }
-function fixIOSHeight() {
-  const wrap = document.getElementById('wrap');
-  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    wrap.style.height = window.innerHeight + 'px';
-    setTimeout(() => {
-      wrap.style.height = window.innerHeight + 'px';
-    }, 200);
-  } else {
-    wrap.style.height = '';
-  }
-}
-window.addEventListener('resize', fixIOSHeight);
-window.addEventListener('focusin', fixIOSHeight);
-window.addEventListener('focusout', fixIOSHeight);
-window.addEventListener('orientationchange', fixIOSHeight);
-fixIOSHeight();
-async function startApp() {
+
+async function initApp() {
   showGlobalLoader(true);
-  const MIN_LOAD = 1200 + Math.floor(Math.random()*500);
-  let t0 = Date.now();
-  showPage(`
-    <div class="welcome-block">
-      <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
-      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
-    </div>
-  `);
-  ensureTheme();
   try {
-    let r = await fetch("https://bar-backend-production.up.railway.app/userinfo", {
+    let resp = await fetch(`${backend}/userinfo`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId })
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId})
     });
-    let d = await r.json();
-    let dt = Date.now() - t0;
-    if (dt < MIN_LOAD) await new Promise(res => setTimeout(res, MIN_LOAD - dt));
-    showGlobalLoader(false);
-    if (!d.ok) {
-      setPageTitle('Добро пожаловать');
-      showPage(`
-        <div class="welcome-block">
-          <div class="welcome-greet">${welcomeGreeting()}, гость!</div>
-          <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
-          <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
-        </div>
-      `);
-      ensureTheme();
-      return;
+    let data = await resp.json();
+    if (data.ok) {
+      USER = data;
+      showMenu();
+    } else {
+      document.getElementById('main').innerHTML = `<div style=\"padding:20px;text-align:center;\" class=\"error\">Ошибка: ${data.error}. Попробуйте перезапустить приложение или /start в боте.</div>`;
     }
-    USER = { username: d.username, bar_name: d.bar_name };
-    showMenu();
   } catch (e) {
-    showGlobalLoader(false);
-    setPageTitle('Ошибка');
-    showPage('<div class="error">Не удалось подключиться к серверу.<br>' + e + '</div>');
-    ensureTheme();
+    document.getElementById('main').innerHTML = `<div style=\"padding:20px;text-align:center;\" class=\"error\">Ошибка сети. Проверьте подключение и попробуйте снова.</div>`;
   }
+  showGlobalLoader(false);
+  if(tg && tg.ready) tg.ready();
 }
-startApp();
+
+initApp();
+
