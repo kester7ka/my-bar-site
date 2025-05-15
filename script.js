@@ -66,7 +66,6 @@ window.showMenu = showMenu;
 window.showAddPage = showAddPage;
 window.showExpiredPage = showExpiredPage;
 window.showSearchPage = showSearchPage;
-window.showEditPage = showEditPage;
 window.openReopenForm = openReopenForm;
 window.confirmDelete = confirmDelete;
 window.deleteItem = deleteItem;
@@ -105,12 +104,11 @@ function showMenu() {
       ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
     </div>
     <div class="menu fadeIn" id="menuBlock">
-      <button class="menu-btn" onclick="showAddPage()"><span class="menu-icon">➕</span> Добавить позицию</button>
-      <button class="menu-btn" onclick="showExpiredPage()"><span class="menu-icon">⏱️</span> Проверить сроки</button>
-      <button class="menu-btn" onclick="showSearchPage()"><span class="menu-icon">🔍</span> Поиск</button>
-      <button class="menu-btn" onclick="showStatsPage()"><span class="menu-icon">📊</span> Статистика бара</button>
-      <button class="menu-btn" onclick="showExportPage()"><span class="menu-icon">📤</span> Печать/экспорт</button>
-      <button class="menu-btn" onclick="showEditPage()"><span class="menu-icon">🔄</span> Редактировать/переоткрыть</button>
+      <button class="menu-btn" onclick="showAddPage()">Добавить позицию</button>
+      <button class="menu-btn" onclick="showExpiredPage()">Проверить сроки</button>
+      <button class="menu-btn" onclick="showSearchPage()">Поиск</button>
+      <button class="menu-btn" onclick="showStatsPage()">Статистика бара</button>
+      <button class="menu-btn" onclick="showExportPage()">Экспорт (Excel / PDF)</button>
     </div>
   `);
   ensureTheme();
@@ -166,7 +164,7 @@ function showStatsPage() {
 }
 
 function showExportPage() {
-  setPageTitle('Печать / экспорт');
+  setPageTitle('Экспорт');
   showPage(addBackButton(`<div class="export-block">
     <div class="export-info">Скачать все позиции в формате Excel или PDF</div>
     <button class="export-btn" onclick="exportPositions('csv')">Скачать Excel (CSV)</button>
@@ -207,9 +205,13 @@ function exportPositions(type) {
         html+=`<tr><td>${x.category}</td><td>${x.tob}</td><td>${x.name}</td><td>${x.opened_at}</td><td>${x.shelf_life_days}</td><td>${x.expiry_at}</td><td>${x.opened==1?"Открыто":"Закрыто"}</td></tr>`;
       });
       html+="</table>";
-      let win = window.open("", "_blank");
-      win.document.write(`<h2>Список позиций</h2>${html}`);
-      win.print();
+      let blob = new Blob([`<h2>Список позиций</h2>${html}`], {type: "text/html"});
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "bar-export.html";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     }
   });
 }
@@ -411,9 +413,9 @@ function showSearchPage() {
 
   const categories = [
     { value: "", label: "Все категории", icon: "" },
-    { value: "🍯 Сиропы", label: "Сиропы", icon: "🍯" },
-    { value: "🥕 Ингредиенты", label: "Ингредиенты", icon: "🥕" },
-    { value: "📦 Прочее", label: "Прочее", icon: "📦" }
+    { value: "🍯 Сиропы", label: "Сиропы", icon: "" },
+    { value: "🥕 Ингредиенты", label: "Ингредиенты", icon: "" },
+    { value: "📦 Прочее", label: "Прочее", icon: "" }
   ];
   const statuses = [
     { value: "", label: "Все статусы" },
@@ -514,17 +516,16 @@ function openCardActionsModal(rJson) {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-dialog">
-        <div class="modal-title">Что сделать с позицией?</div>
+        <div class="modal-title">Открыть позицию?</div>
         <div class="modal-buttons-row">
           <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
-          <button class="modal-btn edit" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
+          <button class="modal-btn edit" onclick="closeDeleteModal()">Отмена</button>
         </div>
-        <button class="modal-btn cancel-full" onclick="closeDeleteModal()">Отмена</button>
       </div>
     `;
     document.body.appendChild(overlay);
     ensureTheme();
-  }, 370);
+  }, 10);
 }
 
 async function autoOpen(rJson) {
@@ -532,35 +533,40 @@ async function autoOpen(rJson) {
   closeDeleteModal();
   let today = new Date().toISOString().slice(0,10);
 
-  await fetch(`${backend}/delete`, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, tob: r.tob, opened: r.opened, opened_at: r.opened_at})
-  });
-
   let respSearch = await fetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({user_id: userId, query: r.tob})
   });
   let dataSearch = await respSearch.json();
-  let alreadyOpened = false;
+  let openedItem = null;
+  let closedItem = null;
   if (dataSearch.ok && Array.isArray(dataSearch.results)) {
-    alreadyOpened = dataSearch.results.some(x => x.tob === r.tob && x.opened == 1);
+    openedItem = dataSearch.results.find(x => x.tob === r.tob && x.opened == 1);
+    closedItem = dataSearch.results.find(x => x.tob === r.tob && x.opened == 0 && x.opened_at === r.opened_at);
   }
-  if (alreadyOpened) {
-    showNotification("Уже есть открытая позиция с этим TOB!", true);
+  if (!openedItem || !closedItem) {
+    showNotification("Ошибка: не найдена закрытая или открытая позиция!", true);
     showSearchPage();
     return;
   }
-
+  await fetch(`${backend}/delete`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, tob: openedItem.tob, opened: 1, opened_at: openedItem.opened_at})
+  });
+  await fetch(`${backend}/delete`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, tob: closedItem.tob, opened: 0, opened_at: closedItem.opened_at})
+  });
   let reqAdd = {
     user_id: userId,
-    category: r.category,
-    tob: r.tob,
-    name: r.name,
+    category: closedItem.category,
+    tob: closedItem.tob,
+    name: closedItem.name,
     opened_at: today,
-    shelf_life_days: r.shelf_life_days,
+    shelf_life_days: closedItem.shelf_life_days,
     opened: 1
   };
   let resp = await fetch(`${backend}/add`, {
@@ -598,13 +604,13 @@ function confirmDelete(rJson) {
     `;
     document.body.appendChild(overlay);
     ensureTheme();
-  }, 370);
+  }, 10);
 }
 function closeDeleteModal() {
   let overlay = document.querySelector('.modal-overlay');
   if (!overlay) return;
   overlay.classList.add('hide');
-  setTimeout(() => overlay.remove(), 370);
+  setTimeout(() => overlay.remove(), 180);
 }
 async function deleteItem(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
@@ -626,7 +632,7 @@ async function deleteItem(rJson) {
       showNotification("Ошибка удаления: " + data.error, true);
       showSearchPage();
     }
-  }, 370);
+  }, 180);
 }
 function showNotification(msg, isError = false) {
   let old = document.getElementById('notifOverlay');
@@ -677,113 +683,41 @@ function showExpiredPage() {
       ensureTheme();
     });
 }
-function showEditPage() {
-  setPageTitle('Редактирование позиций');
-  showPage(addBackButton(`
-    <div id="editBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
-      <input id="editSearchInput" type="text" placeholder="Поиск по TOB или названию">
-      <div id="editResults" style="min-height:90px;"></div>
+function startApp() {
+  showGlobalLoader(true);
+  const MIN_LOAD = 1200 + Math.floor(Math.random()*500);
+  let t0 = Date.now();
+  showPage(`
+    <div class="welcome-block">
+      <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
     </div>
-  `));
+  `);
   ensureTheme();
-  const input = document.getElementById('editSearchInput');
-  let allItems = [];
-  const resultsDiv = document.getElementById('editResults');
-  resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
-  fetch(`${backend}/search`, {
+  fetch("https://bar-backend-production.up.railway.app/userinfo", {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, query: ""})
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
-    allItems = data.results;
-    renderEditList("");
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id: userId })
+  }).then(r=>r.json()).then(d=>{
+    let dt = Date.now() - t0;
+    setTimeout(()=>{
+      showGlobalLoader(false);
+      if (!d.ok) {
+        setPageTitle('Добро пожаловать');
+        showPage(`
+          <div class="welcome-block">
+            <div class="welcome-greet">${welcomeGreeting()}, гость!</div>
+            <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
+            <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
+          </div>
+        `);
+        ensureTheme();
+        return;
+      }
+      USER = { username: d.username, bar_name: d.bar_name };
+      showMenu();
+    }, Math.max(MIN_LOAD - dt, 0));
   });
-  input.addEventListener('input', e => {
-    renderEditList(e.target.value);
-  });
-  function renderEditList(filter) {
-    filter = (filter||"").trim().toLowerCase();
-    let items = allItems;
-    if(filter)
-      items = allItems.filter(
-        x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
-      );
-    if (!items.length) {
-      resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
-      return;
-    }
-    let cards = `<div class="card-list">`;
-    items.forEach(r => {
-      cards += renderCard(r);
-    });
-    cards += `</div>`;
-    resultsDiv.innerHTML = cards;
-  }
-}
-function openReopenForm(rJson) {
-  setPageTitle('Редактирование позиции');
-  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-  const today = new Date().toISOString().slice(0,10);
-  showPage(addBackButton(`
-    <form id="reopenf" class="beautiful-form" autocomplete="off">
-      <div class="field-row">
-        <label class="field-label">Категория</label>
-        <input value="${r.category}" readonly>
-      </div>
-      <div class="field-row">
-        <label class="field-label">TOB</label>
-        <input value="${r.tob}" readonly>
-      </div>
-      <div class="field-row">
-        <label class="field-label">Название</label>
-        <input name="name" required value="${r.name}">
-      </div>
-      <div class="field-row">
-        <label class="field-label">Срок хранения (дней)</label>
-        <input name="shelf_life_days" type="number" min="1" required value="${r.shelf_life_days}">
-      </div>
-      <div class="field-row">
-        <label class="field-label">Дата открытия</label>
-        <input name="opened_at" type="date" value="${today}" required>
-      </div>
-      <div class="btns">
-        <button type="submit">Сохранить</button>
-      </div>
-    </form>
-  `));
-  ensureTheme();
-  setTimeout(() => {
-    let inputs = document.querySelectorAll('.beautiful-form input, .beautiful-form select');
-    inputs.forEach(inp => {
-      inp.addEventListener('focus', function() {
-        scrollInputIntoView(this);
-      });
-    });
-  }, 100);
-  document.getElementById('reopenf').onsubmit = async function(e){
-    e.preventDefault();
-    let d = Object.fromEntries(new FormData(this));
-    let req = {
-      user_id: userId,
-      tob: r.tob,
-      name: d.name,
-      opened_at: d.opened_at,
-      shelf_life_days: d.shelf_life_days
-    };
-    let resp = await fetch(`${backend}/reopen`, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(req)
-    });
-    let data = await resp.json();
-    if (data.ok)
-      msg("Позиция успешно переоткрыта!", "success");
-    else
-      msg("Ошибка: " + data.error, "error");
-  };
 }
 function showGlobalLoader(show = true) {
   const loader = document.getElementById('globalLoader');
@@ -816,46 +750,4 @@ window.addEventListener('focusin', fixIOSHeight);
 window.addEventListener('focusout', fixIOSHeight);
 window.addEventListener('orientationchange', fixIOSHeight);
 fixIOSHeight();
-async function startApp() {
-  showGlobalLoader(true);
-  const MIN_LOAD = 1200 + Math.floor(Math.random()*500);
-  let t0 = Date.now();
-  showPage(`
-    <div class="welcome-block">
-      <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
-      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
-    </div>
-  `);
-  ensureTheme();
-  try {
-    let r = await fetch("https://bar-backend-production.up.railway.app/userinfo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId })
-    });
-    let d = await r.json();
-    let dt = Date.now() - t0;
-    if (dt < MIN_LOAD) await new Promise(res => setTimeout(res, MIN_LOAD - dt));
-    showGlobalLoader(false);
-    if (!d.ok) {
-      setPageTitle('Добро пожаловать');
-      showPage(`
-        <div class="welcome-block">
-          <div class="welcome-greet">${welcomeGreeting()}, гость!</div>
-          <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
-          <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
-        </div>
-      `);
-      ensureTheme();
-      return;
-    }
-    USER = { username: d.username, bar_name: d.bar_name };
-    showMenu();
-  } catch (e) {
-    showGlobalLoader(false);
-    setPageTitle('Ошибка');
-    showPage('<div class="error">Не удалось подключиться к серверу.<br>' + e + '</div>');
-    ensureTheme();
-  }
-}
 startApp();
