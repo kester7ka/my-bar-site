@@ -4,10 +4,6 @@
   <meta charset="UTF-8">
   <title>Ингредиенты бара</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="format-detection" content="telephone=no">
-  <meta name="HandheldFriendly" content="true">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
   <style>
     html, body {
@@ -319,35 +315,38 @@
       font-weight: 700;
       font-size: 0.93em;
       border-radius: 13px 13px 13px 0;
-      padding: 4px 10px 4px 10px;
+      padding: 4px 12px 4px 12px;
       margin: 0 0 9px 0;
       letter-spacing: 0.01em;
       box-shadow: 0 1px 8px #b9dbff0a;
-      position: absolute;
-      right: 12px;
-      top: 12px;
+      position: relative;
+      right: 0;
+      top: 0;
       border-top-right-radius: 18px;
       max-width: 60%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       z-index: 2;
+      margin-left: auto;
     }
     .card-status-badge {
       display: inline-block;
       font-weight: 700;
       font-size: 0.93em;
       border-radius: 13px 0 13px 13px;
-      padding: 4px 14px 4px 14px;
+      padding: 4px 16px 4px 16px;
       letter-spacing: 0.01em;
       box-shadow: 0 1px 8px #b9dbff0a;
       background: #19c37d;
       color: #fff;
-      margin-top: 14px;
-      margin-bottom: 0;
-      margin-left: 0;
-      margin-right: 0;
+      margin-top: 0;
+      margin-bottom: 7px;
       position: relative;
+      left: 0;
+      right: 0;
+      margin-left: 0;
+      margin-right: auto;
     }
     .card-status-badge.closed {
       background: #ee4747;
@@ -355,7 +354,7 @@
     }
     .item-card {
       min-width: 0;
-      min-height: 160px;
+      min-height: 120px;
       max-width: 100%;
       width: 100%;
       box-sizing: border-box;
@@ -363,51 +362,39 @@
       flex-direction: column;
       position: relative;
       background: linear-gradient(120deg, #eaf6ff 0%, #f1f3fa 100%);
-      border-radius: 20px;
-      box-shadow: 0 3px 16px #0077ff1a, 0 1.5px 6px #b9dbff44;
-      padding: 14px 18px 22px 18px;
+      border-radius: 18px;
+      box-shadow: 0 2px 10px #0077ff1a, 0 1.5px 4px #b9dbff44;
+      padding: 12px 14px 13px 14px;
       margin: 0;
       outline: 1.5px solid #e3eaff1c;
       overflow: hidden;
       transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
       animation: popIn 0.43s;
       align-self: stretch;
+      margin-bottom: 15px;
     }
-    .item-card .card-badge {
-      position: absolute;
-      right: 12px;
-      top: 12px;
-      left: auto;
-      bottom: auto;
-      border-top-right-radius: 18px;
-      border-bottom-left-radius: 0;
-      z-index: 2;
-    }
-    .item-card .card-status-badge {
-      margin-top: 0;
-      margin-bottom: 14px;
-      margin-left: 0;
-      margin-right: 0;
-      align-self: flex-start;
-      position: relative;
-      top: 38px;
-      left: 0;
+    .item-card .badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 7px;
+      gap: 9px;
     }
     .item-card .card-title {
       font-weight: 700;
-      font-size: 1.03em;
+      font-size: 1.07em;
       margin-bottom: 4px;
       color: var(--accent-dark, #0051b3);
       word-break: break-all;
-      max-width: 80%;
+      max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      line-height: 1.18;
-      margin-top: 16px;
+      line-height: 1.16;
+      margin-top: 3px;
     }
     .item-card .card-row {
-      font-size: 0.97em;
+      font-size: 0.98em;
       margin-bottom: 2px;
       color: #444;
       line-height: 1.27;
@@ -421,13 +408,13 @@
       margin-right: 4px;
     }
     .card-actions-bottom {
-      margin-top: auto;
+      margin-top: 7px;
       display: flex;
-      gap: 8px;
-      padding-top: 14px;
+      gap: 7px;
+      padding-top: 5px;
       animation: fadeIn 0.3s;
     }
-    .editbtn, .deletebtn {
+    .editbtn, .deletebtn, .openbtn {
       flex: 1;
       border-radius: 9px;
       font-size: 0.97em;
@@ -442,26 +429,103 @@
     .editbtn:active { background: #d4e3f7; color: #006eff;}
     .deletebtn { background: #ffeaea; color: #ee4747;}
     .deletebtn:active { background: #ffdede; color: #b90000;}
-    .beautiful-form .btns {
-      gap: 16px;
-      margin-top: 10px;
+    .openbtn { background: #19c37d; color: #fff;}
+    .openbtn:active { background: #16ac6c;}
+    .modal-overlay {
+      position: fixed;
+      z-index: 3000;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(30,46,70,0.22);
+      backdrop-filter: blur(7px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.19s;
     }
-    .beautiful-form .btns button {
-      font-size: 1.15em;
-      padding: 16px 0;
-      border-radius: 14px;
-      background: linear-gradient(90deg, #006eff 60%, #13c1e3 100%);
-      color: #fff;
+    .modal-dialog {
+      background: #fff;
+      color: #222;
+      padding: 27px 34px 26px 34px;
+      font-size: 1.13em;
       font-weight: 700;
-      border: none;
-      box-shadow: 0 2px 8px #0077ff1a;
-      cursor: pointer;
-      transition: background 0.25s, transform 0.17s;
-      animation: popIn 0.33s;
+      border-radius: 18px;
+      box-shadow: 0 3px 16px #13c1e340;
+      min-width: 220px;
+      min-height: 60px;
+      text-align: center;
+      animation: notifPopupIn .25s cubic-bezier(.4,0,.2,1) forwards;
+      position: relative;
+      max-width: 90vw;
+    }
+    .modal-dialog .modal-title {
+      color: #222;
+      font-weight: 700;
+      font-size: 1.08em;
+      margin-bottom: 16px;
+    }
+    .modal-dialog .delete-item-name {
+      font-weight: 700;
+      color: #ee4747;
+      font-size: 1.16em;
+      display: inline-block;
+      margin: 0 3px;
+      background: #ffeaea;
+      border-radius: 7px;
+      padding: 2px 10px;
+      border: 1.5px solid #ee4747;
+      box-shadow: 0 1px 6px #ffbaba30;
+      transition: background 0.22s, color 0.22s;
+    }
+    .modal-dialog .modal-buttons {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .modal-dialog button {
       flex: 1;
-      width: 100%;
-      margin: 0;
-      letter-spacing: 0.03em;
+      border-radius: 13px;
+      font-size: 1em;
+      padding: 11px 0;
+      background: var(--accent, #006eff);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      box-shadow: 0 1px 5px #0077ff22;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.18s;
+      animation: popIn 0.19s;
+      min-width: 110px;
+      margin: 0 4px;
+    }
+    .modal-dialog button.cancel {
+      background: #e2e6ee; color: #4a4a4a;
+    }
+    .modal-dialog .modal-buttons .open-just {
+      background: #19c37d; color: #fff;
+    }
+    .modal-dialog .modal-buttons .edit {
+      background: #eaf2ff; color: #2179ba;
+    }
+    .modal-dialog button:active {
+      background: var(--accent-dark, #0051b3);
+      transform: scale(0.98);
+    }
+    .modal-dialog button.cancel:active {
+      background: #c9ccd5;
+    }
+    body.dark .modal-dialog { background: #232b33; color: #b9dbff;}
+    body.dark .modal-dialog .modal-title { color: #b9dbff;}
+    body.dark .modal-dialog button { background: #62b0ff; color: #232b33;}
+    body.dark .modal-dialog button.cancel { background: #3a4e68; color: #f1f1f1;}
+    body.dark .modal-dialog .modal-buttons .open-just { background: #23c882; color: #fff;}
+    body.dark .modal-dialog .modal-buttons .edit { background: #17334e; color: #62b0ff;}
+    .modal-overlay.hide { animation: fadeOut 0.22s cubic-bezier(.4,0,.2,1) forwards;}
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; }}
+    @keyframes notifPopupIn { from { opacity: 0; transform: scale(0.94);} to   { opacity: 1; transform: scale(1);}}
+    @media (max-width: 600px) {
+      .modal-dialog { padding: 12vw 3vw 12vw 3vw; min-width: 0; }
     }
     .beautiful-form .btns button:active {
       background: linear-gradient(90deg, #0051b3 60%, #13c1e3 100%);
@@ -582,8 +646,8 @@
       .beautiful-form {padding: 18px 3vw 10px 3vw;}
       .card-badge {font-size: 0.87em;}
       .card-status-badge {font-size: 0.87em;}
-      .item-card {padding: 11px 10px 15px 10px;}
-      .card-list { gap: 10px; }
+      .item-card {padding: 8px 7px 10px 7px; min-height: 80px;}
+      .card-list { gap: 7px; }
       .menu button { padding: 13px 0; }
       .backbtn { font-size: 0.98em; padding: 10px 0;}
       h2 { font-size: 1.07em; }
@@ -715,6 +779,7 @@
     window.openReopenForm = openReopenForm;
     window.confirmDelete = confirmDelete;
     window.deleteItem = deleteItem;
+    let allItemsCache = [];
     function setPageTitle(title) {
       document.getElementById('pageTitle').innerHTML = title;
     }
@@ -776,6 +841,112 @@
         scrollInputIntoView(e.target);
       }
     });
+
+    // ----- CARD BUTTONS LOGIC -----
+    function renderCardButtons(item) {
+      if (item.opened === 1 || item.opened === "1") {
+        // Открыт: редактировать и удалить
+        return `
+        <div class="card-actions-bottom">
+          <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(item))}');return false;">Редактировать</button>
+          <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(item))}');return false;">Удалить</button>
+        </div>
+        `;
+      } else {
+        // Закрыт: открыть (модалка) и удалить
+        return `
+        <div class="card-actions-bottom">
+          <button class="openbtn" onclick="openClosedModal('${encodeURIComponent(JSON.stringify(item))}');return false;">Открыть</button>
+          <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(item))}');return false;">Удалить</button>
+        </div>
+        `;
+      }
+    }
+    // ----- /CARD BUTTONS LOGIC -----
+
+    // ----- MODAL LOGIC -----
+    function showModal(html) {
+      let old = document.querySelector('.modal-overlay');
+      if (old) old.remove();
+      let overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = html;
+      document.body.appendChild(overlay);
+      ensureTheme();
+    }
+    function closeModal() {
+      let overlay = document.querySelector('.modal-overlay');
+      if (!overlay) return;
+      overlay.classList.add('hide');
+      setTimeout(() => overlay.remove(), 260);
+    }
+    function confirmDelete(rJson) {
+      let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+      showModal(`
+        <div class="modal-dialog">
+          <div class="modal-title">
+            Вы действительно хотите удалить <span class="delete-item-name">${r.name}</span>?
+          </div>
+          <div class="modal-buttons">
+            <button onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+            <button class="cancel" onclick="closeModal()">Отмена</button>
+          </div>
+        </div>
+      `);
+    }
+    function openClosedModal(rJson) {
+      let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+      showModal(`
+        <div class="modal-dialog">
+          <div class="modal-title">
+            Перед открытием выберите действие
+          </div>
+          <div class="modal-buttons">
+            <button class="open-just" onclick="openJustOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть автоматически</button>
+            <button class="edit" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}',true);closeModal();">Редактировать</button>
+            <button class="cancel" onclick="closeModal()">Отмена</button>
+          </div>
+        </div>
+      `);
+    }
+    async function openJustOpen(rJson) {
+      closeModal();
+      let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+      // Удалить старую закрытую, создать новую открытую с теми же полями (только дата открытия — сегодня)
+      let today = new Date().toISOString().slice(0,10);
+      let shelf_life_days = r.shelf_life_days;
+      let expiry_at = (new Date(Date.parse(today) + 86400000 * (parseInt(shelf_life_days)||0))).toISOString().slice(0,10);
+      let addReq = {
+        user_id: userId,
+        category: r.category,
+        tob: r.tob,
+        name: r.name,
+        opened_at: today,
+        shelf_life_days: shelf_life_days,
+        opened: 1
+      };
+      // 1. Удалить старую закрытую
+      await fetch(`${backend}/delete`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({user_id: userId, tob: r.tob})
+      });
+      // 2. Создать новую открытую
+      let resp = await fetch(`${backend}/add`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(addReq)
+      });
+      let data = await resp.json();
+      if (data.ok) {
+        vibrate();
+        msg("Позиция успешно открыта!", "success");
+      } else {
+        msg("Ошибка: " + data.error, "error");
+      }
+    }
+    // ----- /MODAL LOGIC -----
+
     function showAddPage() {
       setPageTitle('Добавить позицию');
       showPage(addBackButton(`
@@ -863,47 +1034,7 @@
         }
       };
     }
-    function showExpiredPage() {
-      setPageTitle('Проверка сроков');
-      showPage(addBackButton(`<div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div><div id="expiredCards"></div>`));
-      ensureTheme();
-      fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
-        .then(r=>r.json())
-        .then(d=>{
-          const title = document.getElementById('expiredTitle');
-          const cardsDiv = document.getElementById('expiredCards');
-          if(!d.ok) {
-            title.innerHTML = "Ошибка: "+d.error;
-            cardsDiv.innerHTML = "";
-            return;
-          }
-          if(!d.results.length) {
-            title.innerHTML = "Нет просроченных позиций!";
-            title.className = "success";
-            cardsDiv.innerHTML = "";
-            return;
-          }
-          title.innerHTML = "Просроченные позиции:";
-          title.className = "";
-          let cards = `<div class="card-list">`;
-          d.results.forEach(x=>{
-            cards += `
-              <div class="item-card">
-                <div class="card-badge">${x.category}</div>
-                <div class="card-status-badge ${x.opened === false || x.opened === 0 || x.opened === '0' ? 'closed' : 'opened'}" style="position: static; margin-top: 42px; margin-bottom: 10px;">
-                  ${x.opened === false || x.opened === 0 || x.opened === '0' ? 'Закрыто' : 'Открыто'}
-                </div>
-                <div class="card-title">${x.name}</div>
-                <div class="card-row"><b>TOB:</b> ${x.tob}</div>
-                <div class="card-row"><b>Годен до:</b> ${x.expiry_at}</div>
-              </div>
-            `;
-          });
-          cards += `</div>`;
-          cardsDiv.innerHTML = cards;
-          ensureTheme();
-        });
-    }
+
     function showSearchPage() {
       setPageTitle('Поиск');
       showPage(addBackButton(`
@@ -945,6 +1076,7 @@
       .then(data => {
         if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
         allItems = data.results;
+        allItemsCache = allItems; // cache for edit page logic
         renderList();
       });
       function renderList() {
@@ -965,14 +1097,17 @@
         items.forEach(r => {
           cards += `
             <div class="item-card">
-              <div class="card-badge">${r.category}</div>
-              <div class="card-status-badge ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'closed' : 'opened'}" style="position: static; margin-top: 42px; margin-bottom: 10px;">
-                ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'Закрыто' : 'Открыто'}
+              <div class="badge-row">
+                <span class="card-status-badge ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'closed' : 'opened'}">
+                  ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'Закрыто' : 'Открыто'}
+                </span>
+                <span class="card-badge">${r.category}</span>
               </div>
               <div class="card-title" title="${r.name}">${r.name}</div>
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
+              ${renderCardButtons(r)}
             </div>
           `;
         });
@@ -983,68 +1118,9 @@
       filterCategory.addEventListener('change', renderList);
       filterOpened.addEventListener('change', renderList);
     }
-    function showEditPage() {
-      setPageTitle('Редактирование позиций');
-      showPage(addBackButton(`
-        <div id="editBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
-          <input id="editSearchInput" type="text" placeholder="Поиск по TOB или названию">
-          <div id="editResults" style="min-height:90px;"></div>
-        </div>
-      `));
-      ensureTheme();
-      const input = document.getElementById('editSearchInput');
-      let allItems = [];
-      const resultsDiv = document.getElementById('editResults');
-      resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
-      fetch(`${backend}/search`, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({user_id: userId, query: ""})
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
-        allItems = data.results;
-        renderEditList("");
-      });
-      input.addEventListener('input', e => {
-        renderEditList(e.target.value);
-      });
-      function renderEditList(filter) {
-        filter = (filter||"").trim().toLowerCase();
-        let items = allItems;
-        if(filter)
-          items = allItems.filter(
-            x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
-          );
-        if (!items.length) {
-          resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
-          return;
-        }
-        let cards = `<div class="card-list">`;
-        items.forEach(r => {
-          cards += `
-            <div class="item-card">
-              <div class="card-badge">${r.category}</div>
-              <div class="card-status-badge ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'closed' : 'opened'}" style="position: static; margin-top: 42px; margin-bottom: 10px;">
-                ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'Закрыто' : 'Открыто'}
-              </div>
-              <div class="card-title" title="${r.name}">${r.name}</div>
-              <div class="card-row"><b>TOB:</b> ${r.tob}</div>
-              <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
-              <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
-              <div class="card-actions-bottom">
-                <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Редактировать</button>
-                <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
-              </div>
-            </div>
-          `;
-        });
-        cards += `</div>`;
-        resultsDiv.innerHTML = cards;
-      }
-    }
-    function openReopenForm(rJson) {
+
+    // Форма редактирования — рендерится и для ручного "редактировать" и для "открыть → редактировать"
+    function openReopenForm(rJson, isReopenFromClosed) {
       setPageTitle('Редактирование позиции');
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       const today = new Date().toISOString().slice(0,10);
@@ -1060,7 +1136,7 @@
           </div>
           <div class="field-row">
             <label class="field-label">Название</label>
-            <input value="${r.name}" readonly>
+            <input name="name" type="text" value="${r.name}" ${isReopenFromClosed?'':'readonly'}>
           </div>
           <div class="field-row">
             <label class="field-label">Срок хранения (дней)</label>
@@ -1071,7 +1147,7 @@
             <input name="opened_at" type="date" value="${today}" required>
           </div>
           <div class="btns">
-            <button type="submit">Сохранить</button>
+            <button type="submit">${isReopenFromClosed ? "Открыть" : "Сохранить"}</button>
           </div>
         </form>
       `));
@@ -1087,56 +1163,57 @@
       document.getElementById('reopenf').onsubmit = async function(e){
         e.preventDefault();
         let d = Object.fromEntries(new FormData(this));
-        let req = {
-          user_id: userId,
-          tob: r.tob,
-          opened_at: d.opened_at,
-          shelf_life_days: d.shelf_life_days
-        };
-        let resp = await fetch(`${backend}/reopen`, {
-          method: "POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify(req)
-        });
-        let data = await resp.json();
-        if (data.ok)
-          msg("Позиция успешно переоткрыта!", "success");
-        else
-          msg("Ошибка: " + data.error, "error");
+        if (isReopenFromClosed) {
+          // удаляем старую закрытую, добавляем новую открытую
+          await fetch(`${backend}/delete`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({user_id: userId, tob: r.tob})
+          });
+          let req = {
+            user_id: userId,
+            category: r.category,
+            tob: r.tob,
+            name: d.name,
+            opened_at: d.opened_at,
+            shelf_life_days: d.shelf_life_days,
+            opened: 1
+          };
+          let resp = await fetch(`${backend}/add`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(req)
+          });
+          let data = await resp.json();
+          if (data.ok)
+            msg("Позиция открыта!", "success");
+          else
+            msg("Ошибка: " + data.error, "error");
+        } else {
+          let req = {
+            user_id: userId,
+            tob: r.tob,
+            opened_at: d.opened_at,
+            shelf_life_days: d.shelf_life_days
+          };
+          let resp = await fetch(`${backend}/reopen`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(req)
+          });
+          let data = await resp.json();
+          if (data.ok)
+            msg("Позиция успешно переоткрыта!", "success");
+          else
+            msg("Ошибка: " + data.error, "error");
+        }
       };
     }
-    function confirmDelete(rJson) {
+
+    function deleteItem(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-      let old = document.querySelector('.modal-overlay');
-      if (old) old.remove();
-      let overlay = document.createElement('div');
-      overlay.className = 'modal-overlay';
-      overlay.innerHTML = `
-        <div class="modal-dialog">
-          <div class="modal-title">
-            Вы действительно хотите удалить <span class="delete-item-name">${r.name}</span>?
-          </div>
-          <div class="modal-buttons">
-            <button onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
-            <button class="cancel" onclick="closeDeleteModal()">Отмена</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(overlay);
-      ensureTheme();
-    }
-    function closeDeleteModal() {
-      let overlay = document.querySelector('.modal-overlay');
-      if (!overlay) return;
-      overlay.classList.add('hide');
-      setTimeout(() => overlay.remove(), 220);
-    }
-    async function deleteItem(rJson) {
-      let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-      let overlay = document.querySelector('.modal-overlay');
-      if(overlay) overlay.classList.add('hide');
+      closeModal();
       setTimeout(async () => {
-        if(overlay) overlay.remove();
         let resp = await fetch(`${backend}/delete`, {
           method: "POST",
           headers: {"Content-Type":"application/json"},
@@ -1147,11 +1224,11 @@
           vibrate();
           showMenu();
         } else {
-          showNotification("Ошибка удаления: " + data.error, true);
           showMenu();
         }
       }, 220);
     }
+
     function showNotification(msg, isError = false) {
       let old = document.getElementById('notifOverlay');
       if (old) old.remove();
