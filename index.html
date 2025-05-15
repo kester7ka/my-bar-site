@@ -2,31 +2,37 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Бар помощник</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Ингредиенты бара</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
   <div class="wrap" id="wrap">
     <div class="header-bar">
       <div class="theme-toggle-row">
-        <button class="theme-toggle" id="themeToggle">
-          <span class="icon sun">☀️</span>
-          <span class="icon moon" style="display:none">🌙</span>
-          <span class="theme-label" id="themeText"></span>
+        <button class="theme-toggle" id="themeToggle" aria-label="Сменить тему" title="Сменить тему">
+          <span class="icon sun">
+            <svg width="26" height="26" viewBox="0 0 23 23" fill="none"><circle cx="11.5" cy="11.5" r="5" fill="currentColor"/><g stroke="currentColor" stroke-width="2"><line x1="11.5" y1="2" x2="11.5" y2="0"/><line x1="11.5" y1="21" x2="11.5" y2="23"/><line x1="2" y1="11.5" x2="0" y2="11.5"/><line x1="21" y1="11.5" x2="23" y2="11.5"/><line x1="4.38" y1="4.38" x2="2.97" y2="2.97"/><line x1="18.62" y1="18.62" x2="20.03" y2="20.03"/><line x1="18.62" y1="4.38" x2="20.03" y2="2.97"/><line x1="4.38" y1="18.62" x2="2.97" y2="20.03"/></g></svg>
+          </span>
+          <span class="icon moon">
+            <svg width="26" height="26" viewBox="0 0 23 23" fill="none"><path d="M21 16.5C19.5 17.5 18 18 16.5 18C11.5294 18 7.5 13.9706 7.5 9C7.5 6.5 8.5 4.5 10 3C6 4 3 7.5 3 12C3 17 7.02944 21 12 21C15.5 21 18.5 19 21 16.5Z" fill="currentColor"/></svg>
+          </span>
+          <span class="theme-label" id="themeText">Тёмная тема</span>
         </button>
       </div>
-      <img class="user-avatar" id="userAvatar" style="display:none" />
+      <img src="" id="userAvatar" class="user-avatar" style="display:none;" alt="Аватар">
     </div>
     <div class="content-inner">
       <h2 id="pageTitle">Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span></h2>
       <div id="main"></div>
     </div>
-    <div id="globalLoader" class="global-loader-overlay" style="display:none;opacity:0;">
-      <div class="global-loader-spinner"></div>
-      <div class="global-loader-text">Загрузка...</div>
-    </div>
   </div>
-  <script src="main.js"></script>
+  <div class="global-loader-overlay" id="globalLoader" style="display:none;">
+    <div class="global-loader-spinner"></div>
+    <div class="global-loader-text">Загрузка...</div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
