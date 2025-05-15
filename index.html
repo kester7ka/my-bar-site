@@ -285,10 +285,8 @@
       align-items: center;
       justify-content: stretch;
       margin: 16px 0 4px 0;
-      gap: 13px;
+      gap: 10px;
       border-radius: 14px;
-      overflow: visible;
-      box-shadow: 0 2px 10px #bffedb1a;
       background: none;
       border: none;
     }
@@ -296,37 +294,45 @@
       flex: 1 1 0;
       font-size: 1.13em;
       font-weight: 700;
-      padding: 14px 0;
+      padding: 15px 0;
       margin: 0;
       border: none;
       outline: none;
       cursor: pointer;
       background: #eaf2ff;
-      color: #006eff;
+      color: #19c37d;
       transition: background 0.19s, color 0.18s, box-shadow 0.21s;
       border-radius: 14px;
-      box-shadow: 0 2px 8px #b9dbff29;
+      box-shadow: none;
       letter-spacing: 0.03em;
+      border: 2px solid #eaf2ff;
+      position: relative;
     }
-    .status-toggle-btn.selected.opened {
+    .status-toggle-btn.opened {
+      color: #fff;
       background: #19c37d;
-      color: #fff;
-      box-shadow: 0 2px 12px #3be87b60;
+      border: 2px solid #19c37d;
+      z-index: 2;
     }
-    .status-toggle-btn.selected.closed {
+    .status-toggle-btn.closed {
+      color: #fff;
       background: #ee4747;
-      color: #fff;
-      box-shadow: 0 2px 12px #ee4747a6;
+      border: 2px solid #ee4747;
+      z-index: 2;
     }
-    .status-toggle-btn:not(.selected):active { background: #d3e5f8; color: #0051b3;}
-    body.dark .status-toggle-btn { background: #22303b; color: #62b0ff;}
-    body.dark .status-toggle-btn.selected.opened { background: #23c882; color: #fff;}
-    body.dark .status-toggle-btn.selected.closed { background: #c94b4b; color: #fff;}
-    body.dark .status-toggle-btn:not(.selected):active { background: #18304a; color: #62b0ff;}
+    .status-toggle-btn:not(.opened):not(.closed) {
+      background: #eaf2ff;
+      color: #19c37d;
+      border: 2px solid #eaf2ff;
+    }
+    .status-toggle-btn.selected {
+      box-shadow: 0 2px 12px #13c1e340;
+    }
+    body.dark .status-toggle-btn { background: #22303b; color: #19c37d; border: 2px solid #22303b;}
+    body.dark .status-toggle-btn.opened { background: #23c882; color: #fff; border: 2px solid #23c882;}
+    body.dark .status-toggle-btn.closed { background: #c94b4b; color: #fff; border: 2px solid #c94b4b;}
     .card-badge, .card-status-badge {
       display: inline-block;
-      background: #e5f3ff;
-      color: #2179ba;
       font-weight: 700;
       font-size: 0.93em;
       border-radius: 13px 13px 13px 0;
@@ -345,8 +351,8 @@
       transition: background 0.23s, color 0.23s;
     }
     .card-status-badge.opened {
-      background: #e5f3ff;
-      color: #2179ba;
+      background: #19c37d;
+      color: #fff;
     }
     .card-status-badge.closed {
       background: #ffeaea;
@@ -354,8 +360,8 @@
     }
     body.dark .card-badge,
     body.dark .card-status-badge.opened {
-      background: #17334e;
-      color: #b9dbff;
+      background: #23c882;
+      color: #fff;
     }
     body.dark .card-status-badge.closed {
       background: #3a1d1d;
@@ -437,7 +443,7 @@
       font-family: inherit;
       font-weight: 700;
       letter-spacing: 0.03em;
-      box-shadow: 0 2px 14px #0077ff33, 0 2px 1.5px #fff7 inset;
+      box-shadow: none;
       cursor: pointer;
       outline: none;
       border: none;
@@ -447,15 +453,15 @@
       width: 100%;
       max-width: 100%;
       margin: 0;
-      background: linear-gradient(90deg, #006eff 60%, #13c1e3 100%);
-      color: #fff;
+      background: #eaf2ff;
+      color: #2179ba;
     }
-    .editbtn { background: #eaf2ff; color: #2179ba;}
-    .editbtn:active { background: #d4e3f7; color: #006eff;}
+    .editbtn { background: #e2e6ee; color: #444;}
+    .editbtn:active { background: #c1c7cd; color: #222;}
     .deletebtn { background: #ffeaea; color: #ee4747;}
     .deletebtn:active { background: #ffdede; color: #b90000;}
-    .openbtn { background: linear-gradient(90deg, #19c37d 60%, #13c1e3 100%); color: #fff;}
-    .openbtn:active { background: linear-gradient(90deg, #16b374 60%, #13c1e3 100%); color: #fff;}
+    .openbtn { background: #19c37d; color: #fff;}
+    .openbtn:active { background: #17ab6c; color: #fff;}
     .beautiful-form .btns {
       gap: 16px;
       margin-top: 10px;
@@ -611,11 +617,9 @@
       font-size: 1em;
       padding: 15px 0;
       border-radius: 14px;
-      background: linear-gradient(90deg, #006eff 60%, #13c1e3 100%);
-      color: #fff;
       font-weight: 700;
       border: none;
-      box-shadow: 0 2px 14px #0077ff33, 0 2px 1.5px #fff7 inset;
+      box-shadow: none;
       cursor: pointer;
       transition: background 0.23s cubic-bezier(.4,0,.2,1), color 0.23s cubic-bezier(.4,0,.2,1), box-shadow 0.23s cubic-bezier(.4,0,.2,1), transform 0.16s cubic-bezier(.4,0,.2,1);
       animation: popIn 0.33s;
@@ -623,16 +627,16 @@
       margin: 0;
     }
     .modal-dialog .modal-btn.openbtn {
-      background: linear-gradient(90deg, #19c37d 60%, #13c1e3 100%);
+      background: #19c37d;
       color: #fff;
     }
     .modal-dialog .modal-btn.edit {
-      background: #eaf2ff;
-      color: #2179ba;
+      background: #e2e6ee;
+      color: #444;
     }
     .modal-dialog .modal-btn.edit:active {
-      background: #d4e3f7;
-      color: #006eff;
+      background: #c1c7cd;
+      color: #222;
     }
     .modal-dialog .modal-btn.deletebtn {
       background: #ffeaea;
@@ -651,7 +655,7 @@
       font-size: 1em;
       padding: 15px 0;
       font-weight: 600;
-      box-shadow: 0 1px 5px #0077ff22;
+      box-shadow: none;
       animation: popIn 0.33s;
     }
     .modal-dialog .modal-btn.cancel-full:active {
@@ -659,10 +663,9 @@
     }
     body.dark .modal-dialog { background: #232b33; color: #b9dbff;}
     body.dark .modal-dialog .modal-title { color: #b9dbff;}
-    body.dark .modal-dialog .modal-btn { background: #62b0ff; color: #232b33;}
-    body.dark .modal-dialog .modal-btn.edit { background: #17334e; color: #62b0ff;}
+    body.dark .modal-dialog .modal-btn.openbtn { background: #23c882; color: #fff;}
+    body.dark .modal-dialog .modal-btn.edit { background: #3a3e47; color: #b9dbff;}
     body.dark .modal-dialog .modal-btn.cancel-full { background: #3a4e68; color: #f1f1f1;}
-    .modal-overlay.hide { animation: fadeOut 0.22s cubic-bezier(.4,0,.2,1) forwards; opacity: 0;}
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; }}
     @keyframes fadeInInput {
       from { opacity: 0; transform: translateY(16px);}
@@ -775,6 +778,60 @@
     .notif-popup.error { color: #ee4747;}
     body.dark .notif-popup { background: #232b33; color: #1ca97b;}
     body.dark .notif-popup.error { color: #ee4747;}
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      padding: 8px 18px;
+      background: #232b33;
+      color: #b9dbff;
+      border-radius: 18px;
+      border: 2px solid #3e4b5a;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.22s, color 0.2s, border 0.2s;
+      margin: 0;
+      outline: none;
+      background: #eaf2ff;
+      color: #2179ba;
+      border: 2px solid #eaf2ff;
+    }
+    .filter-btn.selected {
+      background: #19c37d;
+      color: #fff;
+      border: 2px solid #19c37d;
+    }
+    .filter-btn.status.selected {
+      background: #ee4747;
+      color: #fff;
+      border: 2px solid #ee4747;
+    }
+    body.dark .filter-btn {
+      background: #22303b;
+      color: #b9dbff;
+      border: 2px solid #22303b;
+    }
+    body.dark .filter-btn.selected {
+      background: #23c882;
+      color: #fff;
+      border: 2px solid #23c882;
+    }
+    body.dark .filter-btn.status.selected {
+      background: #c94b4b;
+      color: #fff;
+      border: 2px solid #c94b4b;
+    }
+    .filter-btn:active {
+      opacity: 0.93;
+      transform: scale(0.98);
+    }
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -1058,31 +1115,57 @@
       setPageTitle('Поиск');
       showPage(addBackButton(`
         <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
-          <div style="display:flex;gap:12px;margin-bottom:10px;">
-            <div style="flex:1;">
-              <select id="filterCategory" style="width:100%;padding:11px 8px;border-radius:9px;border:1.5px solid #e3e6ef;">
-                <option value="">Все категории</option>
-                <option value="🍯 Сиропы">🍯 Сиропы</option>
-                <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
-                <option value="📦 Прочее">📦 Прочее</option>
-              </select>
-            </div>
-            <div style="flex:1;">
-              <select id="filterOpened" style="width:100%;padding:11px 8px;border-radius:9px;border:1.5px solid #e3e6ef;">
-                <option value="">Все статусы</option>
-                <option value="1">Открыто</option>
-                <option value="0">Закрыто</option>
-              </select>
-            </div>
-          </div>
+          <div class="filter-bar" id="filterBar"></div>
           <input id="searchInput" type="text" placeholder="Поиск по TOB или названию">
           <div id="searchResults" style="min-height:90px;"></div>
         </div>
       `));
       ensureTheme();
+
+      const categories = [
+        { value: "", label: "Все категории", icon: "" },
+        { value: "🍯 Сиропы", label: "Сиропы", icon: "🍯" },
+        { value: "🥕 Ингредиенты", label: "Ингредиенты", icon: "🥕" },
+        { value: "📦 Прочее", label: "Прочее", icon: "📦" }
+      ];
+      const statuses = [
+        { value: "", label: "Все статусы" },
+        { value: "1", label: "Открыто" },
+        { value: "0", label: "Закрыто" }
+      ];
+      let filterCategory = "";
+      let filterOpened = "";
+      function renderFilterBar() {
+        const bar = document.getElementById('filterBar');
+        bar.innerHTML = '';
+        categories.forEach(cat => {
+          const btn = document.createElement('button');
+          btn.type = "button";
+          btn.className = "filter-btn" + (filterCategory === cat.value ? " selected" : "");
+          btn.innerHTML = (cat.icon ? cat.icon + ' ' : '') + cat.label;
+          btn.onclick = () => {
+            filterCategory = cat.value;
+            renderFilterBar();
+            renderList();
+          };
+          bar.appendChild(btn);
+        });
+        statuses.forEach(status => {
+          const btn = document.createElement('button');
+          btn.type = "button";
+          btn.className = "filter-btn status" + (filterOpened === status.value ? " selected" : "");
+          btn.innerHTML = status.label;
+          btn.onclick = () => {
+            filterOpened = status.value;
+            renderFilterBar();
+            renderList();
+          };
+          bar.appendChild(btn);
+        });
+      }
+      renderFilterBar();
+
       const input = document.getElementById('searchInput');
-      const filterCategory = document.getElementById('filterCategory');
-      const filterOpened = document.getElementById('filterOpened');
       let allItems = [];
       const resultsDiv = document.getElementById('searchResults');
       resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
@@ -1099,11 +1182,9 @@
       });
       function renderList() {
         let filter = (input.value||"").trim().toLowerCase();
-        let cat = filterCategory.value;
-        let opened = filterOpened.value;
         let items = allItems;
-        if (cat) items = items.filter(x=>x.category === cat);
-        if (opened !== '') items = items.filter(x=>String(x.opened)==opened);
+        if (filterCategory) items = items.filter(x=>x.category === filterCategory);
+        if (filterOpened !== '') items = items.filter(x=>String(x.opened)==filterOpened);
         if (filter) {
           items = items.filter(
             x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
@@ -1128,8 +1209,6 @@
         resultsDiv.innerHTML = cards;
       }
       input.addEventListener('input', renderList);
-      filterCategory.addEventListener('change', renderList);
-      filterOpened.addEventListener('change', renderList);
     }
 
     function openCardActionsModal(rJson) {
@@ -1404,6 +1483,9 @@
       const wrap = document.getElementById('wrap');
       if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         wrap.style.height = window.innerHeight + 'px';
+        setTimeout(() => {
+          wrap.style.height = window.innerHeight + 'px';
+        }, 200);
       } else {
         wrap.style.height = '';
       }
@@ -1411,6 +1493,7 @@
     window.addEventListener('resize', fixIOSHeight);
     window.addEventListener('focusin', fixIOSHeight);
     window.addEventListener('focusout', fixIOSHeight);
+    window.addEventListener('orientationchange', fixIOSHeight);
     fixIOSHeight();
     async function startApp() {
       showGlobalLoader(true);
