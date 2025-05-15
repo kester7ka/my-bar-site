@@ -969,3 +969,10 @@ body.dark .tob-warning {
   filter: grayscale(0.6);
   cursor: not-allowed;
 }
+.card-badge.category-badge {
+  background: linear-gradient(90deg, #b8b6e0 0%, #7f6bae 100%);
+  color: #fff;
+}
+.stat-block.fadeIn {
+  animation: fadeIn 0.8s;
+}
