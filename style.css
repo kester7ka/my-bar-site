@@ -976,3 +976,43 @@ body.dark .tob-warning {
 .stat-block.fadeIn {
   animation: fadeIn 0.8s;
 }
+.card-badge.category-badge {
+  background: linear-gradient(90deg, #b8b6e0 0%, #7f6bae 100%);
+  color: #fff;
+}
+.stat-block.fadeIn {
+  animation: fadeIn 0.8s;
+}
+.modal-overlay.show-blur {
+  backdrop-filter: blur(13px);
+  background: rgba(30, 46, 70, 0.22);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.37s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show-blur.visible {
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity 0.37s cubic-bezier(.4,0,.2,1);
+}
+.modal-dialog {
+  transform: translateY(40px) scale(0.96);
+  opacity: 0;
+  transition: all 0.33s cubic-bezier(.4,0,.2,1);
+}
+.modal-overlay.visible .modal-dialog {
+  transform: translateY(0px) scale(1);
+  opacity: 1;
+}
+.modal-dialog.modal-action .modal-btn.openbtn.large {
+  font-size: 1.18em;
+  padding: 18px 0;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+.modal-dialog.modal-action .modal-btn.editbtn {
+  margin-bottom: 7px;
+}
