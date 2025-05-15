@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Ингредиенты бара</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="HandheldFriendly" content="true">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
   <style>
     html, body {
@@ -18,6 +22,7 @@
       color: var(--text, #222);
       letter-spacing: 0.01em;
       box-sizing: border-box;
+      touch-action: manipulation;
     }
     body {
       min-height: 100vh;
@@ -222,11 +227,6 @@
       flex-direction: column;
       gap: 6px;
     }
-    .field-row.inline {
-      flex-direction: row;
-      align-items: center;
-      gap: 15px;
-    }
     .field-label {
       font-size: 1em;
       font-weight: 600;
@@ -319,6 +319,131 @@
     body.dark .status-toggle-btn.selected.opened { background: #23c882; color: #fff;}
     body.dark .status-toggle-btn.selected.closed { background: #c94b4b; color: #fff;}
     body.dark .status-toggle-btn:not(.selected):active { background: #18304a; color: #62b0ff;}
+    .card-badge {
+      display: inline-block;
+      background: #e5f3ff;
+      color: #2179ba;
+      font-weight: 700;
+      font-size: 0.93em;
+      border-radius: 13px 13px 13px 0;
+      padding: 4px 10px 4px 10px;
+      margin: 0 0 9px 0;
+      letter-spacing: 0.01em;
+      box-shadow: 0 1px 8px #b9dbff0a;
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      border-top-right-radius: 18px;
+      max-width: 60%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      z-index: 2;
+    }
+    .card-status-badge {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 0.93em;
+      border-radius: 13px 0 13px 13px;
+      padding: 4px 14px 4px 14px;
+      letter-spacing: 0.01em;
+      box-shadow: 0 1px 8px #b9dbff0a;
+      background: #19c37d;
+      color: #fff;
+      margin-top: 13px;
+      margin-bottom: 0;
+      margin-left: 0;
+      margin-right: 0;
+      position: relative;
+    }
+    .card-status-badge.closed {
+      background: #ee4747;
+      color: #fff;
+    }
+    .item-card {
+      min-width: 0;
+      min-height: 160px;
+      max-width: 100%;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: linear-gradient(120deg, #eaf6ff 0%, #f1f3fa 100%);
+      border-radius: 20px;
+      box-shadow: 0 3px 16px #0077ff1a, 0 1.5px 6px #b9dbff44;
+      padding: 14px 18px 22px 18px;
+      margin: 0;
+      outline: 1.5px solid #e3eaff1c;
+      overflow: hidden;
+      transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
+      animation: popIn 0.43s;
+      align-self: stretch;
+    }
+    .item-card .card-title {
+      font-weight: 700;
+      font-size: 1.03em;
+      margin-bottom: 4px;
+      color: var(--accent-dark, #0051b3);
+      word-break: break-all;
+      max-width: 80%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.18;
+      margin-top: 16px;
+    }
+    .item-card .card-row {
+      font-size: 0.97em;
+      margin-bottom: 2px;
+      color: #444;
+      line-height: 1.27;
+      word-break: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-card .card-row b {
+      font-weight: 700;
+      color: #006eff;
+      margin-right: 4px;
+    }
+    .item-card .card-badge {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      left: auto;
+      bottom: auto;
+      border-top-right-radius: 18px;
+      border-bottom-left-radius: 0;
+    }
+    .item-card .card-status-badge {
+      margin-top: 18px;
+      margin-left: 0;
+      margin-right: 0;
+      align-self: flex-start;
+    }
+    .card-actions-bottom {
+      margin-top: auto;
+      display: flex;
+      gap: 8px;
+      padding-top: 14px;
+      animation: fadeIn 0.3s;
+    }
+    .editbtn, .deletebtn {
+      flex: 1;
+      border-radius: 9px;
+      font-size: 0.97em;
+      padding: 8px 0;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background 0.17s, color 0.17s;
+      animation: popIn 0.33s;
+    }
+    .editbtn { background: #eaf2ff; color: #2179ba;}
+    .editbtn:active { background: #d4e3f7; color: #006eff;}
+    .deletebtn { background: #ffeaea; color: #ee4747;}
+    .deletebtn:active { background: #ffdede; color: #b90000;}
     .beautiful-form .btns {
       gap: 16px;
       margin-top: 10px;
@@ -337,16 +462,9 @@
       animation: popIn 0.33s;
       flex: 1;
     }
-    .beautiful-form .btns button.cancel {
-      background: #e2e6ee;
-      color: #4a4a4a;
-    }
     .beautiful-form .btns button:active {
       background: linear-gradient(90deg, #0051b3 60%, #13c1e3 100%);
       transform: scale(0.98);
-    }
-    .beautiful-form .btns button.cancel:active {
-      background: #c9ccd5;
     }
     .backbtn {
       margin-bottom: 18px;
@@ -409,245 +527,24 @@
     }
     .success { color: #1ca97b; font-weight: 600; animation: fadeIn 0.7s;}
     .error { color: #ee4747; font-weight: 600; animation: fadeIn 0.7s;}
-    .card-list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-top: 8px;
-      margin-bottom: 12px;
-      animation: fadeIn 0.45s;
-      padding: 0;
-      box-sizing: border-box;
-      width: 100%;
+    @keyframes fadeInInput {
+      from { opacity: 0; transform: translateY(16px);}
+      to   { opacity: 1; transform: none;}
     }
-    .item-card {
-      min-width: 0;
-      min-height: 160px;
-      max-width: 100%;
-      width: 100%;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      background: linear-gradient(120deg, #eaf6ff 0%, #f1f3fa 100%);
-      border-radius: 20px;
-      box-shadow: 0 3px 16px #0077ff1a, 0 1.5px 6px #b9dbff44;
-      padding: 14px 18px 16px 18px;
-      margin: 0;
-      outline: 1.5px solid #e3eaff1c;
-      overflow: hidden;
-      transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
-      animation: popIn 0.43s;
-      align-self: stretch;
-    }
-    .item-card .card-title {
-      font-weight: 700;
-      font-size: 1.03em;
-      margin-bottom: 4px;
-      color: var(--accent-dark, #0051b3);
-      word-break: break-all;
-      max-width: 80%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      line-height: 1.18;
-    }
-    .item-card .card-row {
-      font-size: 0.97em;
-      margin-bottom: 2px;
-      color: #444;
-      line-height: 1.27;
-      word-break: break-word;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .item-card .card-row b {
-      font-weight: 700;
-      color: #006eff;
-      margin-right: 4px;
-    }
-    .item-card .card-badge {
-      display: inline-block;
-      background: #e5f3ff;
-      color: #2179ba;
-      font-weight: 700;
-      font-size: 0.93em;
-      border-radius: 13px 13px 13px 0;
-      padding: 4px 10px 4px 10px;
-      margin: 0 0 9px 0;
-      letter-spacing: 0.01em;
-      box-shadow: 0 1px 8px #b9dbff0a;
-      position: absolute;
-      right: 12px;
-      top: 12px;
-      border-top-right-radius: 18px;
-      max-width: 60%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      z-index: 2;
-    }
-    .card-actions-bottom {
-      margin-top: auto;
-      display: flex;
-      gap: 8px;
-      padding-top: 14px;
-      animation: fadeIn 0.3s;
-    }
-    .editbtn, .deletebtn {
-      flex: 1;
-      border-radius: 9px;
-      font-size: 0.97em;
-      padding: 8px 0;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      transition: background 0.17s, color 0.17s;
-      animation: popIn 0.33s;
-    }
-    .editbtn { background: #eaf2ff; color: #2179ba;}
-    .editbtn:active { background: #d4e3f7; color: #006eff;}
-    .deletebtn { background: #ffeaea; color: #ee4747;}
-    .deletebtn:active { background: #ffdede; color: #b90000;}
-    .modal-overlay {
-      position: fixed;
-      z-index: 3000;
-      top: 0; left: 0; right: 0; bottom: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(30,46,70,0.18);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.16s;
-    }
-    .modal-dialog {
-      background: #fff;
-      color: #1ca97b;
-      padding: 27px 34px 26px 34px;
-      font-size: 1.13em;
-      font-weight: 700;
-      border-radius: 18px;
-      box-shadow: 0 3px 16px #13c1e340;
-      min-width: 220px;
-      min-height: 60px;
-      text-align: center;
-      animation: notifPopupIn .3s cubic-bezier(.4,0,.2,1) forwards;
-      position: relative;
-    }
-    .modal-dialog .modal-title {
-      color: #222;
-      font-weight: 700;
-      font-size: 1.08em;
-      margin-bottom: 16px;
-    }
-    .modal-dialog .delete-item-name {
-      font-weight: 700;
-      color: #ee4747;
-      font-size: 1.16em;
-      display: inline-block;
-      margin: 0 3px;
-      background: #ffeaea;
-      border-radius: 7px;
-      padding: 2px 10px;
-      border: 1.5px solid #ee4747;
-      box-shadow: 0 1px 6px #ffbaba30;
-      transition: background 0.22s, color 0.22s;
-    }
-    body.dark .modal-dialog .delete-item-name {
-      color: #ff4f4f;
-      background: #3a1d1d;
-      border-color: #ff4f4f;
-      box-shadow: 0 1px 6px #ff4f4f33;
-    }
-    .modal-dialog .modal-buttons {
-      margin-top: 18px;
-      display: flex;
-      gap: 12px;
-    }
-    .modal-dialog button {
-      flex: 1;
-      border-radius: 13px;
-      font-size: 1em;
-      padding: 11px 0;
-      background: var(--accent, #006eff);
-      color: #fff;
-      font-weight: 600;
-      border: none;
-      box-shadow: 0 1px 5px #0077ff22;
-      cursor: pointer;
-      transition: background 0.25s, transform 0.18s;
-      animation: popIn 0.33s;
-    }
-    .modal-dialog button.cancel {
-      background: #e2e6ee;
-      color: #4a4a4a;
-    }
-    .modal-dialog button:active {
-      background: var(--accent-dark, #0051b3);
-      transform: scale(0.98);
-    }
-    .modal-dialog button.cancel:active {
-      background: #c9ccd5;
-    }
-    body.dark .modal-dialog { background: #232b33; color: #b9dbff;}
-    body.dark .modal-dialog .modal-title { color: #b9dbff;}
-    body.dark .modal-dialog button { background: #62b0ff; color: #232b33;}
-    body.dark .modal-dialog button.cancel { background: #3a4e68; color: #f1f1f1;}
-    .modal-overlay.hide { animation: fadeOut 0.22s cubic-bezier(.4,0,.2,1) forwards;}
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; }}
-    .global-loader-overlay {
-      position: fixed;
-      z-index: 4000;
-      top: 0; left: 0; right: 0; bottom: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(241,243,247,0.92);
-      opacity: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.36s;
-      flex-direction: column;
-    }
-    body.dark .global-loader-overlay { background: rgba(21,28,36,0.93);}
-    .global-loader-spinner {
-      width: 54px;
-      height: 54px;
-      border: 6px solid #e3eaff;
-      border-top: 6px solid var(--accent, #006eff);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin-bottom: 22px;
-      margin-top: 12px;
-    }
-    @keyframes spin { 0% { transform: rotate(0);} 100% { transform: rotate(360deg);}}
-    .global-loader-text {
-      font-size: 1.18em;
-      font-weight: 700;
-      color: var(--accent-dark, #0051b3);
-      text-align: center;
-      letter-spacing: 0.01em;
-    }
-    body.dark .global-loader-text { color: var(--accent, #62b0ff);}
-    @keyframes notifPopupIn { from { opacity: 0; transform: scale(0.93);} to   { opacity: 1; transform: scale(1);}}
     @keyframes fadeIn { from { opacity:0; transform: translateY(32px);} to   { opacity:1; transform: none;}}
     @keyframes popIn { from { opacity:0; transform: scale(0.95);} to   { opacity:1; transform: scale(1);}}
     @media (max-width: 600px) {
-      .notif-popup { font-size: 1em; padding: 15px 10vw; min-width: 0; }
-      .item-card { min-height: 120px; padding: 11px 10px 13px 10px;}
+      .beautiful-form {padding: 18px 3vw 10px 3vw;}
+      .card-badge {font-size: 0.87em;}
+      .card-status-badge {font-size: 0.87em;}
+      .item-card {padding: 11px 10px 15px 10px;}
       .card-list { gap: 10px; }
       .menu button { padding: 13px 0; }
       .backbtn { font-size: 0.98em; padding: 10px 0;}
       h2 { font-size: 1.07em; }
-      .mini-notification { font-size: 0.98em; padding: 10px 14px;}
-      .modal-dialog { padding: 18px 7vw 18px 7vw; min-width: 0; }
-      .item-card { padding: 11px 10px 13px 10px;}
-      .content-inner { padding: 0 8px; }
-      .card-list { padding: 0;}
     }
     @media (max-width: 400px) {
-      .notif-popup { font-size: 0.98em; padding: 12px 2vw;}
-      .modal-dialog { padding: 12px 2vw 12px 2vw;}
+      .beautiful-form {padding: 12px 2vw 6px 2vw;}
       .content-inner { padding: 0 4px; }
     }
     body.dark {
@@ -670,6 +567,8 @@
     body.dark .item-card .card-title { color: #62b0ff; }
     body.dark .item-card .card-row { color: #b9dbff; }
     body.dark .item-card .card-badge { background: #17334e; color: #b9dbff;}
+    body.dark .item-card .card-status-badge.opened { background: #23c882;}
+    body.dark .item-card .card-status-badge.closed { background: #c94b4b;}
     body.dark .editbtn { background: #17334e; color: #62b0ff;}
     body.dark .editbtn:active { background: #23436b; color: #b9dbff;}
     body.dark .deletebtn { background: #3a1d1d; color: #ff9595;}
@@ -703,6 +602,19 @@
     <div class="global-loader-text">Загрузка...</div>
   </div>
   <script>
+    // Отключение double-tap zoom на всех устройствах
+    document.addEventListener('touchstart', function preventZoom(e) {
+      if(e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+    let lastTouch = 0;
+    document.addEventListener('touchend', function(e){
+      const now = Date.now();
+      if(now - lastTouch <= 350){
+        e.preventDefault();
+      }
+      lastTouch = now;
+    }, { passive: false });
+
     const themeBtn = document.getElementById('themeToggle');
     const themeText = document.getElementById('themeText');
     function ensureTheme() {
@@ -845,16 +757,15 @@
             <input name="name" id="name" required placeholder="Название позиции">
           </div>
           <div class="field-row">
-            <label class="field-label" for="opened_at">Дата открытия</label>
-            <input name="opened_at" id="opened_at" type="date" required>
-          </div>
-          <div class="field-row">
             <label class="field-label" for="shelf_life_days">Срок хранения (дней)</label>
             <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="30">
           </div>
+          <div class="field-row">
+            <label class="field-label" for="opened_at">Дата открытия</label>
+            <input name="opened_at" id="opened_at" type="date" required>
+          </div>
           <div class="btns">
             <button type="submit">Добавить</button>
-            <button type="button" class="cancel" onclick="showMenu()">Назад</button>
           </div>
         </form>
       `));
@@ -934,11 +845,13 @@
           d.results.forEach(x=>{
             cards += `
               <div class="item-card">
-                <div class="card-badge">Просрочено</div>
+                <div class="card-badge">${x.category}</div>
                 <div class="card-title">${x.name}</div>
-                <div class="card-row"><b>Категория:</b> ${x.category}</div>
                 <div class="card-row"><b>TOB:</b> ${x.tob}</div>
                 <div class="card-row"><b>Годен до:</b> ${x.expiry_at}</div>
+                <div class="card-status-badge ${x.opened === false || x.opened === 0 || x.opened === '0' ? 'closed' : 'opened'}">
+                  ${x.opened === false || x.opened === 0 || x.opened === '0' ? 'Закрыто' : 'Открыто'}
+                </div>
               </div>
             `;
           });
@@ -951,12 +864,31 @@
       setPageTitle('Поиск');
       showPage(addBackButton(`
         <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
+          <div style="display:flex;gap:12px;margin-bottom:10px;">
+            <div style="flex:1;">
+              <select id="filterCategory" style="width:100%;padding:11px 8px;border-radius:9px;border:1.5px solid #e3e6ef;">
+                <option value="">Все категории</option>
+                <option value="🍯 Сиропы">🍯 Сиропы</option>
+                <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
+                <option value="📦 Прочее">📦 Прочее</option>
+              </select>
+            </div>
+            <div style="flex:1;">
+              <select id="filterOpened" style="width:100%;padding:11px 8px;border-radius:9px;border:1.5px solid #e3e6ef;">
+                <option value="">Все статусы</option>
+                <option value="1">Открыто</option>
+                <option value="0">Закрыто</option>
+              </select>
+            </div>
+          </div>
           <input id="searchInput" type="text" placeholder="Поиск по TOB или названию">
           <div id="searchResults" style="min-height:90px;"></div>
         </div>
       `));
       ensureTheme();
       const input = document.getElementById('searchInput');
+      const filterCategory = document.getElementById('filterCategory');
+      const filterOpened = document.getElementById('filterOpened');
       let allItems = [];
       const resultsDiv = document.getElementById('searchResults');
       resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
@@ -969,18 +901,18 @@
       .then(data => {
         if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
         allItems = data.results;
-        renderList("");
+        renderList();
       });
-      input.addEventListener('input', e => {
-        renderList(e.target.value);
-      });
-      function renderList(filter) {
-        filter = (filter||"").trim().toLowerCase();
+      function renderList() {
+        let filter = (input.value||"").trim().toLowerCase();
+        let cat = filterCategory.value;
+        let opened = filterOpened.value;
         let items = allItems;
-        if(filter)
-          items = allItems.filter(
-            x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
-          );
+        if (cat) items = items.filter(x=>x.category === cat);
+        if (opened !== '') items = items.filter(x=>String(x.opened)==opened);
+        if (filter) items = items.filter(
+          x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
+        );
         if (!items.length) {
           resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
           return;
@@ -994,12 +926,18 @@
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
+              <div class="card-status-badge ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'closed' : 'opened'}">
+                ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'Закрыто' : 'Открыто'}
+              </div>
             </div>
           `;
         });
         cards += `</div>`;
         resultsDiv.innerHTML = cards;
       }
+      input.addEventListener('input', renderList);
+      filterCategory.addEventListener('change', renderList);
+      filterOpened.addEventListener('change', renderList);
     }
     function showEditPage() {
       setPageTitle('Редактирование позиций');
@@ -1048,6 +986,9 @@
               <div class="card-row"><b>TOB:</b> ${r.tob}</div>
               <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
               <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
+              <div class="card-status-badge ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'closed' : 'opened'}">
+                ${r.opened === false || r.opened === 0 || r.opened === '0' ? 'Закрыто' : 'Открыто'}
+              </div>
               <div class="card-actions-bottom">
                 <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Редактировать</button>
                 <button class="deletebtn" onclick="confirmDelete('${encodeURIComponent(JSON.stringify(r))}');return false;">Удалить</button>
@@ -1078,16 +1019,15 @@
             <input value="${r.name}" readonly>
           </div>
           <div class="field-row">
-            <label class="field-label">Дата открытия</label>
-            <input name="opened_at" type="date" value="${today}" required>
-          </div>
-          <div class="field-row">
             <label class="field-label">Срок хранения (дней)</label>
             <input name="shelf_life_days" type="number" min="1" required value="${r.shelf_life_days}">
           </div>
+          <div class="field-row">
+            <label class="field-label">Дата открытия</label>
+            <input name="opened_at" type="date" value="${today}" required>
+          </div>
           <div class="btns">
             <button type="submit">Сохранить</button>
-            <button type="button" class="cancel" onclick="showMenu()">Назад</button>
           </div>
         </form>
       `));
