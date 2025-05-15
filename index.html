@@ -371,20 +371,15 @@
       animation: popIn 0.43s;
       align-self: stretch;
     }
-    .item-card .card-header-row {
+    .item-card .card-header-col {
       display: flex;
-      gap: 9px;
-      align-items: flex-start;
-      margin-bottom: 2px;
-    }
-    .item-card .card-header-row .card-badge,
-    .item-card .card-header-row .card-status-badge {
-      margin-bottom: 0;
-      margin-top: 0;
-      min-width: 88px;
-    }
-    .item-card .card-header-row .card-status-badge {
-      margin-right: 6px;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 2;
     }
     .item-card .card-title {
       font-weight: 700;
@@ -399,6 +394,7 @@
       line-height: 1.18;
       margin-top: 0;
       margin-left: 2px;
+      padding-right: 135px;
     }
     .item-card .card-row {
       font-size: 0.96em;
@@ -409,6 +405,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       margin-left: 2px;
+      padding-right: 135px;
     }
     .item-card .card-row b {
       font-weight: 700;
@@ -673,10 +670,12 @@
       .menu button { padding: 13px 0; }
       .backbtn { font-size: 0.98em; padding: 10px 0;}
       h2 { font-size: 1.07em; }
+      .item-card .card-title, .item-card .card-row {padding-right: 110px;}
     }
     @media (max-width: 400px) {
       .beautiful-form {padding: 12px 2vw 6px 2vw;}
       .content-inner { padding: 0 4px; }
+      .item-card .card-title, .item-card .card-row {padding-right: 75px;}
     }
     body.dark {
       --main-bg: #151c24;
@@ -958,10 +957,9 @@
     }
 
     function renderCard(r, actions = true) {
-      // category badge + status badge
-      let badge = `<div class="card-header-row">
-        <div class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</div>
+      let badgeCol = `<div class="card-header-col">
         <div class="card-badge">${r.category}</div>
+        <div class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</div>
       </div>`;
       let title = `<div class="card-title" title="${r.name}">${r.name}</div>`;
       let rows = `
@@ -983,7 +981,7 @@
           </div>`;
         }
       }
-      return `<div class="item-card">${badge}${title}${rows}${buttons}</div>`;
+      return `<div class="item-card">${badgeCol}${title}${rows}${buttons}</div>`;
     }
 
     function showSearchPage() {
@@ -1078,7 +1076,6 @@
     async function autoOpen(rJson) {
       let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
       closeDeleteModal();
-      // Удаляем закрытую, создаём такую же открытую с сегодняшней датой и тем же сроком
       let today = new Date().toISOString().slice(0,10);
       let reqAdd = {
         user_id: userId,
@@ -1089,13 +1086,11 @@
         shelf_life_days: r.shelf_life_days,
         opened: 1
       };
-      // Удаляем старую (закрытую)
       await fetch(`${backend}/delete`, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({user_id: userId, tob: r.tob})
+        body: JSON.stringify({user_id: userId, tob: r.tob, opened: r.opened, opened_at: r.opened_at})
       });
-      // Создаём новую (открытую)
       let resp = await fetch(`${backend}/add`, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
@@ -1145,7 +1140,7 @@
         let resp = await fetch(`${backend}/delete`, {
           method: "POST",
           headers: {"Content-Type":"application/json"},
-          body: JSON.stringify({user_id: userId, tob: r.tob})
+          body: JSON.stringify({user_id: userId, tob: r.tob, opened: r.opened, opened_at: r.opened_at})
         });
         let data = await resp.json();
         if (data.ok) {
