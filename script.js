@@ -472,24 +472,6 @@ function showSearchPage() {
   input.addEventListener('input', renderList);
 }
 
-function showOpenModal(rJson) {
-  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-  closeModal();
-  let overlay = document.createElement('div');
-  overlay.className = 'modal-overlay show-blur';
-  overlay.innerHTML = `
-    <div class="modal-dialog modal-action">
-      <div class="modal-title">Выберите действие</div>
-      <button class="modal-btn openbtn large" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
-      <button class="modal-btn editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
-      <button class="modal-btn cancel-full" onclick="closeModal()">Отмена</button>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-  setTimeout(() => overlay.classList.add('visible'), 10);
-  ensureTheme();
-}
-
 function showDeleteModal(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   closeModal();
@@ -498,7 +480,48 @@ function showDeleteModal(rJson) {
   overlay.innerHTML = `
     <div class="modal-dialog modal-delete">
       <div class="modal-title">Вы уверены, что хотите удалить <span class="delete-item-name">${r.name}</span>?</div>
-      <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+      <div class="modal-buttons-row">
+        <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+        <button class="modal-btn cancelbtn" onclick="closeModal()">Отмена</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add('visible'), 10);
+  ensureTheme();
+}
+
+async function deleteItem(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  let overlay = document.querySelector('.modal-overlay.show-blur');
+  let dialog = overlay ? overlay.querySelector('.modal-dialog.modal-delete') : null;
+  if (dialog) {
+    dialog.classList.add('success-check');
+    dialog.innerHTML = `<div class="check-anim"></div>`;
+  }
+  await fetch(`${backend}/delete`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, id: r.id})
+  });
+  setTimeout(() => {
+    closeModal();
+    showSearchPage();
+  }, 1100);
+}
+
+function showOpenModal(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  closeModal();
+  let overlay = document.createElement('div');
+  overlay.className = 'modal-overlay show-blur';
+  overlay.innerHTML = `
+    <div class="modal-dialog modal-action">
+      <div class="modal-title">Выберите действие</div>
+      <div class="modal-buttons-row">
+        <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
+        <button class="modal-btn editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
+      </div>
       <button class="modal-btn cancel-full" onclick="closeModal()">Отмена</button>
     </div>
   `;
@@ -532,51 +555,9 @@ async function autoOpen(rJson) {
     body: JSON.stringify(req)
   });
   let data = await resp.json();
-  if (data.ok) {
-    showNotification(data.replaced ? "Открытая позиция заменена на новую!" : "Позиция открыта!", false);
-    showSearchPage();
-  } else {
-    showNotification("Ошибка открытия: "+data.error, true);
-    showSearchPage();
-  }
+  showSearchPage();
 }
 
-async function deleteItem(rJson) {
-  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-  closeModal();
-  let resp = await fetch(`${backend}/delete`, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, id: r.id})
-  });
-  let data = await resp.json();
-  if (data.ok) {
-    vibrate();
-    showNotification("Позиция удалена!");
-    showSearchPage();
-  } else {
-    showNotification("Ошибка удаления: " + data.error, true);
-    showSearchPage();
-  }
-}
-function showNotification(msg, isError = false) {
-  let old = document.getElementById('notifOverlay');
-  if (old) {
-    old.classList.add('hide');
-    setTimeout(()=>old.remove(),370);
-  }
-  let overlay = document.createElement('div');
-  overlay.className = 'notif-overlay';
-  overlay.id = 'notifOverlay';
-  overlay.innerHTML = `<div class="notif-popup${isError?' error':''}">${msg}</div>`;
-  document.body.appendChild(overlay);
-  setTimeout(() => { overlay.querySelector('.notif-popup').style.opacity = 1; }, 10);
-  setTimeout(() => {
-    let popup = overlay.querySelector('.notif-popup');
-    if (popup) popup.classList.add('hide');
-    setTimeout(()=>overlay.remove(), 370);
-  }, 1700);
-}
 function showExpiredPage() {
   setPageTitle('Проверка сроков');
   showPage(addBackButton(`<div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div><div id="expiredCards"></div>`));
