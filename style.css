@@ -719,35 +719,39 @@ body.dark .card-status-badge.closed {
   background: #c9ccd5;
 }
 .modal-dialog.modal-delete.success-check {
+  background: transparent !important;
+  box-shadow: none !important;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100px;
-  padding: 28px 0;
-  background: transparent !important;
-  flex-direction: column;
 }
 .check-anim {
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   opacity: 1;
-  background: none !important;
+  background: transparent !important;
   animation: checkShow 0.5s 0s forwards cubic-bezier(.4,0,.2,1);
 }
 .check-anim svg {
-  width: 70px;
-  height: 70px;
+  width: 86px;
+  height: 86px;
   stroke: #19c37d;
-  stroke-width: 5.5;
+  stroke-width: 7;
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
   opacity: 0;
   animation: checkMark 0.33s 0.23s forwards cubic-bezier(.4,0,.2,1);
+  display: block;
+  margin: 0 auto;
+  background: transparent;
 }
 @keyframes checkShow {
   0% { opacity: 0; transform: scale(0.7);}
