@@ -209,7 +209,6 @@ body.dark h2 { color: var(--accent, #62b0ff); }
   box-shadow: 0 4px 20px #0077ff18;
   margin-top: 10px;
   margin-bottom: 20px;
-  animation: popIn 0.41s;
   max-width: 420px;
   margin-left: auto;
   margin-right: auto;
@@ -217,9 +216,14 @@ body.dark h2 { color: var(--accent, #62b0ff); }
   display: flex;
   flex-direction: column;
   gap: 17px;
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
 }
 .stat-block.fadeIn {
-  animation: fadeIn 0.8s;
+  opacity: 1;
+  transform: none;
+  animation: none;
 }
 .stat-row {
   display: flex;
@@ -724,34 +728,30 @@ body.dark .card-status-badge.closed {
   flex-direction: column;
 }
 .check-anim {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #19c37d;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   opacity: 0;
-  animation: checkShow 0.4s 0s forwards cubic-bezier(.4,0,.2,1);
+  background: none !important;
+  animation: checkShow 0.5s 0s forwards cubic-bezier(.4,0,.2,1);
 }
-.check-anim:after {
-  content: '';
-  display: block;
-  width: 22px;
-  height: 12px;
-  border-left: 4px solid #fff;
-  border-bottom: 4px solid #fff;
-  border-radius: 0 0 5px 5px;
-  position: absolute;
-  left: 17px; top: 22px;
-  transform: rotate(-45deg) scale(0.7);
+.check-anim svg {
+  width: 42px;
+  height: 42px;
+  stroke: #19c37d;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
   opacity: 0;
-  animation: checkMark 0.3s 0.25s forwards cubic-bezier(.4,0,.2,1);
+  animation: checkMark 0.33s 0.23s forwards cubic-bezier(.4,0,.2,1);
 }
 @keyframes checkShow {
-  0% { opacity: 0; transform: scale(0.6);}
-  60% { opacity: 1; transform: scale(1.07);}
+  0% { opacity: 0; transform: scale(0.7);}
+  70% { opacity: 1; transform: scale(1.08);}
   100% { opacity: 1; transform: scale(1);}
 }
 @keyframes checkMark {
