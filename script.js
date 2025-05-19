@@ -132,7 +132,8 @@ document.body.addEventListener('focusin', function(e) {
 
 function showStatsPage() {
   setPageTitle('Статистика бара');
-  showPage(addBackButton(`<div class="stat-block fadeIn" id="statBlock"><div style="text-align:center;color:#aaa;">Загрузка...</div></div>`));
+  showPage(addBackButton(`<div class="stat-block" id="statBlock"><div style="text-align:center;color:#aaa;">Загрузка...</div></div>`));
+  setTimeout(()=>document.getElementById('statBlock').classList.add('fadeIn'),50);
   fetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
@@ -233,6 +234,7 @@ function showAddPage() {
   let allItems = [];
   let fetchedItems = false;
   let openTobExists = false;
+  let openedItemName = '';
   const tobInput = document.getElementById('tob');
   const tobWarning = document.getElementById('tobWarning');
   const nameInput = document.getElementById('name');
@@ -271,11 +273,17 @@ function showAddPage() {
     openTobExists = false;
     tobWarning.style.display = "none";
     tobWarning.innerHTML = "";
+    nameInput.readOnly = false;
+    nameInput.value = '';
+    openedItemName = '';
     if (tobVal.length === 6) {
       let exists = allItems.find(x => x.tob === tobVal && x.opened == 1);
       if (exists) {
         openTobExists = true;
-        tobWarning.innerHTML = `<span class="tob-warning">Позиция с этим TOB уже <b>открыта</b>. Можете добавить только закрытую позицию, либо сначала закройте открытую.</span>`;
+        nameInput.value = exists.name;
+        nameInput.readOnly = true;
+        openedItemName = exists.name;
+        tobWarning.innerHTML = `<span class="tob-warning">Позиция с этим TOB уже <b>открыта</b>. Изменение названия запрещено.</span>`;
         tobWarning.style.display = "block";
       }
     }
@@ -516,10 +524,12 @@ function showOpenModal(rJson) {
   closeModal();
   let overlay = document.createElement('div');
   overlay.className = 'modal-overlay show-blur';
+
   overlay.innerHTML = `
-    <div class="modal-dialog modal-action">
-      <div class="modal-title">Выберите действие</div>
-      <div class="modal-buttons-row">
+    <div class="modal-dialog modal-action" style="max-width:360px;">
+      <div class="modal-title">Открытие позиции</div>
+      <div id="open-modal-warning" style="color:#e49000;font-size:1em;margin-bottom:10px;display:none;text-align:center"></div>
+      <div class="modal-buttons-row" id="open-modal-btns">
         <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
         <button class="modal-btn editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
       </div>
@@ -528,7 +538,30 @@ function showOpenModal(rJson) {
   `;
   document.body.appendChild(overlay);
   setTimeout(() => overlay.classList.add('visible'), 10);
+
+  findOpenedByTOB(r.tob).then(opened => {
+    const warning = document.getElementById('open-modal-warning');
+    const btns = document.getElementById('open-modal-btns');
+    if (!opened) {
+      warning.innerHTML = "Позиция будет открыта, срок годности уменьшится.";
+      warning.style.display = "block";
+      btns.innerHTML = `
+        <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
+      `;
+    }
+  });
+
   ensureTheme();
+}
+
+async function findOpenedByTOB(tob) {
+  let resp = await fetch(`${backend}/search`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, query: tob})
+  });
+  let data = await resp.json();
+  return (data.results || []).find(x => x.tob === tob && x.opened == 1);
 }
 
 function closeModal() {
@@ -543,13 +576,7 @@ async function autoOpen(rJson) {
   closeModal();
   let today = new Date().toISOString().slice(0,10);
 
-  let resp = await fetch(`${backend}/search`, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, query: r.tob})
-  });
-  let data = await resp.json();
-  let opened = data.results.find(x => x.tob === r.tob && x.opened == 1);
+  let opened = await findOpenedByTOB(r.tob);
   let expiry_at = r.expiry_at;
   if (opened) {
     expiry_at = opened.expiry_at;
@@ -571,6 +598,62 @@ async function autoOpen(rJson) {
     })
   });
   showSearchPage();
+}
+
+// Креативная страница редактирования позиции
+function openReopenForm(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  setPageTitle('Редактировать позицию');
+  showPage(addBackButton(`
+    <form id="editf" class="beautiful-form" autocomplete="off" style="max-width:430px;">
+      <div class="field-row">
+        <label class="field-label">TOB (нельзя изменить)</label>
+        <input value="${r.tob}" readonly style="background:#eaf2ff;color:#888;">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="edit_name">Название</label>
+        <input name="edit_name" id="edit_name" required value="${r.name}">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="edit_category">Категория</label>
+        <select name="edit_category" id="edit_category" required>
+          <option value="🍯 Сиропы" ${r.category === "🍯 Сиропы"?"selected":""}>🍯 Сиропы</option>
+          <option value="🥕 Ингредиенты" ${r.category === "🥕 Ингредиенты"?"selected":""}>🥕 Ингредиенты</option>
+          <option value="📦 Прочее" ${r.category === "📦 Прочее"?"selected":""}>📦 Прочее</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="edit_shelf_life_days">Срок хранения (дней)</label>
+        <input name="edit_shelf_life_days" id="edit_shelf_life_days" type="number" min="1" required value="${r.shelf_life_days}">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="edit_opened_at">Дата открытия</label>
+        <input name="edit_opened_at" id="edit_opened_at" type="date" required value="${r.opened_at}">
+      </div>
+      <div class="btns">
+        <button type="submit" id="editSubmitBtn">Сохранить</button>
+      </div>
+    </form>
+  `));
+  ensureTheme();
+
+  document.getElementById('editf').onsubmit = async function(e) {
+    e.preventDefault();
+    let d = Object.fromEntries(new FormData(this));
+    await fetch(`${backend}/update`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        user_id: userId,
+        id: r.id,
+        category: d.edit_category,
+        name: d.edit_name,
+        shelf_life_days: d.edit_shelf_life_days,
+        opened_at: d.edit_opened_at
+      })
+    });
+    showSearchPage();
+  };
 }
 
 function showExpiredPage() {
