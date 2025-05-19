@@ -283,7 +283,7 @@ function showAddPage() {
         nameInput.value = exists.name;
         nameInput.readOnly = true;
         openedItemName = exists.name;
-        tobWarning.innerHTML = `<span class="tob-warning">Добавление открытой позиции с этим TOB запрещено. Изменить название также невозможно. Сначала закройте или удалите текущую открытую позицию с этим TOB.</span>`;
+        tobWarning.innerHTML = `<span class="tob-warning">Добавление открытой позиции с этим TOB запрещено. Сначала закройте или удалите открытую позицию с этим TOB.</span>`;
         tobWarning.style.display = "block";
       }
     }
@@ -322,7 +322,10 @@ function showAddPage() {
     let data = await resp.json();
     if (data.ok) {
       vibrate();
-      msg("Позиция добавлена!", "success");
+      showCheckAnim();
+      setTimeout(() => {
+        msg("Позиция добавлена!", "success");
+      }, 1000);
     } else {
       msg("Ошибка: " + data.error, "error");
     }
@@ -506,7 +509,7 @@ async function deleteItem(rJson) {
   setTimeout(() => {
     closeModal();
     showSearchPage();
-  }, 1100);
+  }, 1000);
 }
 
 async function findOpenedByTOB(tob) {
@@ -531,9 +534,8 @@ function showOpenModal(rJson) {
       overlay.innerHTML = `
         <div class="modal-dialog modal-delete">
           <div class="modal-title">
-            <span>Позиция </span>
-            <span class="modal-name-box">${r.name}</span>
-            <span style="color:#ee4747;display:block;margin-top:7px;font-size:1.05em;">Открытая позиция с этим TOB уже существует.<br>Изменить название невозможно.<br>Сначала закройте или удалите открытую позицию.</span>
+            <span class="modal-name-box">${opened.name}</span>
+            <div style="font-size:0.97em;color:#888;margin-top:5px;">Срок годности открытой: ${opened.expiry_at ? opened.expiry_at : '-'}</div>
           </div>
           <div class="modal-buttons-row">
             <button class="modal-btn editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
@@ -545,11 +547,7 @@ function showOpenModal(rJson) {
     } else {
       overlay.innerHTML = `
         <div class="modal-dialog modal-delete">
-          <div class="modal-title">
-            <span>Что сделать с позицией </span>
-            <span class="modal-name-box">${r.name}</span>
-          </div>
-          <button class="modal-btn openbtn" style="width:100%;margin-bottom:12px;" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Изменить и открыть</button>
+          <button class="modal-btn openbtn" style="width:100%;margin-bottom:12px;" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}', true)">Изменить и открыть</button>
           <button class="modal-btn cancel-full" onclick="closeModal()">Отмена</button>
         </div>
       `;
@@ -573,9 +571,9 @@ async function autoOpen(rJson) {
   let dialog = overlay ? overlay.querySelector('.modal-dialog') : null;
 
   let today = new Date().toISOString().slice(0,10);
-
   let opened = await findOpenedByTOB(r.tob);
   let expiry_at = r.expiry_at;
+
   if (opened) {
     expiry_at = opened.expiry_at;
     await fetch(`${backend}/delete`, {
@@ -584,6 +582,7 @@ async function autoOpen(rJson) {
       body: JSON.stringify({user_id: userId, id: opened.id})
     });
   }
+
   await fetch(`${backend}/update`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
@@ -604,10 +603,10 @@ async function autoOpen(rJson) {
   setTimeout(() => {
     closeModal();
     showSearchPage();
-  }, 1100);
+  }, 1000);
 }
 
-function openReopenForm(rJson) {
+function openReopenForm(rJson, openAfterEdit = false) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   setPageTitle('Редактировать позицию');
   showPage(addBackButton(`
@@ -646,20 +645,25 @@ function openReopenForm(rJson) {
   document.getElementById('editf').onsubmit = async function(e) {
     e.preventDefault();
     let d = Object.fromEntries(new FormData(this));
-    let resp = await fetch(`${backend}/update`, {
+    let req = {
+      user_id: userId,
+      id: r.id,
+      category: d.edit_category,
+      name: d.edit_name,
+      shelf_life_days: d.edit_shelf_life_days,
+      opened_at: d.edit_opened_at
+    };
+    await fetch(`${backend}/update`, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({
-        user_id: userId,
-        id: r.id,
-        category: d.edit_category,
-        name: d.edit_name,
-        shelf_life_days: d.edit_shelf_life_days,
-        opened_at: d.edit_opened_at
-      })
+      body: JSON.stringify(req)
     });
     vibrate();
-    showSearchPage();
+    if (openAfterEdit) {
+      autoOpen(encodeURIComponent(JSON.stringify({...r, ...req})));
+    } else {
+      showSearchPage();
+    }
   };
 }
 
@@ -779,6 +783,30 @@ window.addEventListener('focusin', fixIOSHeight);
 window.addEventListener('focusout', fixIOSHeight);
 window.addEventListener('orientationchange', fixIOSHeight);
 fixIOSHeight();
+
+function showCheckAnim() {
+  closeModal();
+  let overlay = document.createElement('div');
+  overlay.className = 'modal-overlay show-blur visible';
+  overlay.innerHTML = `
+    <div class="modal-dialog modal-delete success-check" style="background:transparent;box-shadow:none;">
+      <div class="check-anim" style="background:transparent;">
+        <svg viewBox="0 0 110 110" style="width:86px;height:86px;display:block;">
+          <polyline points="30,58 50,80 82,36" style="stroke:#19c37d;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none;" />
+        </svg>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => {
+    overlay.classList.add('visible');
+  }, 20);
+  setTimeout(() => {
+    overlay.classList.remove('visible');
+    setTimeout(() => overlay.remove(), 370);
+  }, 900);
+}
+
 async function startApp() {
   showGlobalLoader(true);
   const MIN_LOAD = 1200 + Math.floor(Math.random()*500);
