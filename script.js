@@ -154,6 +154,7 @@ function showStatsPage() {
       <div class="stat-row"><span class="stat-label">Закрытых:</span> <span class="stat-value gray">${closed}</span></div>
       <div class="stat-row"><span class="stat-label">Просрочено:</span> <span class="stat-value red">${expired}</span></div>
     `;
+    document.getElementById('statBlock').classList.add('fadeIn');
   });
 }
 
@@ -497,7 +498,7 @@ async function deleteItem(rJson) {
   let dialog = overlay ? overlay.querySelector('.modal-dialog.modal-delete') : null;
   if (dialog) {
     dialog.classList.add('success-check');
-    dialog.innerHTML = `<div class="check-anim"></div>`;
+    dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 42 42"><polyline points="10,22 18,32 32,12"/></svg></div>`;
   }
   await fetch(`${backend}/delete`, {
     method: "POST",
@@ -542,19 +543,33 @@ async function autoOpen(rJson) {
   closeModal();
   let today = new Date().toISOString().slice(0,10);
 
-  let req = {
-    user_id: userId,
-    category: r.category,
-    tob: r.tob,
-    name: r.name,
-    shelf_life_days: r.shelf_life_days
-  };
-  let resp = await fetch(`${backend}/open`, {
+  let resp = await fetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
-    body: JSON.stringify(req)
+    body: JSON.stringify({user_id: userId, query: r.tob})
   });
   let data = await resp.json();
+  let opened = data.results.find(x => x.tob === r.tob && x.opened == 1);
+  let expiry_at = r.expiry_at;
+  if (opened) {
+    expiry_at = opened.expiry_at;
+    await fetch(`${backend}/delete`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId, id: opened.id})
+    });
+  }
+  await fetch(`${backend}/update`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      user_id: userId,
+      id: r.id,
+      opened: 1,
+      opened_at: today,
+      expiry_at: expiry_at
+    })
+  });
   showSearchPage();
 }
 
