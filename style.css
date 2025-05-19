@@ -202,6 +202,7 @@ body.dark h2 { color: var(--accent, #62b0ff); }
   transform: scale(0.98);
   box-shadow: 0 1.5px 8px #0077ff22, 0 1.5px 1.5px #fff7 inset;
 }
+/* Статистика — плавное появление */
 .stat-block {
   padding: 23px 14px;
   background: var(--card-bg, #fff);
@@ -724,7 +725,7 @@ body.dark .card-status-badge.closed {
   justify-content: center;
   min-height: 100px;
   padding: 28px 0;
-  background: #fff;
+  background: transparent !important;
   flex-direction: column;
 }
 .check-anim {
@@ -764,7 +765,7 @@ body.dark .modal-btn.openbtn { background: #23c882; color: #fff;}
 body.dark .modal-btn.editbtn { background: #3a3e47; color: #b9dbff;}
 body.dark .modal-btn.cancel-full { background: #3a4e68; color: #f1f1f1;}
 body.dark .modal-btn.deletebtn { background: #3a1d1d; color: #ff9595;}
-body.dark .modal-dialog.modal-delete.success-check { background: #232b33;}
+body.dark .modal-dialog.modal-delete.success-check { background: transparent !important;}
 @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; }}
 @keyframes fadeInInput {
   from { opacity: 0; transform: translateY(16px);}
