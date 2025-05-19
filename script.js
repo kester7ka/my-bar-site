@@ -283,7 +283,7 @@ function showAddPage() {
         nameInput.value = exists.name;
         nameInput.readOnly = true;
         openedItemName = exists.name;
-        tobWarning.innerHTML = `<span class="tob-warning">Позиция с этим TOB уже <b>открыта</b>. Изменение названия запрещено.</span>`;
+        tobWarning.innerHTML = `<span class="tob-warning">Позиция с этим TOB уже <b style="color:#ee4747;">открыта</b>. Изменение названия запрещено.</span>`;
         tobWarning.style.display = "block";
       }
     }
@@ -319,10 +319,7 @@ function showAddPage() {
       let data = await resp.json();
       if (data.ok) {
         vibrate();
-        if (data.replaced)
-          msg("Открытая позиция заменена на новую!", "success");
-        else
-          msg("Позиция открыта!", "success");
+        msg("Открытая позиция заменена на новую!", "success");
       } else {
         msg("Ошибка: " + data.error, "error");
       }
@@ -488,7 +485,10 @@ function showDeleteModal(rJson) {
   overlay.className = 'modal-overlay show-blur';
   overlay.innerHTML = `
     <div class="modal-dialog modal-delete">
-      <div class="modal-title">Вы уверены, что хотите удалить <span class="delete-item-name">${r.name}</span>?</div>
+      <div class="modal-title">
+        <span>Вы уверены, что хотите удалить </span>
+        <span class="delete-item-name" style="color:#ee4747;">${r.name}</span>?
+      </div>
       <div class="modal-buttons-row">
         <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
         <button class="modal-btn cancelbtn" onclick="closeModal()">Отмена</button>
@@ -507,6 +507,7 @@ async function deleteItem(rJson) {
   if (dialog) {
     dialog.classList.add('success-check');
     dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 42 42"><polyline points="10,22 18,32 32,12"/></svg></div>`;
+    vibrate();
   }
   await fetch(`${backend}/delete`, {
     method: "POST",
@@ -526,8 +527,11 @@ function showOpenModal(rJson) {
   overlay.className = 'modal-overlay show-blur';
 
   overlay.innerHTML = `
-    <div class="modal-dialog modal-action" style="max-width:360px;">
-      <div class="modal-title">Открытие позиции</div>
+    <div class="modal-dialog modal-delete">
+      <div class="modal-title">
+        <span>Что сделать с позицией </span>
+        <span class="delete-item-name" style="color:#ee4747;">${r.name}</span>?
+      </div>
       <div id="open-modal-warning" style="color:#e49000;font-size:1em;margin-bottom:10px;display:none;text-align:center"></div>
       <div class="modal-buttons-row" id="open-modal-btns">
         <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
@@ -573,7 +577,9 @@ function closeModal() {
 
 async function autoOpen(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
-  closeModal();
+  let overlay = document.querySelector('.modal-overlay.show-blur');
+  let dialog = overlay ? overlay.querySelector('.modal-dialog') : null;
+
   let today = new Date().toISOString().slice(0,10);
 
   let opened = await findOpenedByTOB(r.tob);
@@ -597,7 +603,16 @@ async function autoOpen(rJson) {
       expiry_at: expiry_at
     })
   });
-  showSearchPage();
+
+  if (dialog) {
+    dialog.classList.add('success-check');
+    dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 42 42"><polyline points="10,22 18,32 32,12"/></svg></div>`;
+    vibrate();
+  }
+  setTimeout(() => {
+    closeModal();
+    showSearchPage();
+  }, 1100);
 }
 
 // Креативная страница редактирования позиции
@@ -640,7 +655,7 @@ function openReopenForm(rJson) {
   document.getElementById('editf').onsubmit = async function(e) {
     e.preventDefault();
     let d = Object.fromEntries(new FormData(this));
-    await fetch(`${backend}/update`, {
+    let resp = await fetch(`${backend}/update`, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
@@ -652,40 +667,87 @@ function openReopenForm(rJson) {
         opened_at: d.edit_opened_at
       })
     });
+    vibrate();
     showSearchPage();
   };
 }
 
+// --- Проверить сроки с фильтром "Сегодня / Завтра" ---
 function showExpiredPage() {
   setPageTitle('Проверка сроков');
-  showPage(addBackButton(`<div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div><div id="expiredCards"></div>`));
+  showPage(addBackButton(`
+    <div class="beautiful-form" style="gap:12px;max-width:440px;">
+      <div class="filter-bar-wrap" style="margin-bottom:0;">
+        <div class="filter-bar-section" id="expiredDayFilter"></div>
+      </div>
+      <div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>
+      <div id="expiredCards"></div>
+    </div>
+  `));
   ensureTheme();
-  fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
-    .then(r=>r.json())
-    .then(d=>{
-      const title = document.getElementById('expiredTitle');
-      const cardsDiv = document.getElementById('expiredCards');
-      if(!d.ok) {
-        title.innerHTML = "Ошибка: "+d.error;
-        cardsDiv.innerHTML = "";
-        return;
-      }
-      if(!d.results.length) {
-        title.innerHTML = "Нет просроченных позиций!";
-        title.className = "success";
-        cardsDiv.innerHTML = "";
-        return;
-      }
-      title.innerHTML = "Просроченные позиции:";
-      title.className = "";
-      let cards = `<div class="card-list">`;
-      d.results.forEach(x=>{
-        cards += renderCard(x, false);
-      });
-      cards += `</div>`;
-      cardsDiv.innerHTML = cards;
-      ensureTheme();
+
+  let filter = 'today';
+  renderDayFilter();
+  fetchAndRender();
+
+  function renderDayFilter() {
+    const bar = document.getElementById('expiredDayFilter');
+    bar.innerHTML = '';
+    [['today', 'Сегодня'], ['tomorrow','Завтра']].forEach(([val, label]) => {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.className = "filter-btn" + (filter === val ? " selected" : "");
+      btn.innerHTML = label;
+      btn.onclick = () => {
+        filter = val;
+        renderDayFilter();
+        fetchAndRender();
+      };
+      bar.appendChild(btn);
     });
+  }
+
+  function fetchAndRender() {
+    const title = document.getElementById('expiredTitle');
+    const cardsDiv = document.getElementById('expiredCards');
+    title.innerHTML = "Загрузка...";
+    cardsDiv.innerHTML = "";
+    let now = new Date();
+    let dateToCheck = new Date();
+    if (filter === 'tomorrow') {
+      dateToCheck.setDate(now.getDate() + 1);
+    }
+    let y = dateToCheck.getFullYear();
+    let m = ('0' + (dateToCheck.getMonth()+1)).slice(-2);
+    let d = ('0' + dateToCheck.getDate()).slice(-2);
+    let checkDate = `${y}-${m}-${d}`;
+
+    fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
+      .then(r=>r.json())
+      .then(data=>{
+        if(!data.ok) {
+          title.innerHTML = "Ошибка: "+data.error;
+          cardsDiv.innerHTML = "";
+          return;
+        }
+        let filtered = (data.results||[]).filter(x=>x.expiry_at===checkDate);
+        if(!filtered.length) {
+          title.innerHTML = "Нет позиций, которые просрочатся " + (filter==='today' ? "сегодня!" : "завтра!");
+          title.className = "success";
+          cardsDiv.innerHTML = "";
+          return;
+        }
+        title.innerHTML = (filter==='today' ? "Сегодня истекают:" : "Завтра истекают:");
+        title.className = "";
+        let cards = `<div class="card-list">`;
+        filtered.forEach(x=>{
+          cards += renderCard(x, false);
+        });
+        cards += `</div>`;
+        cardsDiv.innerHTML = cards;
+        ensureTheme();
+      });
+  }
 }
 function showGlobalLoader(show = true) {
   const loader = document.getElementById('globalLoader');
