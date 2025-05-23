@@ -159,6 +159,21 @@ function showStatsPage() {
   });
 }
 
+function msTimeNow() {
+  const now = new Date();
+  const msOffset = 3 * 60 * 60 * 1000;
+  return new Date(now.getTime() + msOffset);
+}
+function msDateStrToDate(dateStr) {
+  return new Date(new Date(dateStr).getTime() + 3 * 60 * 60 * 1000);
+}
+function msDaysBetween(dateStr1, dateStr2) {
+  if (!dateStr1 || !dateStr2) return '-';
+  const d1 = msDateStrToDate(dateStr1);
+  const d2 = msDateStrToDate(dateStr2);
+  return Math.max(0, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+}
+
 function showAddPage() {
   setPageTitle('Добавить позицию');
   showPage(addBackButton(`
@@ -168,6 +183,7 @@ function showAddPage() {
         <select name="category" id="category" required>
           <option value="🍯 Сиропы">🍯 Сиропы</option>
           <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
+          <option value="☕ Кофе">☕ Кофе</option>
           <option value="📦 Прочее">📦 Прочее</option>
         </select>
       </div>
@@ -379,6 +395,7 @@ function showSearchPage() {
     { value: "", label: "Все категории", icon: "" },
     { value: "🍯 Сиропы", label: "🍯 Сиропы", icon: "" },
     { value: "🥕 Ингредиенты", label: "🥕 Ингредиенты", icon: "" },
+    { value: "☕ Кофе", label: "☕ Кофе", icon: "" },
     { value: "📦 Прочее", label: "📦 Прочее", icon: "" }
   ];
   const statuses = [
@@ -498,7 +515,7 @@ async function deleteItem(rJson) {
   let dialog = overlay ? overlay.querySelector('.modal-dialog.modal-delete') : null;
   if (dialog) {
     dialog.classList.add('success-check');
-    dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 70 70"><polyline points="18,38 31,52 54,22"/></svg></div>`;
+    dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 110 110"><polyline points="30,58 50,80 82,36"/></svg></div>`;
     vibrate();
   }
   await fetch(`${backend}/delete`, {
@@ -531,11 +548,12 @@ function showOpenModal(rJson) {
     overlay.className = 'modal-overlay show-blur';
 
     if (opened) {
+      let days = msDaysBetween(opened.opened_at, opened.expiry_at);
       overlay.innerHTML = `
         <div class="modal-dialog modal-delete">
           <div class="modal-title">
             <span class="modal-name-box">${opened.name}</span>
-            <div style="font-size:0.97em;color:#888;margin-top:5px;">Срок годности открытой: ${opened.expiry_at ? opened.expiry_at : '-'}</div>
+            <div style="font-size:0.97em;color:#888;margin-top:5px;">Срок годности открытой: ${days !== '-' ? days + ' дн.' : '-'}</div>
           </div>
           <div class="modal-buttons-row">
             <button class="modal-btn editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
@@ -570,7 +588,8 @@ async function autoOpen(rJson) {
   let overlay = document.querySelector('.modal-overlay.show-blur');
   let dialog = overlay ? overlay.querySelector('.modal-dialog') : null;
 
-  let today = new Date().toISOString().slice(0,10);
+  let msNow = msTimeNow();
+  let today = msNow.toISOString().slice(0,10);
   let opened = await findOpenedByTOB(r.tob);
   let expiry_at = r.expiry_at;
 
@@ -597,7 +616,7 @@ async function autoOpen(rJson) {
 
   if (dialog) {
     dialog.classList.add('success-check');
-    dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 70 70"><polyline points="18,38 31,52 54,22"/></svg></div>`;
+    dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 110 110"><polyline points="30,58 50,80 82,36"/></svg></div>`;
     vibrate();
   }
   setTimeout(() => {
@@ -624,6 +643,7 @@ function openReopenForm(rJson, openAfterEdit = false) {
         <select name="edit_category" id="edit_category" required>
           <option value="🍯 Сиропы" ${r.category === "🍯 Сиропы"?"selected":""}>🍯 Сиропы</option>
           <option value="🥕 Ингредиенты" ${r.category === "🥕 Ингредиенты"?"selected":""}>🥕 Ингредиенты</option>
+          <option value="☕ Кофе" ${r.category === "☕ Кофе"?"selected":""}>☕ Кофе</option>
           <option value="📦 Прочее" ${r.category === "📦 Прочее"?"selected":""}>📦 Прочее</option>
         </select>
       </div>
@@ -706,10 +726,10 @@ function showExpiredPage() {
     const cardsDiv = document.getElementById('expiredCards');
     title.innerHTML = "Загрузка...";
     cardsDiv.innerHTML = "";
-    let now = new Date();
-    let dateToCheck = new Date();
+    let msNow = msTimeNow();
+    let dateToCheck = new Date(msNow);
     if (filter === 'tomorrow') {
-      dateToCheck.setDate(now.getDate() + 1);
+      dateToCheck.setDate(dateToCheck.getDate() + 1);
     }
     let y = dateToCheck.getFullYear();
     let m = ('0' + (dateToCheck.getMonth()+1)).slice(-2);
@@ -791,7 +811,7 @@ function showCheckAnim() {
   overlay.innerHTML = `
     <div class="modal-dialog modal-delete success-check" style="background:transparent;box-shadow:none;">
       <div class="check-anim" style="background:transparent;">
-        <svg viewBox="0 0 110 110" style="width:86px;height:86px;display:block;">
+        <svg viewBox="0 0 110 110" style="width:94px;height:94px;display:block;">
           <polyline points="30,58 50,80 82,36" style="stroke:#19c37d;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none;" />
         </svg>
       </div>
@@ -800,7 +820,7 @@ function showCheckAnim() {
   document.body.appendChild(overlay);
   setTimeout(() => {
     overlay.classList.add('visible');
-  }, 20);
+  }, 10);
   setTimeout(() => {
     overlay.classList.remove('visible');
     setTimeout(() => overlay.remove(), 370);
