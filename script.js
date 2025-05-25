@@ -1,3 +1,39 @@
+function escapeHtml(str) {
+  if (typeof str !== "string") return "";
+  return str.replace(/[&<>"'`=\/]/g, function(s) {
+    return ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+      "`": "&#96;",
+      "=": "&#61;",
+      "/": "&#47;"
+    })[s];
+  });
+}
+let lastAction = {};
+function canProceed(action, minInterval = 1200) {
+  const now = Date.now();
+  if (!lastAction[action] || now - lastAction[action] > minInterval) {
+    lastAction[action] = now;
+    return true;
+  }
+  return false;
+}
+function isValidCategory(cat) {
+  return ["🍯 Сиропы", "🥕 Ингредиенты", "☕ Кофе", "📦 Прочее"].includes(cat);
+}
+function isValidName(name) {
+  return name && name.length <= 60 && !/[<>&]/.test(name);
+}
+function isValidTob(tob) {
+  return tob && /^\d{6}$/.test(tob);
+}
+function isValidShelf(s) {
+  return s && /^\d+$/.test(s) && Number(s) > 0 && Number(s) <= 365;
+}
 document.addEventListener('touchstart', function preventZoom(e) {
   if(e.touches.length > 1) e.preventDefault();
 }, { passive: false });
@@ -81,7 +117,7 @@ function showPage(contentHtml) {
 function addBackButton(html) {
   return `<button class="backbtn" onclick="showMenu()">Назад</button>` + html;
 }
-function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${m}</div>`)); }
+function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${escapeHtml(m)}</div>`)); }
 let USER = null;
 function welcomeGreeting() {
   const now = new Date();
@@ -95,8 +131,8 @@ function showMenu() {
   setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
   showPage(`
     <div class="welcome-block">
-      <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
-      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
+      <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
     </div>
     <div class="menu fadeIn" id="menuBlock">
       <button class="menu-btn" onclick="showAddPage()">Добавить позицию</button>
@@ -142,7 +178,7 @@ function showStatsPage() {
   .then(r => r.json())
   .then(data => {
     if (!data.ok) {
-      document.getElementById('statBlock').innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+      document.getElementById('statBlock').innerHTML = `<div class="error">Ошибка: ${escapeHtml(data.error)}</div>`;
       return;
     }
     let total = data.results.length;
@@ -158,7 +194,6 @@ function showStatsPage() {
     document.getElementById('statBlock').classList.add('fadeIn');
   });
 }
-
 function msTimeNow() {
   const now = new Date();
   const msOffset = 3 * 60 * 60 * 1000;
@@ -173,7 +208,6 @@ function msDaysBetween(dateStr1, dateStr2) {
   const d2 = msDateStrToDate(dateStr2);
   return Math.max(0, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
 }
-
 function showAddPage() {
   setPageTitle('Добавить позицию');
   showPage(addBackButton(`
@@ -193,7 +227,7 @@ function showAddPage() {
       </div>
       <div class="field-row">
         <label class="field-label" for="tob">TOB (6 цифр)</label>
-        <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456" autocomplete="off">
+        <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456" autocomplete="off" inputmode="numeric">
         <div id="tobWarning" style="display:none"></div>
       </div>
       <div class="field-row">
@@ -258,13 +292,19 @@ function showAddPage() {
   const dateInput = document.getElementById('opened_at');
   const catInput = document.getElementById('category');
   const submitBtn = document.getElementById('addSubmitBtn');
+  tobInput.addEventListener('keydown', function(e){
+    if (e.key.length === 1 && !/[0-9]/.test(e.key)) e.preventDefault();
+  });
+  tobInput.addEventListener('input', function(e){
+    this.value = this.value.replace(/\D/g, '').slice(0,6);
+  });
 
   function validateForm() {
     let allOk = true;
-    if (!catInput.value) allOk = false;
-    if (!tobInput.value.match(/^\d{6}$/)) allOk = false;
-    if (!nameInput.value.trim()) allOk = false;
-    if (!shelfInput.value || parseInt(shelfInput.value) < 1) allOk = false;
+    if (!isValidCategory(catInput.value)) allOk = false;
+    if (!isValidTob(tobInput.value)) allOk = false;
+    if (!isValidName(nameInput.value.trim())) allOk = false;
+    if (!isValidShelf(shelfInput.value)) allOk = false;
     if (!dateInput.value) allOk = false;
     if (opened && openTobExists) allOk = false;
     submitBtn.disabled = !allOk;
@@ -319,6 +359,11 @@ function showAddPage() {
     e.preventDefault();
     let d = Object.fromEntries(new FormData(this));
     d.opened = opened ? 1 : 0;
+    if (!isValidCategory(d.category) || !isValidTob(d.tob) || !isValidName(d.name) || !isValidShelf(d.shelf_life_days)) {
+      msg("Некорректные данные, проверьте поля.", "error");
+      return;
+    }
+    if (!canProceed("add", 1200)) return;
     if (opened && openTobExists) return;
     let req = {
       user_id: userId,
@@ -347,17 +392,16 @@ function showAddPage() {
     }
   };
 }
-
 function renderCard(r, actions = true) {
   let badgeCol = `<div class="card-header-col">
-    <div class="card-badge category-badge">${r.category}</div>
+    <div class="card-badge category-badge">${escapeHtml(r.category)}</div>
     <div class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</div>
   </div>`;
-  let title = `<div class="card-title" title="${r.name}">${r.name}</div>`;
+  let title = `<div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>`;
   let rows = `
-    <div class="card-row"><b>TOB:</b> ${r.tob}</div>
-    <div class="card-row"><b>Открыто:</b> ${r.opened_at}</div>
-    <div class="card-row"><b>Годен до:</b> ${r.expiry_at}</div>
+    <div class="card-row"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
+    <div class="card-row"><b>Открыто:</b> ${escapeHtml(r.opened_at)}</div>
+    <div class="card-row"><b>Годен до:</b> ${escapeHtml(r.expiry_at)}</div>
   `;
   let buttons = "";
   if (actions) {
@@ -376,7 +420,6 @@ function renderCard(r, actions = true) {
   }
   return `<div class="item-card">${badgeCol}${title}${rows}${buttons}</div>`;
 }
-
 function showSearchPage() {
   setPageTitle('Поиск');
   showPage(addBackButton(`
@@ -452,7 +495,7 @@ function showSearchPage() {
   })
   .then(r => r.json())
   .then(data => {
-    if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+    if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${escapeHtml(data.error)}</div>`;
     allItems = data.results;
     renderList();
   });
@@ -486,7 +529,6 @@ function showSearchPage() {
   }
   input.addEventListener('input', renderList);
 }
-
 function showDeleteModal(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   closeModal();
@@ -496,7 +538,7 @@ function showDeleteModal(rJson) {
     <div class="modal-dialog modal-delete">
       <div class="modal-title">
         <span>Вы уверены, что хотите удалить </span>
-        <span class="modal-name-box">${r.name}</span>?
+        <span class="modal-name-box">${escapeHtml(r.name)}</span>?
       </div>
       <div class="modal-buttons-row">
         <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
@@ -508,8 +550,8 @@ function showDeleteModal(rJson) {
   setTimeout(() => overlay.classList.add('visible'), 10);
   ensureTheme();
 }
-
 async function deleteItem(rJson) {
+  if (!canProceed("delete", 1200)) return;
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   let overlay = document.querySelector('.modal-overlay.show-blur');
   let dialog = overlay ? overlay.querySelector('.modal-dialog.modal-delete') : null;
@@ -518,17 +560,27 @@ async function deleteItem(rJson) {
     dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 110 110"><polyline points="30,58 50,80 82,36"/></svg></div>`;
     vibrate();
   }
-  await fetch(`${backend}/delete`, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({user_id: userId, id: r.id})
-  });
-  setTimeout(() => {
-    closeModal();
-    showSearchPage();
-  }, 1000);
+  try {
+    let resp = await fetch(`${backend}/delete`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId, id: r.id})
+    });
+    let data = await resp.json();
+    if (!data.ok && dialog) {
+      dialog.innerHTML = `<div class="error" style="padding:22px;">Ошибка: ${escapeHtml(data.error || "Ошибка удаления")}</div>`;
+    } else {
+      setTimeout(() => {
+        closeModal();
+        showSearchPage();
+      }, 1000);
+    }
+  } catch (e) {
+    if (dialog) {
+      dialog.innerHTML = `<div class="error" style="padding:22px;">Ошибка: ${escapeHtml(e.message || "Ошибка сети")}</div>`;
+    }
+  }
 }
-
 async function findOpenedByTOB(tob) {
   let resp = await fetch(`${backend}/search`, {
     method: "POST",
@@ -538,21 +590,18 @@ async function findOpenedByTOB(tob) {
   let data = await resp.json();
   return (data.results || []).find(x => x.tob === tob && x.opened == 1);
 }
-
 function showOpenModal(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   closeModal();
-
   findOpenedByTOB(r.tob).then(opened => {
     let overlay = document.createElement('div');
     overlay.className = 'modal-overlay show-blur';
-
     if (opened) {
       let days = msDaysBetween(opened.opened_at, opened.expiry_at);
       overlay.innerHTML = `
         <div class="modal-dialog modal-delete">
           <div class="modal-title">
-            <span class="modal-name-box">${opened.name}</span>
+            <span class="modal-name-box">${escapeHtml(opened.name)}</span>
             <div style="font-size:0.97em;color:#888;margin-top:5px;">Срок годности открытой: ${days !== '-' ? days + ' дн.' : '-'}</div>
           </div>
           <div class="modal-buttons-row">
@@ -575,24 +624,20 @@ function showOpenModal(rJson) {
     ensureTheme();
   });
 }
-
 function closeModal() {
   let overlay = document.querySelector('.modal-overlay');
   if (!overlay) return;
   overlay.classList.remove('visible');
   setTimeout(() => overlay.remove(), 370);
 }
-
 async function autoOpen(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   let overlay = document.querySelector('.modal-overlay.show-blur');
   let dialog = overlay ? overlay.querySelector('.modal-dialog') : null;
-
   let msNow = msTimeNow();
   let today = msNow.toISOString().slice(0,10);
   let opened = await findOpenedByTOB(r.tob);
   let expiry_at = r.expiry_at;
-
   if (opened) {
     expiry_at = opened.expiry_at;
     await fetch(`${backend}/delete`, {
@@ -601,7 +646,6 @@ async function autoOpen(rJson) {
       body: JSON.stringify({user_id: userId, id: opened.id})
     });
   }
-
   await fetch(`${backend}/update`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
@@ -613,7 +657,6 @@ async function autoOpen(rJson) {
       expiry_at: expiry_at
     })
   });
-
   if (dialog) {
     dialog.classList.add('success-check');
     dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 110 110"><polyline points="30,58 50,80 82,36"/></svg></div>`;
@@ -624,7 +667,6 @@ async function autoOpen(rJson) {
     showSearchPage();
   }, 1000);
 }
-
 function openReopenForm(rJson, openAfterEdit = false) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   setPageTitle('Редактировать позицию');
@@ -632,11 +674,11 @@ function openReopenForm(rJson, openAfterEdit = false) {
     <form id="editf" class="beautiful-form" autocomplete="off" style="max-width:430px;">
       <div class="field-row">
         <label class="field-label">TOB (нельзя изменить)</label>
-        <input value="${r.tob}" readonly style="background:#eaf2ff;color:#888;">
+        <input value="${escapeHtml(r.tob)}" readonly style="background:#eaf2ff;color:#888;">
       </div>
       <div class="field-row">
         <label class="field-label" for="edit_name">Название</label>
-        <input name="edit_name" id="edit_name" required value="${r.name}">
+        <input name="edit_name" id="edit_name" required value="${escapeHtml(r.name)}">
       </div>
       <div class="field-row">
         <label class="field-label" for="edit_category">Категория</label>
@@ -649,11 +691,11 @@ function openReopenForm(rJson, openAfterEdit = false) {
       </div>
       <div class="field-row">
         <label class="field-label" for="edit_shelf_life_days">Срок хранения (дней)</label>
-        <input name="edit_shelf_life_days" id="edit_shelf_life_days" type="number" min="1" required value="${r.shelf_life_days}">
+        <input name="edit_shelf_life_days" id="edit_shelf_life_days" type="number" min="1" required value="${escapeHtml(""+r.shelf_life_days)}">
       </div>
       <div class="field-row">
         <label class="field-label" for="edit_opened_at">Дата открытия</label>
-        <input name="edit_opened_at" id="edit_opened_at" type="date" required value="${r.opened_at}">
+        <input name="edit_opened_at" id="edit_opened_at" type="date" required value="${escapeHtml(r.opened_at)}">
       </div>
       <div class="btns">
         <button type="submit" id="editSubmitBtn">Сохранить</button>
@@ -661,7 +703,6 @@ function openReopenForm(rJson, openAfterEdit = false) {
     </form>
   `));
   ensureTheme();
-
   document.getElementById('editf').onsubmit = async function(e) {
     e.preventDefault();
     let d = Object.fromEntries(new FormData(this));
@@ -673,6 +714,11 @@ function openReopenForm(rJson, openAfterEdit = false) {
       shelf_life_days: d.edit_shelf_life_days,
       opened_at: d.edit_opened_at
     };
+    if (!isValidCategory(req.category) || !isValidName(req.name) || !isValidShelf(req.shelf_life_days)) {
+      msg("Некорректные данные, проверьте поля.", "error");
+      return;
+    }
+    if (!canProceed("edit", 1200)) return;
     await fetch(`${backend}/update`, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
@@ -686,7 +732,6 @@ function openReopenForm(rJson, openAfterEdit = false) {
     }
   };
 }
-
 function showExpiredPage() {
   setPageTitle('Проверка сроков');
   showPage(addBackButton(`
@@ -740,7 +785,7 @@ function showExpiredPage() {
       .then(r=>r.json())
       .then(data=>{
         if(!data.ok) {
-          title.innerHTML = "Ошибка: "+data.error;
+          title.innerHTML = "Ошибка: "+escapeHtml(data.error);
           cardsDiv.innerHTML = "";
           return;
         }
@@ -833,8 +878,8 @@ async function startApp() {
   let t0 = Date.now();
   showPage(`
     <div class="welcome-block">
-      <div class="welcome-greet">${welcomeGreeting()},<br>${USER ? USER.username : ""}!</div>
-      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${USER.bar_name}</span>` : ""}
+      <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
     </div>
   `);
   ensureTheme();
@@ -852,7 +897,7 @@ async function startApp() {
       setPageTitle('Добро пожаловать');
       showPage(`
         <div class="welcome-block">
-          <div class="welcome-greet">${welcomeGreeting()}, гость!</div>
+          <div class="welcome-greet">${escapeHtml(welcomeGreeting())}, гость!</div>
           <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
           <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
         </div>
@@ -865,7 +910,7 @@ async function startApp() {
   } catch (e) {
     showGlobalLoader(false);
     setPageTitle('Ошибка');
-    showPage('<div class="error">Не удалось подключиться к серверу.<br>' + e + '</div>');
+    showPage('<div class="error">Не удалось подключиться к серверу.<br>' + escapeHtml(e) + '</div>');
     ensureTheme();
   }
 }
