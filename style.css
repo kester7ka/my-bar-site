@@ -286,7 +286,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: flex;
   flex-direction: column;
   position: relative;
-  background: linear-gradient(120deg, #243041 0%, #1d2530 100%);
+  background: linear-gradient(120deg, #6f6af8 0%, #232b33 100%) !important;
   border-radius: 18px;
   box-shadow: 0 3px 12px #13c1e320;
   padding: 12px 11px 12px 13px;
@@ -807,22 +807,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .nav-add-btn {
   width: 56px;
   height: 56px;
-  background: #23213a;
-  box-shadow: 0 2px 10px #1a133a60;
-  border-radius: 50%;
-  margin-bottom: 0;
-  margin-top: 0;
-  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  background: #23213a;
+  box-shadow: 0 2px 10px #1a133a60;
   border: 3px solid #18162a;
   color: #fff;
-  transition: background 0.18s, box-shadow 0.18s;
+  margin: 0;
+  position: relative;
 }
-.nav-add-btn:active {
-  background: #19173a;
-  box-shadow: 0 2px 14px #19173a80;
+.nav-add-btn svg {
+  width: 32px !important;
+  height: 32px !important;
+  display: block;
+  margin: 0 auto;
+}
+.nav-add-btn svg circle {
+  fill: #23213a !important;
 }
 @media (max-width: 700px) {
   .wrap { padding-top: calc(env(safe-area-inset-top, 0px) + 38px);}
@@ -846,10 +849,81 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .nav-btn[title="Статистика"] svg rect {
   fill: #888 !important;
 }
-.nav-add-btn svg circle {
-  fill: #18162a !important;
+/* --- expired-main-block: плитка как на референсе --- */
+.expired-main-block {
+  background: linear-gradient(120deg, #6f6af8 0%, #232b33 100%) !important;
+  border-radius: 22px;
+  box-shadow: 0 4px 24px #6f6af830, 0 1.5px 8px #232b3380 inset;
+  padding: 28px 18px 18px 18px;
+  margin: 0 auto 22px auto;
+  max-width: 440px;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: stretch;
+  border: 2.5px solid #3e4b5a;
+  animation: popIn 0.5s;
 }
-.nav-add-btn svg {
-  width: 28px !important;
-  height: 28px !important;
+.expired-main-block .expired-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.expired-main-block .expired-icon {
+  width: 32px;
+  height: 32px;
+  background: #ee4747;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.3em;
+  box-shadow: 0 2px 8px #ee474755;
+}
+.expired-main-block .expired-title-text {
+  font-size: 1.18em;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+.expired-main-block .filter-bar-wrap {
+  background: none;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+}
+.expired-main-block .filter-bar-section {
+  background: none !important;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin-bottom: 0;
+  gap: 8px;
+}
+.expired-main-block .filter-btn {
+  background: #232b33;
+  color: #b9dbff;
+  border-radius: 14px;
+  border: 2px solid #232b33;
+  font-size: 1em;
+  font-weight: 600;
+  padding: 8px 18px;
+  transition: background 0.22s, color 0.2s, border 0.2s;
+}
+.expired-main-block .filter-btn.selected {
+  background: #ee4747;
+  color: #fff;
+  border: 2px solid #ee4747;
+}
+.expired-main-block .filter-btn:active {
+  opacity: 0.93;
+  transform: scale(0.98);
+}
+.expired-main-block .card-list {
+  margin-top: 10px;
 }
