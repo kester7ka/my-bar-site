@@ -46,24 +46,6 @@ document.addEventListener('touchend', function(e){
   lastTouch = now;
 }, { passive: false });
 
-const themeBtn = document.getElementById('themeToggle');
-const themeText = document.getElementById('themeText');
-function ensureTheme() {
-  let theme = localStorage.getItem('theme');
-  if(!theme) {
-    if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
-    else theme = 'light';
-  }
-  document.body.classList.toggle('dark', theme === 'dark');
-  themeText.textContent = theme === 'dark' ? "Светлая тема" : "Тёмная тема";
-}
-function setTheme(dark) {
-  localStorage.setItem('theme', dark ? 'dark' : 'light');
-  ensureTheme();
-}
-themeBtn.addEventListener('click', () => setTheme(!document.body.classList.contains('dark')));
-ensureTheme();
-
 let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
 let username = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "";
@@ -110,7 +92,6 @@ function setPageTitle(title) {
 function showPage(contentHtml) {
   const el = document.getElementById("main");
   el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
-  ensureTheme();
   window.scrollTo({top: 0, behavior: 'smooth'});
   forceExpand();
 }
@@ -134,14 +115,7 @@ function showMenu() {
       <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
       ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
     </div>
-    <div class="menu fadeIn" id="menuBlock">
-      <button class="menu-btn" onclick="showAddPage()">Добавить позицию</button>
-      <button class="menu-btn" onclick="showExpiredPage()">Проверить сроки</button>
-      <button class="menu-btn" onclick="showSearchPage()">Поиск</button>
-      <button class="menu-btn" onclick="showStatsPage()">Статистика бара</button>
-    </div>
   `);
-  ensureTheme();
 }
 function vibrate(ms = 30) {
   if (window.navigator && window.navigator.vibrate) {
@@ -247,7 +221,6 @@ function showAddPage() {
       </div>
     </form>
   `));
-  ensureTheme();
   setTimeout(() => {
     let inputs = document.querySelectorAll('.beautiful-form input, .beautiful-form select');
     inputs.forEach(inp => {
@@ -432,7 +405,6 @@ function showSearchPage() {
       <div id="searchResults" style="min-height:90px;"></div>
     </div>
   `));
-  ensureTheme();
 
   const categories = [
     { value: "", label: "Все категории", icon: "" },
@@ -548,7 +520,6 @@ function showDeleteModal(rJson) {
   `;
   document.body.appendChild(overlay);
   setTimeout(() => overlay.classList.add('visible'), 10);
-  ensureTheme();
 }
 async function deleteItem(rJson) {
   if (!canProceed("delete", 1200)) return;
@@ -621,7 +592,6 @@ function showOpenModal(rJson) {
     }
     document.body.appendChild(overlay);
     setTimeout(() => overlay.classList.add('visible'), 10);
-    ensureTheme();
   });
 }
 function closeModal() {
@@ -674,7 +644,7 @@ function openReopenForm(rJson, openAfterEdit = false) {
     <form id="editf" class="beautiful-form" autocomplete="off" style="max-width:430px;">
       <div class="field-row">
         <label class="field-label">TOB (нельзя изменить)</label>
-        <input value="${escapeHtml(r.tob)}" readonly style="background:#eaf2ff;color:#888;">
+        <input value="${escapeHtml(r.tob)}" readonly style="background:#1d2332;color:#888;">
       </div>
       <div class="field-row">
         <label class="field-label" for="edit_name">Название</label>
@@ -702,7 +672,6 @@ function openReopenForm(rJson, openAfterEdit = false) {
       </div>
     </form>
   `));
-  ensureTheme();
   document.getElementById('editf').onsubmit = async function(e) {
     e.preventDefault();
     let d = Object.fromEntries(new FormData(this));
@@ -743,7 +712,6 @@ function showExpiredPage() {
       <div id="expiredCards"></div>
     </div>
   `));
-  ensureTheme();
 
   let filter = 'today';
   renderDayFilter();
@@ -813,7 +781,6 @@ function showExpiredPage() {
         });
         cards += `</div>`;
         cardsDiv.innerHTML = cards;
-        ensureTheme();
       });
   }
 }
@@ -857,7 +824,7 @@ function showCheckAnim() {
     <div class="modal-dialog modal-delete success-check" style="background:transparent;box-shadow:none;">
       <div class="check-anim" style="background:transparent;">
         <svg viewBox="0 0 110 110" style="width:94px;height:94px;display:block;">
-          <polyline points="30,58 50,80 82,36" style="stroke:#19c37d;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none;" />
+          <polyline points="30,58 50,80 82,36" style="stroke:#23c882;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none;" />
         </svg>
       </div>
     </div>
@@ -882,7 +849,6 @@ async function startApp() {
       ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
     </div>
   `);
-  ensureTheme();
   try {
     let r = await fetch("https://bar-backend-production.up.railway.app/userinfo", {
       method: "POST",
@@ -899,10 +865,9 @@ async function startApp() {
         <div class="welcome-block">
           <div class="welcome-greet">${escapeHtml(welcomeGreeting())}, гость!</div>
           <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
-          <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
+          <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#6f6af8 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
         </div>
       `);
-      ensureTheme();
       return;
     }
     USER = { username: d.username, bar_name: d.bar_name };
@@ -911,7 +876,44 @@ async function startApp() {
     showGlobalLoader(false);
     setPageTitle('Ошибка');
     showPage('<div class="error">Не удалось подключиться к серверу.<br>' + escapeHtml(e) + '</div>');
-    ensureTheme();
   }
 }
 startApp();
+
+function showProfilePage() {
+  setPageTitle('Профиль');
+  showPage(`
+    <div class="welcome-block">
+      <div class="welcome-greet">${escapeHtml(USER?.username || "")}</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
+      <div style="color:#888;font-size:1.13em;margin-top:18px;">Профиль временно недоступен</div>
+    </div>
+  `);
+}
+
+function setActiveNav(navId) {
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(navId).classList.add('active');
+}
+
+document.getElementById('nav-home').addEventListener('click', () => {
+  setActiveNav('nav-home');
+  showMenu();
+});
+document.getElementById('nav-search').addEventListener('click', () => {
+  setActiveNav('nav-search');
+  showSearchPage();
+});
+document.getElementById('nav-add').addEventListener('click', () => {
+  setActiveNav('nav-add');
+  showAddPage();
+});
+document.getElementById('nav-stats').addEventListener('click', () => {
+  setActiveNav('nav-stats');
+  showStatsPage();
+});
+document.getElementById('nav-profile').addEventListener('click', () => {
+  setActiveNav('nav-profile');
+  showProfilePage();
+});
+setActiveNav('nav-home');
