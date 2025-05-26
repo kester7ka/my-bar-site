@@ -88,6 +88,8 @@ h2 {
   margin-bottom: 22px;
   animation: fadeIn 0.5s;
   width: 100%;
+  background: #211c2e !important;
+  box-shadow: 0 4px 20px #1a133a40;
 }
 .stat-block {
   padding: 23px 14px;
@@ -146,6 +148,8 @@ h2 {
   margin-left: auto;
   margin-right: auto;
   position: relative;
+  background: #211c2e !important;
+  box-shadow: 0 4px 20px #1a133a40;
 }
 .field-row {
   display: flex;
@@ -420,31 +424,32 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .welcome-block {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80px;
-  animation: fadeIn 0.7s;
-  margin-bottom: 12px;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 18px;
+  background: none;
+  margin-bottom: 18px;
 }
 .welcome-greet {
-  font-size: 1.16em;
+  font-size: 1.45em;
   font-weight: 700;
-  color: #62b0ff;
-  margin-bottom: 6px;
-  letter-spacing: 0.01em;
-  text-align: center;
+  color: #f1f1f1;
+  text-align: left;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.welcome-greet::before {
+  content: '👋';
+  font-size: 1.2em;
+  margin-right: 6px;
 }
 .welcome-bar {
-  font-size: 0.98em;
-  color: #13c1e3;
-  background: #232b33;
-  padding: 5px 15px;
-  border-radius: 11px;
-  margin-bottom: 8px;
-  font-weight: 600;
-  display: inline-block;
-  text-align: center;
+  color: #b9dbff;
+  font-size: 1em;
+  margin-top: 4px;
+  display: block;
 }
 .result {
   margin: 14px 0 0 0;
@@ -690,6 +695,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   flex-wrap: wrap;
   gap: 10px;
   background: #232b33;
+  background: #211c2e !important;
+  box-shadow: 0 4px 20px #1a133a40;
 }
 .filter-bar-section:last-child { margin-bottom: 0;}
 .filter-bar {
@@ -798,31 +805,51 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   filter: drop-shadow(0 0 8px #13c1e360);
 }
 .nav-add-btn {
-  width: 68px;
-  height: 68px;
-  background: linear-gradient(135deg, #13c1e3 60%, #6f6af8 100%);
-  box-shadow: 0 2px 16px #13c1e360;
+  width: 56px;
+  height: 56px;
+  background: #23213a;
+  box-shadow: 0 2px 10px #1a133a60;
   border-radius: 50%;
-  margin-bottom: 34px;
-  margin-top: -24px;
+  margin-bottom: 0;
+  margin-top: 0;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 4px solid #232b33;
+  border: 3px solid #18162a;
   color: #fff;
   transition: background 0.18s, box-shadow 0.18s;
 }
 .nav-add-btn:active {
-  background: linear-gradient(135deg, #19c37d 30%, #13c1e3 100%);
-  box-shadow: 0 2px 20px #19c37d40;
+  background: #19173a;
+  box-shadow: 0 2px 14px #19173a80;
 }
 @media (max-width: 700px) {
   .wrap { padding-top: calc(env(safe-area-inset-top, 0px) + 38px);}
   .content-inner { max-width: 100vw; padding: 0 8px; }
+  .bottom-nav {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+  }
+}
+@media (max-width: 700px) and (pointer: coarse) {
+  input:focus ~ .bottom-nav, textarea:focus ~ .bottom-nav {
+    position: fixed;
+    bottom: 0 !important;
+  }
 }
 @media (max-width: 400px) {
   .beautiful-form {padding: 12px 2vw 6px 2vw;}
   .content-inner { padding: 0 4px; }
   .item-card .card-title, .item-card .card-row {padding-right: 75px;}
+}
+.nav-btn[title="Статистика"] svg rect {
+  fill: #888 !important;
+}
+.nav-add-btn svg circle {
+  fill: #18162a !important;
+}
+.nav-add-btn svg {
+  width: 28px !important;
+  height: 28px !important;
 }
