@@ -100,12 +100,6 @@ function addBackButton(html) {
 }
 function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${escapeHtml(m)}</div>`)); }
 let USER = null;
-function getGreetingIcon(hour) {
-  if (hour >= 5 && hour < 12) return '☀️';
-  if (hour >= 12 && hour < 18) return '🌤️';
-  if (hour >= 18 && hour < 23) return '🌙';
-  return '🌙';
-}
 function welcomeGreeting() {
   const now = new Date();
   const h = now.getHours();
@@ -114,36 +108,13 @@ function welcomeGreeting() {
   if (h >= 18 && h < 23) return "Добрый вечер";
   return "Доброй ночи";
 }
-
-function renderExpiredTiles(expiredItems) {
-  if (!expiredItems || !expiredItems.length) return '';
-  return `<div class="expired-tiles">` + expiredItems.map(item => `
-    <div class="expired-tile">
-      <span class="expired-icon">⏰</span>
-      <div class="expired-title">${escapeHtml(item.name)}</div>
-      <div class="expired-date">Годен до: ${escapeHtml(item.expiry_at)}</div>
-      <div class="expired-tob">TOB: ${escapeHtml(item.tob)}</div>
-    </div>
-  `).join('') + `</div>`;
-}
-
 function showMenu() {
   setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
-  // Получаем просроченные позиции (заглушка, заменить на реальный fetch если нужно)
-  let expiredItems = window._EXPIRED_ITEMS || [];
-  // Приветствие слева, крупно, с иконкой
-  const now = new Date();
-  const h = now.getHours();
-  let greetIcon = getGreetingIcon(h);
-  let greetText = welcomeGreeting();
-  let usernameText = USER ? escapeHtml(USER.username) : "";
-  let barName = USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : "";
   showPage(`
     <div class="welcome-block">
-      <div class="welcome-greet"><span class="greet-icon">${greetIcon}</span> <span>${greetText},<br>${usernameText}!</span></div>
-      <div>${barName}</div>
+      <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
     </div>
-    ${renderExpiredTiles(expiredItems)}
   `);
 }
 function vibrate(ms = 30) {
@@ -868,11 +839,6 @@ function showCheckAnim() {
   }, 900);
 }
 
-function showBottomNav(show = true) {
-  const nav = document.querySelector('.bottom-nav');
-  if (nav) nav.style.display = show ? 'flex' : 'none';
-}
-
 async function startApp() {
   showGlobalLoader(true);
   const MIN_LOAD = 1200 + Math.floor(Math.random()*500);
@@ -910,12 +876,6 @@ async function startApp() {
     showGlobalLoader(false);
     setPageTitle('Ошибка');
     showPage('<div class="error">Не удалось подключиться к серверу.<br>' + escapeHtml(e) + '</div>');
-  }
-  // После успешной инициализации:
-  if (userId) {
-    showBottomNav(true);
-  } else {
-    showBottomNav(false);
   }
 }
 startApp();
@@ -957,5 +917,3 @@ document.getElementById('nav-profile').addEventListener('click', () => {
   showProfilePage();
 });
 setActiveNav('nav-home');
-// В самом начале скрыть навигацию (на случай если она вдруг видна)
-showBottomNav(false);
