@@ -115,7 +115,88 @@ function showMenu() {
       <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
       ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
     </div>
+    <div class="expired-main-block beautiful-form" style="gap:12px;max-width:440px;margin-bottom:18px;">
+      <div class="filter-bar-wrap" style="margin-bottom:0;">
+        <div class="filter-bar-section" id="mainExpiredDayFilter"></div>
+      </div>
+      <div id="mainExpiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>
+      <div id="mainExpiredCards"></div>
+    </div>
+    <div id="mainContentAfterExpired"></div>
   `);
+
+  let filter = 'today';
+  renderDayFilter();
+  fetchAndRender();
+
+  function renderDayFilter() {
+    const bar = document.getElementById('mainExpiredDayFilter');
+    if (!bar) return;
+    bar.innerHTML = '';
+    [['today', 'Сегодня и ранее'], ['tomorrow','Завтра']].forEach(([val, label]) => {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.className = "filter-btn" + (filter === val ? " selected" : "");
+      btn.innerHTML = label;
+      btn.onclick = () => {
+        filter = val;
+        renderDayFilter();
+        fetchAndRender();
+      };
+      bar.appendChild(btn);
+    });
+  }
+
+  function fetchAndRender() {
+    const title = document.getElementById('mainExpiredTitle');
+    const cardsDiv = document.getElementById('mainExpiredCards');
+    if (!title || !cardsDiv) return;
+    title.innerHTML = "Загрузка...";
+    cardsDiv.innerHTML = "";
+    let msNow = msTimeNow();
+    let dateToCheck = new Date(msNow);
+    if (filter === 'tomorrow') {
+      dateToCheck.setDate(dateToCheck.getDate() + 1);
+    }
+    let y = dateToCheck.getFullYear();
+    let m = ('0' + (dateToCheck.getMonth()+1)).slice(-2);
+    let d = ('0' + dateToCheck.getDate()).slice(-2);
+    let checkDate = `${y}-${m}-${d}`;
+
+    fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
+      .then(r=>r.json())
+      .then(data=>{
+        if(!data.ok) {
+          title.innerHTML = "Ошибка: "+escapeHtml(data.error);
+          cardsDiv.innerHTML = "";
+          return;
+        }
+        let filtered;
+        if (filter === 'today') {
+          filtered = (data.results||[]).filter(x=>x.expiry_at && x.expiry_at <= checkDate);
+        } else {
+          filtered = (data.results||[]).filter(x=>x.expiry_at === checkDate);
+        }
+        if(!filtered.length) {
+          title.innerHTML = filter === 'today'
+            ? "Нет позиций, у которых срок истекает сегодня или ранее!"
+            : "Нет позиций, которые просрочатся завтра!";
+          title.className = "success";
+          cardsDiv.innerHTML = "";
+          return;
+        }
+        title.innerHTML = filter === 'today'
+          ? "Сегодня и ранее истекают:"
+          : "Завтра истекают:";
+        title.className = "";
+        let cards = `<div class="card-list">`;
+        filtered.forEach(x=>{
+          cards += renderCard(x, false);
+        });
+        cards += `</div>`;
+        cardsDiv.innerHTML = cards;
+      });
+  }
 }
 function vibrate(ms = 30) {
   if (window.navigator && window.navigator.vibrate) {
