@@ -1,877 +1,919 @@
-html, body {
-  min-height: 100vh;
-  width: 100vw;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  font-family: 'Montserrat', Arial, sans-serif;
-  color: #f1f1f1;
-  letter-spacing: 0.01em;
-  background: linear-gradient(120deg, #1a1833 0%, #2a225a 50%, #181c2e 100%);
-}
-body {
-  min-height: 100vh;
-  min-width: 100vw;
-  position: relative;
-  transition: background 0.23s cubic-bezier(.4,0,.2,1), color 0.23s cubic-bezier(.4,0,.2,1);
-}
-.wrap {
-  min-height: 100dvh;
-  width: 100vw;
-  background: transparent;
-  border-radius: 0;
-  padding-top: calc(env(safe-area-inset-top, 0px) + 58px);
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 78px);
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-  overflow-y: auto;
-  z-index: 1;
-  box-sizing: border-box;
-}
-.header-bar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 24px 0 12px;
-  margin-bottom: 10px;
-  position: relative;
-  min-height: 56px;
-  box-sizing: border-box;
-  z-index: 5;
-}
-.user-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 2px 14px #13c1e333, 0 2px 1.5px #232b3380 inset;
-  border: 3px solid #232b33;
-  background: #243041;
-  z-index: 11;
-  transition: border-color 0.2s;
-  object-fit: cover;
-  margin-left: 13px;
-}
-.content-inner {
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 0 20px;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-h2 {
-  text-align: center;
-  margin: 0 0 18px 0;
-  font-weight: 700;
-  font-size: 1.37em;
-  letter-spacing: 0.02em;
-  color: #62b0ff;
-  text-shadow: 0 3px 12px #006eff0a;
-  animation: popIn 0.8s;
-  transition: color 0.23s cubic-bezier(.4,0,.2,1);
-  position: relative;
-  z-index: 1;
-  min-height: 1.7em;
-}
-.menu {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-bottom: 22px;
-  animation: fadeIn 0.5s;
-  width: 100%;
-}
-.stat-block {
-  padding: 23px 14px;
-  background: #1d2332;
-  border-radius: 22px;
-  box-shadow: 0 4px 20px #13c1e330;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  max-width: 420px;
-  margin-left: auto;
-  margin-right: auto;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 17px;
-  opacity: 0;
-  transform: translateY(32px);
-  transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
-}
-.stat-block.fadeIn {
-  opacity: 1;
-  transform: none;
-  animation: none;
-}
-.stat-row {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  font-size: 1.08em;
-  font-weight: 600;
-  color: #2179ba;
-}
-.stat-row .stat-label {
-  flex: 1;
-}
-.stat-row .stat-value {
-  font-weight: 800;
-  font-size: 1.16em;
-  color: #19c37d;
-}
-.stat-row .stat-value.red { color: #ee4747;}
-.stat-row .stat-value.blue { color: #007aff;}
-.stat-row .stat-value.gray { color: #888;}
-.beautiful-form {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding: 28px 14px 14px 14px;
-  background: #232b33;
-  border-radius: 22px;
-  box-shadow: 0 4px 20px #13c1e330;
-  margin-top: 5px;
-  margin-bottom: 20px;
-  animation: popIn 0.41s;
-  max-width: 420px;
-  margin-left: auto;
-  margin-right: auto;
-  position: relative;
-}
-.field-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.field-label {
-  font-size: 1em;
-  font-weight: 600;
-  color: #b9dbff;
-  margin-bottom: 2px;
-  display: block;
-  letter-spacing: 0.01em;
-  transition: color 0.23s cubic-bezier(.4,0,.2,1);
-}
-.beautiful-form input, .beautiful-form select {
-  width: 100%;
-  padding: 13px 12px;
-  border: 1.5px solid #3e4b5a;
-  border-radius: 8px;
-  box-sizing: border-box;
-  box-shadow: 0 1.5px 7px #13c1e307;
-  font-size: 1em;
-  font-family: inherit;
-  background: #22303b !important;
-  transition: border 0.22s, background 0.23s cubic-bezier(.4,0,.2,1), color 0.23s cubic-bezier(.4,0,.2,1);
-  outline: none;
-  color: #f1f1f1 !important;
-  animation: fadeInInput 0.44s;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-}
-.beautiful-form input[type="date"] {
-  min-height: 44px;
-  font-size: 1em;
-  background: #22303b !important;
-  border-radius: 8px;
-}
-.beautiful-form input:focus, .beautiful-form select:focus {
-  border: 1.5px solid #62b0ff;
-  background: #232b33 !important;
-  color: #f1f1f1 !important;
-}
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-}
-.status-toggle-bar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: stretch;
-  margin: 16px 0 4px 0;
-  gap: 10px;
-  border-radius: 14px;
-  background: none;
-  border: none;
-}
-.status-toggle-btn {
-  flex: 1 1 0;
-  font-size: 1.13em;
-  font-weight: 700;
-  padding: 15px 0;
-  margin: 0;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  background: #22303b;
-  color: #19c37d;
-  transition: background 0.19s, color 0.18s, box-shadow 0.21s;
-  border-radius: 14px;
-  box-shadow: none;
-  letter-spacing: 0.03em;
-  border: 2px solid #22303b;
-  position: relative;
-}
-.status-toggle-btn.opened {
-  color: #fff;
-  background: #23c882;
-  border: 2px solid #23c882;
-  z-index: 2;
-}
-.status-toggle-btn.closed {
-  color: #fff;
-  background: #c94b4b;
-  border: 2px solid #c94b4b;
-  z-index: 2;
-}
-.status-toggle-btn:not(.opened):not(.closed) {
-  background: #22303b;
-  color: #19c37d;
-  border: 2px solid #22303b;
-}
-.status-toggle-btn.selected {
-  box-shadow: 0 2px 12px #13c1e340;
-}
-.card-badge, .card-status-badge {
-  display: inline-block;
-  font-weight: 700;
-  font-size: 0.93em;
-  border-radius: 13px 13px 13px 0;
-  padding: 4px 10px 4px 10px;
-  margin: 0 0 8px 0;
-  letter-spacing: 0.01em;
-  box-shadow: 0 1px 8px #b9dbff0a;
-  min-width: 88px;
-  max-width: 60%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  z-index: 2;
-  margin-top: 0;
-  text-align: center;
-  transition: background 0.23s, color 0.23s;
-}
-.card-badge.category-badge {
-  background: linear-gradient(90deg, #b8b6e0 0%, #7f6bae 100%);
-  color: #fff;
-}
-.card-status-badge.opened {
-  background: #23c882;
-  color: #fff;
-}
-.card-status-badge.closed {
-  background: #3a1d1d;
-  color: #ff9595;
-}
-.item-card {
-  min-width: 0;
-  min-height: 112px;
-  max-width: 100%;
-  width: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  background: linear-gradient(120deg, #243041 0%, #1d2530 100%);
-  border-radius: 18px;
-  box-shadow: 0 3px 12px #13c1e320;
-  padding: 12px 11px 12px 13px;
-  margin: 0 0 13px 0;
-  outline: 1.5px solid #3a4e68;
-  overflow: hidden;
-  transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
-  animation: popIn 0.43s;
-  align-self: stretch;
-}
-.item-card .card-header-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  z-index: 2;
-}
-.item-card .card-title {
-  font-weight: 700;
-  font-size: 1.01em;
-  margin-bottom: 2px;
-  color: #62b0ff;
-  word-break: break-all;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.18;
-  margin-top: 0;
-  margin-left: 2px;
-  padding-right: 135px;
-}
-.item-card .card-row {
-  font-size: 0.96em;
-  margin-bottom: 1.7px;
-  color: #b9dbff;
-  line-height: 1.19;
-  word-break: break-word;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-left: 2px;
-  padding-right: 135px;
-}
-.item-card .card-row b {
-  font-weight: 700;
-  color: #13c1e3;
-  margin-right: 4px;
-}
-.card-actions-bottom {
-  margin-top: 0;
-  display: flex;
-  gap: 8px;
-  padding-top: 10px;
-  animation: fadeIn 0.3s;
-}
-.editbtn, .deletebtn, .openbtn {
-  flex: 1;
-  border-radius: 14px;
-  font-size: 1.06em;
-  padding: 15px 0;
-  font-family: inherit;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  box-shadow: none;
-  cursor: pointer;
-  outline: none;
-  border: none;
-  transition: box-shadow 0.23s cubic-bezier(.4,0,.2,1), background 0.23s cubic-bezier(.4,0,.2,1), transform 0.16s cubic-bezier(.4,0,.2,1);
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  background: #232b33;
-  color: #2179ba;
-}
-.editbtn { background: #3a3e47; color: #b9dbff;}
-.editbtn:active { background: #22303b; color: #62b0ff;}
-.deletebtn { background: #3a1d1d; color: #ff9595;}
-.deletebtn:active { background: #c94b4b; color: #fff;}
-.openbtn { background: #23c882; color: #fff;}
-.openbtn:active { background: #19c37d; color: #fff;}
-.beautiful-form .btns {
-  gap: 16px;
-  margin-top: 10px;
-}
-.beautiful-form .btns button {
-  font-size: 1.15em;
-  padding: 16px 0;
-  border-radius: 14px;
-  background: linear-gradient(90deg, #6f6af8 60%, #13c1e3 100%);
-  color: #fff;
-  font-weight: 700;
-  border: none;
-  box-shadow: 0 2px 8px #13c1e320;
-  cursor: pointer;
-  transition: background 0.25s, transform 0.17s;
-  animation: popIn 0.33s;
-  flex: 1;
-  width: 100%;
-  margin: 0;
-  letter-spacing: 0.03em;
-}
-.beautiful-form .btns button:active {
-  background: linear-gradient(90deg, #232b33 60%, #13c1e3 100%);
-  transform: scale(0.98);
-}
-.backbtn {
-  margin-bottom: 18px;
-  font-size: 1em;
-  padding: 11px 0;
-  border-radius: 13px;
-  background: #232b33;
-  border: none;
-  cursor: pointer;
-  color: #2179ba;
-  font-weight: 700;
-  display: block;
-  width: 100%;
-  box-shadow: 0 1px 6px #13c1e355;
-  position: relative;
-  transition: background 0.2s, color 0.2s, box-shadow 0.23s, transform 0.18s;
-  outline: none;
-  letter-spacing: 0.01em;
-  animation: fadeIn 0.33s;
-}
-.backbtn:active {
-  background: #3a4e68;
-  color: #62b0ff;
-  transform: scale(0.98);
-  box-shadow: 0 1px 4px #13c1e333;
-}
-.welcome-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80px;
-  animation: fadeIn 0.7s;
-  margin-bottom: 12px;
-}
-.welcome-greet {
-  font-size: 1.35em;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 0;
-  letter-spacing: 0.01em;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.welcome-greet .greet-icon {
-  font-size: 1.5em;
-  margin-right: 6px;
-}
-.welcome-bar {
-  font-size: 1em;
-  color: #13c1e3;
-  background: #232b33;
-  padding: 5px 15px;
-  border-radius: 11px;
-  font-weight: 600;
-  display: inline-block;
-  text-align: left;
-  margin-top: 7px;
-}
-.result {
-  margin: 14px 0 0 0;
-  font-size: 1.07em;
-  text-align: center;
-  transition: color 0.3s;
-}
-.success { color: #1ca97b; font-weight: 600; animation: fadeIn 0.7s;}
-.error { color: #ee4747; font-weight: 600; animation: fadeIn 0.7s;}
-.modal-overlay {
-  position: fixed;
-  z-index: 3000;
-  top: 0; left: 0; right: 0; bottom: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(30,46,70,0.18);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.22s;
-  transition: opacity 0.24s;
-  opacity: 1;
-}
-.modal-overlay.show-blur {
-  backdrop-filter: blur(13px);
-  background: rgba(30, 46, 70, 0.22);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.37s cubic-bezier(.4,0,.2,1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-overlay.show-blur.visible {
-  opacity: 1;
-  pointer-events: all;
-  transition: opacity 0.37s cubic-bezier(.4,0,.2,1);
-}
-.modal-dialog {
-  background: #232b33;
-  color: #b9dbff;
-  padding: 18px 16px 18px 16px;
-  font-size: 1.13em;
-  font-weight: 700;
-  border-radius: 16px;
-  box-shadow: 0 3px 16px #13c1e330;
-  min-width: 0;
-  max-width: 360px;
-  min-height: 60px;
-  text-align: center;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform: translateY(40px) scale(0.96);
-  opacity: 0;
-  transition: all 0.33s cubic-bezier(.4,0,.2,1);
-}
-.modal-overlay.visible .modal-dialog {
-  transform: translateY(0px) scale(1);
-  opacity: 1;
-}
-.modal-dialog .modal-title {
-  color: #b9dbff;
-  font-weight: 700;
-  font-size: 1em;
-  margin-bottom: 16px;
-  width: 100%;
-  text-align: center;
-}
-.modal-buttons-row {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-  margin-bottom: 0;
-  justify-content: stretch;
-}
-.modal-btn {
-  flex: 1;
-  font-size: 1em;
-  padding: 13px 0;
-  border-radius: 10px;
-  font-weight: 700;
-  border: none;
-  box-shadow: none;
-  cursor: pointer;
-  transition: background 0.23s cubic-bezier(.4,0,.2,1), color 0.23s cubic-bezier(.4,0,.2,1), box-shadow 0.23s cubic-bezier(.4,0,.2,1), transform 0.16s cubic-bezier(.4,0,.2,1);
-  animation: popIn 0.33s;
-  width: 100%;
-  margin: 0;
-}
-.modal-btn.openbtn {
-  background: #23c882;
-  color: #fff;
-}
-.modal-btn.editbtn {
-  background: #3a3e47;
-  color: #b9dbff;
-}
-.modal-btn.editbtn:active {
-  background: #22303b;
-  color: #62b0ff;
-}
-.modal-btn.deletebtn {
-  background: #3a1d1d;
-  color: #ff9595;
-}
-.modal-btn.deletebtn:active {
-  background: #c94b4b;
-  color: #fff;
-}
-.modal-btn.cancelbtn {
-  background: #3a3e47;
-  color: #b9dbff;
-}
-.modal-btn.cancelbtn:active {
-  background: #22303b;
-  color: #62b0ff;
-}
-.modal-btn.cancel-full {
-  width: 100%;
-  margin-top: 13px;
-  border-radius: 10px;
-  font-size: 1em;
-  padding: 13px 0;
-  background: #3a4e68;
-  color: #f1f1f1;
-  font-weight: 600;
-  box-shadow: none;
-}
-.modal-btn.cancel-full:active {
-  background: #22303b;
-}
-.modal-dialog.modal-delete.success-check {
-  background: transparent !important;
-  box-shadow: none !important;
-  min-width: 0;
-  min-height: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.check-anim {
-  width: 100px;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  opacity: 1;
-  background: transparent !important;
-  animation: checkShow 0.5s 0s forwards cubic-bezier(.4,0,.2,1);
-}
-.check-anim svg {
-  width: 86px;
-  height: 86px;
-  stroke: #23c882;
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-  opacity: 0;
-  animation: checkMark 0.33s 0.23s forwards cubic-bezier(.4,0,.2,1);
-  display: block;
-  margin: 0 auto;
-  background: transparent;
-}
-@keyframes checkShow {
-  0% { opacity: 0; transform: scale(0.7);}
-  70% { opacity: 1; transform: scale(1.08);}
-  100% { opacity: 1; transform: scale(1);}
-}
-@keyframes checkMark {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; }}
-@keyframes fadeInInput {
-  from { opacity: 0; transform: translateY(16px);}
-  to   { opacity: 1; transform: none;}
-}
-@keyframes fadeIn { from { opacity:0; transform: translateY(32px);} to   { opacity:1; transform: none;}}
-@keyframes popIn { from { opacity:0; transform: scale(0.95);} to   { opacity:1; transform: scale(1);}}
-@keyframes notifFadeOut { from { opacity:1; transform: translateY(0);} to { opacity:0; transform: translateY(-30px);} }
-@keyframes loaderSpin {
-  0% { transform: rotate(0deg);}
-  100% { transform: rotate(360deg);}
-}
-.global-loader-overlay {
-  position: fixed;
-  z-index: 4000;
-  top: 0; left: 0; right: 0; bottom: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(21,28,36,0.93);
-  opacity: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.36s;
-  flex-direction: column;
-  pointer-events: all;
-  animation: fadeIn 0.33s;
-}
-.global-loader-spinner {
-  width: 72px;
-  height: 72px;
-  border: 7px solid #3e4b5a;
-  border-top: 7px solid #23c882;
-  border-radius: 50%;
-  animation: loaderSpin 0.8s linear infinite;
-  margin-bottom: 24px;
-  margin-top: 8px;
-  box-shadow: 0 3px 16px #13c1e330;
-  background: transparent;
-  display: block;
-}
-.global-loader-text {
-  font-size: 1.22em;
-  font-weight: 700;
-  color: #62b0ff;
-  text-align: center;
-  letter-spacing: 0.01em;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-.filter-bar-wrap {
-  border: 2px solid #22303b;
-  background: #1d2530;
-  border-radius: 18px;
-  padding: 10px 7px;
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.filter-bar-section {
-  border: 2px solid #22303b;
-  border-radius: 14px;
-  padding: 5px 5px;
-  margin-bottom: 7px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  background: #232b33;
-}
-.filter-bar-section:last-child { margin-bottom: 0;}
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  width: 100%;
-}
-.filter-btn {
-  display: flex;
-  align-items: center;
-  padding: 8px 18px;
-  background: #22303b;
-  color: #b9dbff;
-  border-radius: 18px;
-  border: 2px solid #22303b;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.22s, color 0.2s, border 0.2s;
-  margin: 0;
-  outline: none;
-}
-.filter-btn.selected {
-  background: #23c882;
-  color: #fff;
-  border: 2px solid #23c882;
-}
-.filter-btn.status.selected {
-  background: #c94b4b;
-  color: #fff;
-  border: 2px solid #c94b4b;
-}
-.filter-btn:active {
-  opacity: 0.93;
-  transform: scale(0.98);
-}
-.tob-warning {
-  margin-top: 6px;
-  background: #2a271e;
-  color: #ffd369;
-  border-radius: 9px;
-  padding: 7px 13px;
-  font-size: 1.1em;
-  font-weight: 600;
-  box-shadow: 0 1px 6px #ffb80033;
-  opacity: 0.97;
-  transition: opacity 0.23s;
-  animation: fadeIn 0.4s;
-  display: block;
-  border: 1.5px solid #c94b4b;
-}
-.beautiful-form .btns button:disabled {
-  opacity: 0.6;
-  filter: grayscale(0.6);
-  cursor: not-allowed;
-}
-.modal-title .modal-name-box {
-  display: inline-block;
-  background: #2a271e;
-  color: #ffd369;
-  border: 1.5px solid #c94b4b;
-  border-radius: 11px;
-  padding: 3px 10px;
-  margin: 0 4px;
-  font-weight: 700;
-  font-size: 1.15em;
-}
-.bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  background: #18162a;
-  box-shadow: 0 -2px 16px #00000033;
-  display: none; /* Скрыта по умолчанию, показываем через JS */
-  justify-content: space-around;
-  align-items: center;
-  height: 62px;
-  padding: 0 6px;
-  transition: background 0.2s;
-}
-.nav-btn {
-  background: none;
-  border: none;
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 54px;
-  width: 54px;
-  border-radius: 50%;
-  transition: background 0.17s, color 0.17s, box-shadow 0.17s;
-  color: #757d9a;
-  font-size: 1.37em;
-  position: relative;
-  cursor: pointer;
-}
-.nav-btn:active {
-  background: #1d2332;
-  color: #13c1e3;
-}
-.nav-btn.active span,
-.nav-btn.active svg {
-  color: #13c1e3;
-  filter: drop-shadow(0 0 8px #13c1e360);
-}
-.nav-add-btn {
-  width: 54px;
-  height: 54px;
-  min-width: 54px;
-  min-height: 54px;
-  max-width: 54px;
-  max-height: 54px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #181c2e 60%, #232b33 100%);
-  box-shadow: 0 2px 12px #13c1e340;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 0;
-  margin-bottom: 0;
-  border: 3px solid #232b33;
-  left: 0;
-  right: 0;
-}
-.nav-add-btn svg {
-  width: 28px;
-  height: 28px;
-  display: block;
-  margin: auto;
-}
-/* Блок просроченных позиций */
-.expired-tiles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  margin-bottom: 24px;
-}
-.expired-tile {
-  background: linear-gradient(120deg, #3a234d 0%, #2a2040 100%);
-  border: 2.5px solid #c94b4b;
-  border-radius: 18px;
-  box-shadow: 0 3px 16px #c94b4b33;
-  padding: 18px 16px 16px 16px;
-  min-width: 0;
-  min-height: 110px;
-  max-width: 48%;
-  flex: 1 1 180px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  animation: popIn 0.43s;
-}
-.expired-tile .expired-icon {
-  width: 32px;
-  height: 32px;
-  margin-bottom: 8px;
-  color: #c94b4b;
-}
-.expired-tile .expired-title {
-  font-size: 1.08em;
-  font-weight: 700;
-  color: #ff9595;
-  margin-bottom: 4px;
-}
-.expired-tile .expired-date {
-  font-size: 0.97em;
-  color: #b9dbff;
-  margin-bottom: 2px;
-}
-.expired-tile .expired-tob {
-  font-size: 0.93em;
-  color: #c94b4b;
-}
+function escapeHtml(str) {
+  if (typeof str !== "string") return "";
+  return str.replace(/[&<>"'`=\/]/g, function(s) {
+    return ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+      "`": "&#96;",
+      "=": "&#61;",
+      "/": "&#47;"
+    })[s];
+  });
+}
+let lastAction = {};
+function canProceed(action, minInterval = 1200) {
+  const now = Date.now();
+  if (!lastAction[action] || now - lastAction[action] > minInterval) {
+    lastAction[action] = now;
+    return true;
+  }
+  return false;
+}
+function isValidCategory(cat) {
+  return ["🍯 Сиропы", "🥕 Ингредиенты", "☕ Кофе", "📦 Прочее"].includes(cat);
+}
+function isValidName(name) {
+  return name && name.length <= 60 && !/[<>&]/.test(name);
+}
+function isValidTob(tob) {
+  return tob && /^\d{6}$/.test(tob);
+}
+function isValidShelf(s) {
+  return s && /^\d+$/.test(s) && Number(s) > 0 && Number(s) <= 365;
+}
+document.addEventListener('touchstart', function preventZoom(e) {
+  if(e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+let lastTouch = 0;
+document.addEventListener('touchend', function(e){
+  const now = Date.now();
+  if(now - lastTouch <= 350){
+    e.preventDefault();
+  }
+  lastTouch = now;
+}, { passive: false });
+
+let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+let username = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "";
+let userPhoto = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : "";
+const backend = "https://bar-backend-production.up.railway.app";
+const botLink = "https://t.me/BarHelperAB_bot";
+
+function forceExpand() {
+  if (tg && tg.expand) tg.expand();
+}
+if (tg && tg.expand) tg.expand();
+if (userPhoto) {
+  const avatar = document.getElementById('userAvatar');
+  avatar.src = userPhoto;
+  avatar.style.display = 'block';
+}
+document.getElementById('wrap').addEventListener('touchstart', function(e) {
+  if (!e.target.closest('input, textarea, select, button')) {
+    const active = document.activeElement;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
+      active.blur();
+    }
+  }
+});
+
+if (!userId) {
+  document.getElementById('main').innerHTML = `
+    <div style="padding:22px 0;text-align:center" class="error">
+      Откройте сайт через Telegram-бота, чтобы пользоваться баром.<br><br>
+      <a href="${botLink}" style="color:#007aff;font-weight:bold" target="_blank">Открыть бота</a>
+    </div>`;
+  throw new Error("Not in Telegram Mini App");
+}
+
+window.showMenu = showMenu;
+window.showAddPage = showAddPage;
+window.showExpiredPage = showExpiredPage;
+window.showSearchPage = showSearchPage;
+window.showStatsPage = showStatsPage;
+
+function setPageTitle(title) {
+  document.getElementById('pageTitle').innerHTML = title;
+}
+function showPage(contentHtml) {
+  const el = document.getElementById("main");
+  el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  forceExpand();
+}
+function addBackButton(html) {
+  return `<button class="backbtn" onclick="showMenu()">Назад</button>` + html;
+}
+function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${escapeHtml(m)}</div>`)); }
+let USER = null;
+function welcomeGreeting() {
+  const now = new Date();
+  const h = now.getHours();
+  if (h >= 5 && h < 12) return "Доброе утро";
+  if (h >= 12 && h < 18) return "Добрый день";
+  if (h >= 18 && h < 23) return "Добрый вечер";
+  return "Доброй ночи";
+}
+function showMenu() {
+  setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
+  showPage(`
+    <div class="welcome-block">
+      <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
+    </div>
+  `);
+}
+function vibrate(ms = 30) {
+  if (window.navigator && window.navigator.vibrate) {
+    window.navigator.vibrate(ms);
+  }
+  if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+    try {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    } catch (e) {}
+  }
+}
+function scrollInputIntoView(input) {
+  setTimeout(() => {
+    if (input && typeof input.scrollIntoView === "function") {
+      input.scrollIntoView({behavior: "smooth", block: "center"});
+    }
+  }, 120);
+}
+document.body.addEventListener('focusin', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+    scrollInputIntoView(e.target);
+  }
+});
+
+function showStatsPage() {
+  setPageTitle('Статистика бара');
+  showPage(addBackButton(`<div class="stat-block" id="statBlock"><div style="text-align:center;color:#aaa;">Загрузка...</div></div>`));
+  setTimeout(()=>document.getElementById('statBlock').classList.add('fadeIn'),50);
+  fetch(`${backend}/search`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, query: ""})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) {
+      document.getElementById('statBlock').innerHTML = `<div class="error">Ошибка: ${escapeHtml(data.error)}</div>`;
+      return;
+    }
+    let total = data.results.length;
+    let opened = data.results.filter(x=>x.opened==1).length;
+    let closed = data.results.filter(x=>x.opened==0).length;
+    let expired = data.results.filter(x=>x.expiry_at && new Date(x.expiry_at) < new Date()).length;
+    document.getElementById('statBlock').innerHTML = `
+      <div class="stat-row"><span class="stat-label">Всего позиций:</span> <span class="stat-value blue">${total}</span></div>
+      <div class="stat-row"><span class="stat-label">Открытых:</span> <span class="stat-value">${opened}</span></div>
+      <div class="stat-row"><span class="stat-label">Закрытых:</span> <span class="stat-value gray">${closed}</span></div>
+      <div class="stat-row"><span class="stat-label">Просрочено:</span> <span class="stat-value red">${expired}</span></div>
+    `;
+    document.getElementById('statBlock').classList.add('fadeIn');
+  });
+}
+function msTimeNow() {
+  const now = new Date();
+  const msOffset = 3 * 60 * 60 * 1000;
+  return new Date(now.getTime() + msOffset);
+}
+function msDateStrToDate(dateStr) {
+  return new Date(new Date(dateStr).getTime() + 3 * 60 * 60 * 1000);
+}
+function msDaysBetween(dateStr1, dateStr2) {
+  if (!dateStr1 || !dateStr2) return '-';
+  const d1 = msDateStrToDate(dateStr1);
+  const d2 = msDateStrToDate(dateStr2);
+  return Math.max(0, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+}
+function showAddPage() {
+  setPageTitle('Добавить позицию');
+  showPage(addBackButton(`
+    <form id="addf" class="beautiful-form" autocomplete="off">
+      <div class="field-row">
+        <label class="field-label" for="category">Категория</label>
+        <select name="category" id="category" required>
+          <option value="🍯 Сиропы">🍯 Сиропы</option>
+          <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
+          <option value="☕ Кофе">☕ Кофе</option>
+          <option value="📦 Прочее">📦 Прочее</option>
+        </select>
+      </div>
+      <div class="status-toggle-bar" id="statusToggleBar">
+        <button type="button" class="status-toggle-btn opened selected" id="btnOpened">Открыто</button>
+        <button type="button" class="status-toggle-btn closed" id="btnClosed">Закрыто</button>
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="tob">TOB (6 цифр)</label>
+        <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456" autocomplete="off" inputmode="numeric">
+        <div id="tobWarning" style="display:none"></div>
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="name">Название</label>
+        <input name="name" id="name" required placeholder="Название позиции">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="shelf_life_days">Срок хранения (дней)</label>
+        <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="30">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="opened_at">Дата открытия</label>
+        <input name="opened_at" id="opened_at" type="date" required>
+      </div>
+      <div class="btns">
+        <button type="submit" id="addSubmitBtn" disabled>Добавить</button>
+      </div>
+    </form>
+  `));
+  setTimeout(() => {
+    let inputs = document.querySelectorAll('.beautiful-form input, .beautiful-form select');
+    inputs.forEach(inp => {
+      inp.addEventListener('focus', function() {
+        scrollInputIntoView(this);
+      });
+    });
+  }, 100);
+
+  let opened = true;
+  const btnOpened = document.getElementById('btnOpened');
+  const btnClosed = document.getElementById('btnClosed');
+  function updateStatusButtons() {
+    if (opened) {
+      btnOpened.classList.add("selected", "opened");
+      btnClosed.classList.remove("selected", "closed");
+    } else {
+      btnOpened.classList.remove("selected", "opened");
+      btnClosed.classList.add("selected", "closed");
+    }
+  }
+  btnOpened.onclick = function() {
+    opened = true;
+    updateStatusButtons();
+    validateForm();
+  };
+  btnClosed.onclick = function() {
+    opened = false;
+    updateStatusButtons();
+    validateForm();
+  };
+  updateStatusButtons();
+
+  let allItems = [];
+  let fetchedItems = false;
+  let openTobExists = false;
+  let openedItemName = '';
+  const tobInput = document.getElementById('tob');
+  const tobWarning = document.getElementById('tobWarning');
+  const nameInput = document.getElementById('name');
+  const shelfInput = document.getElementById('shelf_life_days');
+  const dateInput = document.getElementById('opened_at');
+  const catInput = document.getElementById('category');
+  const submitBtn = document.getElementById('addSubmitBtn');
+  tobInput.addEventListener('keydown', function(e){
+    if (e.key.length === 1 && !/[0-9]/.test(e.key)) e.preventDefault();
+  });
+  tobInput.addEventListener('input', function(e){
+    this.value = this.value.replace(/\D/g, '').slice(0,6);
+  });
+
+  function validateForm() {
+    let allOk = true;
+    if (!isValidCategory(catInput.value)) allOk = false;
+    if (!isValidTob(tobInput.value)) allOk = false;
+    if (!isValidName(nameInput.value.trim())) allOk = false;
+    if (!isValidShelf(shelfInput.value)) allOk = false;
+    if (!dateInput.value) allOk = false;
+    if (opened && openTobExists) allOk = false;
+    submitBtn.disabled = !allOk;
+  }
+
+  async function fetchItemsOnce() {
+    if (fetchedItems) return;
+    fetchedItems = true;
+    let resp = await fetch(`${backend}/search`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId, query: ""})
+    });
+    let data = await resp.json();
+    if (data.ok && Array.isArray(data.results)) {
+      allItems = data.results;
+    }
+  }
+
+  function checkTob() {
+    let tobVal = tobInput.value;
+    openTobExists = false;
+    tobWarning.style.display = "none";
+    tobWarning.innerHTML = "";
+    nameInput.readOnly = false;
+    nameInput.value = '';
+    openedItemName = '';
+    if (tobVal.length === 6) {
+      let exists = allItems.find(x => x.tob === tobVal && x.opened == 1);
+      if (exists) {
+        openTobExists = true;
+        nameInput.value = exists.name;
+        nameInput.readOnly = true;
+        openedItemName = exists.name;
+        tobWarning.innerHTML = `<span class="tob-warning">Добавление открытой позиции с этим TOB запрещено. Сначала закройте или удалите открытую позицию с этим TOB.</span>`;
+        tobWarning.style.display = "block";
+      }
+    }
+    validateForm();
+  }
+
+  tobInput.addEventListener('input', async function() {
+    await fetchItemsOnce();
+    checkTob();
+  });
+  nameInput.addEventListener('input', validateForm);
+  shelfInput.addEventListener('input', validateForm);
+  dateInput.addEventListener('input', validateForm);
+  catInput.addEventListener('change', validateForm);
+
+  document.getElementById('addf').onsubmit = async function(e){
+    e.preventDefault();
+    let d = Object.fromEntries(new FormData(this));
+    d.opened = opened ? 1 : 0;
+    if (!isValidCategory(d.category) || !isValidTob(d.tob) || !isValidName(d.name) || !isValidShelf(d.shelf_life_days)) {
+      msg("Некорректные данные, проверьте поля.", "error");
+      return;
+    }
+    if (!canProceed("add", 1200)) return;
+    if (opened && openTobExists) return;
+    let req = {
+      user_id: userId,
+      category: d.category,
+      tob: d.tob,
+      name: d.name,
+      shelf_life_days: d.shelf_life_days,
+      opened: d.opened,
+      opened_at: d.opened_at
+    };
+    let url = `${backend}/add`;
+    let resp = await fetch(url, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(req)
+    });
+    let data = await resp.json();
+    if (data.ok) {
+      vibrate();
+      showCheckAnim();
+      setTimeout(() => {
+        msg("Позиция добавлена!", "success");
+      }, 1000);
+    } else {
+      msg("Ошибка: " + data.error, "error");
+    }
+  };
+}
+function renderCard(r, actions = true) {
+  let badgeCol = `<div class="card-header-col">
+    <div class="card-badge category-badge">${escapeHtml(r.category)}</div>
+    <div class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</div>
+  </div>`;
+  let title = `<div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>`;
+  let rows = `
+    <div class="card-row"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
+    <div class="card-row"><b>Открыто:</b> ${escapeHtml(r.opened_at)}</div>
+    <div class="card-row"><b>Годен до:</b> ${escapeHtml(r.expiry_at)}</div>
+  `;
+  let buttons = "";
+  if (actions) {
+    if (r.opened == 1) {
+      buttons = `<div class="card-actions-bottom">
+        <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
+        <button class="deletebtn" onclick="showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+      </div>`;
+    } else {
+      buttons = `<div class="card-actions-bottom">
+        <button class="openbtn" onclick="showOpenModal('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
+        <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
+        <button class="deletebtn" onclick="showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+      </div>`;
+    }
+  }
+  return `<div class="item-card">${badgeCol}${title}${rows}${buttons}</div>`;
+}
+function showSearchPage() {
+  setPageTitle('Поиск');
+  showPage(addBackButton(`
+    <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
+      <input id="searchInput" type="text" placeholder="Поиск по TOB или названию" style="margin-bottom:7px;">
+      <div class="filter-bar-wrap">
+        <div class="filter-bar-section" id="categoryFilterBar"></div>
+        <div class="filter-bar-section" id="statusFilterBar"></div>
+      </div>
+      <div id="searchResults" style="min-height:90px;"></div>
+    </div>
+  `));
+
+  const categories = [
+    { value: "", label: "Все категории", icon: "" },
+    { value: "🍯 Сиропы", label: "🍯 Сиропы", icon: "" },
+    { value: "🥕 Ингредиенты", label: "🥕 Ингредиенты", icon: "" },
+    { value: "☕ Кофе", label: "☕ Кофе", icon: "" },
+    { value: "📦 Прочее", label: "📦 Прочее", icon: "" }
+  ];
+  const statuses = [
+    { value: "", label: "Все статусы" },
+    { value: "1", label: "Открыто" },
+    { value: "0", label: "Закрыто" }
+  ];
+  let filterCategory = "";
+  let filterOpened = "";
+
+  function renderCategoryBar() {
+    const bar = document.getElementById('categoryFilterBar');
+    bar.innerHTML = '';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.className = "filter-btn" + (filterCategory === cat.value ? " selected" : "");
+      btn.innerHTML = cat.label;
+      btn.onclick = () => {
+        filterCategory = cat.value;
+        renderCategoryBar();
+        renderList();
+      };
+      bar.appendChild(btn);
+    });
+  }
+  function renderStatusBar() {
+    const bar = document.getElementById('statusFilterBar');
+    bar.innerHTML = '';
+    statuses.forEach(status => {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.className = "filter-btn status" + (filterOpened === status.value ? " selected" : "");
+      btn.innerHTML = status.label;
+      btn.onclick = () => {
+        filterOpened = status.value;
+        renderStatusBar();
+        renderList();
+      };
+      bar.appendChild(btn);
+    });
+  }
+  renderCategoryBar();
+  renderStatusBar();
+
+  const input = document.getElementById('searchInput');
+  let allItems = [];
+  const resultsDiv = document.getElementById('searchResults');
+  resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
+  fetch(`${backend}/search`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, query: ""})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${escapeHtml(data.error)}</div>`;
+    allItems = data.results;
+    renderList();
+  });
+  function renderList() {
+    let filter = (input.value||"").trim().toLowerCase();
+    let items = allItems;
+    if (filterCategory) items = items.filter(x=>x.category === filterCategory);
+    if (filterOpened !== '') items = items.filter(x=>String(x.opened)==filterOpened);
+    if (filter) {
+      items = items.filter(
+        x => x.tob.toLowerCase().includes(filter) || x.name.toLowerCase().includes(filter)
+      );
+      let openedArr = items.filter(i => i.opened == 1);
+      let closedArr = items.filter(i => i.opened == 0);
+      closedArr.sort((a, b) => {
+        let ea = new Date(a.expiry_at), eb = new Date(b.expiry_at);
+        return Math.abs(ea - Date.now()) - Math.abs(eb - Date.now());
+      });
+      items = [...openedArr, ...closedArr];
+    }
+    if (!items.length) {
+      resultsDiv.innerHTML = `<div style="text-align:center;color:#bbb;font-size:1.07em;margin-top:18px;">Ничего не найдено</div>`;
+      return;
+    }
+    let cards = `<div class="card-list" style="animation:none">`;
+    items.forEach(r => {
+      cards += renderCard(r);
+    });
+    cards += `</div>`;
+    resultsDiv.innerHTML = cards;
+  }
+  input.addEventListener('input', renderList);
+}
+function showDeleteModal(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  closeModal();
+  let overlay = document.createElement('div');
+  overlay.className = 'modal-overlay show-blur';
+  overlay.innerHTML = `
+    <div class="modal-dialog modal-delete">
+      <div class="modal-title">
+        <span>Вы уверены, что хотите удалить </span>
+        <span class="modal-name-box">${escapeHtml(r.name)}</span>?
+      </div>
+      <div class="modal-buttons-row">
+        <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+        <button class="modal-btn cancelbtn" onclick="closeModal()">Отмена</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add('visible'), 10);
+}
+async function deleteItem(rJson) {
+  if (!canProceed("delete", 1200)) return;
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  let overlay = document.querySelector('.modal-overlay.show-blur');
+  let dialog = overlay ? overlay.querySelector('.modal-dialog.modal-delete') : null;
+  if (dialog) {
+    dialog.classList.add('success-check');
+    dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 110 110"><polyline points="30,58 50,80 82,36"/></svg></div>`;
+    vibrate();
+  }
+  try {
+    let resp = await fetch(`${backend}/delete`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId, id: r.id})
+    });
+    let data = await resp.json();
+    if (!data.ok && dialog) {
+      dialog.innerHTML = `<div class="error" style="padding:22px;">Ошибка: ${escapeHtml(data.error || "Ошибка удаления")}</div>`;
+    } else {
+      setTimeout(() => {
+        closeModal();
+        showSearchPage();
+      }, 1000);
+    }
+  } catch (e) {
+    if (dialog) {
+      dialog.innerHTML = `<div class="error" style="padding:22px;">Ошибка: ${escapeHtml(e.message || "Ошибка сети")}</div>`;
+    }
+  }
+}
+async function findOpenedByTOB(tob) {
+  let resp = await fetch(`${backend}/search`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId, query: tob})
+  });
+  let data = await resp.json();
+  return (data.results || []).find(x => x.tob === tob && x.opened == 1);
+}
+function showOpenModal(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  closeModal();
+  findOpenedByTOB(r.tob).then(opened => {
+    let overlay = document.createElement('div');
+    overlay.className = 'modal-overlay show-blur';
+    if (opened) {
+      let days = msDaysBetween(opened.opened_at, opened.expiry_at);
+      overlay.innerHTML = `
+        <div class="modal-dialog modal-delete">
+          <div class="modal-title">
+            <span class="modal-name-box">${escapeHtml(opened.name)}</span>
+            <div style="font-size:0.97em;color:#888;margin-top:5px;">Срок годности открытой: ${days !== '-' ? days + ' дн.' : '-'}</div>
+          </div>
+          <div class="modal-buttons-row">
+            <button class="modal-btn editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}')">Изменить</button>
+            <button class="modal-btn openbtn" onclick="autoOpen('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
+          </div>
+          <button class="modal-btn cancel-full" onclick="closeModal()">Отмена</button>
+        </div>
+      `;
+    } else {
+      overlay.innerHTML = `
+        <div class="modal-dialog modal-delete">
+          <button class="modal-btn openbtn" style="width:100%;margin-bottom:12px;" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}', true)">Изменить и открыть</button>
+          <button class="modal-btn cancel-full" onclick="closeModal()">Отмена</button>
+        </div>
+      `;
+    }
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.classList.add('visible'), 10);
+  });
+}
+function closeModal() {
+  let overlay = document.querySelector('.modal-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('visible');
+  setTimeout(() => overlay.remove(), 370);
+}
+async function autoOpen(rJson) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  let overlay = document.querySelector('.modal-overlay.show-blur');
+  let dialog = overlay ? overlay.querySelector('.modal-dialog') : null;
+  let msNow = msTimeNow();
+  let today = msNow.toISOString().slice(0,10);
+  let opened = await findOpenedByTOB(r.tob);
+  let expiry_at = r.expiry_at;
+  if (opened) {
+    expiry_at = opened.expiry_at;
+    await fetch(`${backend}/delete`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId, id: opened.id})
+    });
+  }
+  await fetch(`${backend}/update`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      user_id: userId,
+      id: r.id,
+      opened: 1,
+      opened_at: today,
+      expiry_at: expiry_at
+    })
+  });
+  if (dialog) {
+    dialog.classList.add('success-check');
+    dialog.innerHTML = `<div class="check-anim"><svg viewBox="0 0 110 110"><polyline points="30,58 50,80 82,36"/></svg></div>`;
+    vibrate();
+  }
+  setTimeout(() => {
+    closeModal();
+    showSearchPage();
+  }, 1000);
+}
+function openReopenForm(rJson, openAfterEdit = false) {
+  let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
+  setPageTitle('Редактировать позицию');
+  showPage(addBackButton(`
+    <form id="editf" class="beautiful-form" autocomplete="off" style="max-width:430px;">
+      <div class="field-row">
+        <label class="field-label">TOB (нельзя изменить)</label>
+        <input value="${escapeHtml(r.tob)}" readonly style="background:#1d2332;color:#888;">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="edit_name">Название</label>
+        <input name="edit_name" id="edit_name" required value="${escapeHtml(r.name)}">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="edit_category">Категория</label>
+        <select name="edit_category" id="edit_category" required>
+          <option value="🍯 Сиропы" ${r.category === "🍯 Сиропы"?"selected":""}>🍯 Сиропы</option>
+          <option value="🥕 Ингредиенты" ${r.category === "🥕 Ингредиенты"?"selected":""}>🥕 Ингредиенты</option>
+          <option value="☕ Кофе" ${r.category === "☕ Кофе"?"selected":""}>☕ Кофе</option>
+          <option value="📦 Прочее" ${r.category === "📦 Прочее"?"selected":""}>📦 Прочее</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="edit_shelf_life_days">Срок хранения (дней)</label>
+        <input name="edit_shelf_life_days" id="edit_shelf_life_days" type="number" min="1" required value="${escapeHtml(""+r.shelf_life_days)}">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="edit_opened_at">Дата открытия</label>
+        <input name="edit_opened_at" id="edit_opened_at" type="date" required value="${escapeHtml(r.opened_at)}">
+      </div>
+      <div class="btns">
+        <button type="submit" id="editSubmitBtn">Сохранить</button>
+      </div>
+    </form>
+  `));
+  document.getElementById('editf').onsubmit = async function(e) {
+    e.preventDefault();
+    let d = Object.fromEntries(new FormData(this));
+    let req = {
+      user_id: userId,
+      id: r.id,
+      category: d.edit_category,
+      name: d.edit_name,
+      shelf_life_days: d.edit_shelf_life_days,
+      opened_at: d.edit_opened_at
+    };
+    if (!isValidCategory(req.category) || !isValidName(req.name) || !isValidShelf(req.shelf_life_days)) {
+      msg("Некорректные данные, проверьте поля.", "error");
+      return;
+    }
+    if (!canProceed("edit", 1200)) return;
+    await fetch(`${backend}/update`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(req)
+    });
+    vibrate();
+    if (openAfterEdit) {
+      autoOpen(encodeURIComponent(JSON.stringify({...r, ...req})));
+    } else {
+      showSearchPage();
+    }
+  };
+}
+function showExpiredPage() {
+  setPageTitle('Проверка сроков');
+  showPage(addBackButton(`
+    <div class="beautiful-form" style="gap:12px;max-width:440px;">
+      <div class="filter-bar-wrap" style="margin-bottom:0;">
+        <div class="filter-bar-section" id="expiredDayFilter"></div>
+      </div>
+      <div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>
+      <div id="expiredCards"></div>
+    </div>
+  `));
+
+  let filter = 'today';
+  renderDayFilter();
+  fetchAndRender();
+
+  function renderDayFilter() {
+    const bar = document.getElementById('expiredDayFilter');
+    bar.innerHTML = '';
+    [['today', 'Сегодня и ранее'], ['tomorrow','Завтра']].forEach(([val, label]) => {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.className = "filter-btn" + (filter === val ? " selected" : "");
+      btn.innerHTML = label;
+      btn.onclick = () => {
+        filter = val;
+        renderDayFilter();
+        fetchAndRender();
+      };
+      bar.appendChild(btn);
+    });
+  }
+
+  function fetchAndRender() {
+    const title = document.getElementById('expiredTitle');
+    const cardsDiv = document.getElementById('expiredCards');
+    title.innerHTML = "Загрузка...";
+    cardsDiv.innerHTML = "";
+    let msNow = msTimeNow();
+    let dateToCheck = new Date(msNow);
+    if (filter === 'tomorrow') {
+      dateToCheck.setDate(dateToCheck.getDate() + 1);
+    }
+    let y = dateToCheck.getFullYear();
+    let m = ('0' + (dateToCheck.getMonth()+1)).slice(-2);
+    let d = ('0' + dateToCheck.getDate()).slice(-2);
+    let checkDate = `${y}-${m}-${d}`;
+
+    fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
+      .then(r=>r.json())
+      .then(data=>{
+        if(!data.ok) {
+          title.innerHTML = "Ошибка: "+escapeHtml(data.error);
+          cardsDiv.innerHTML = "";
+          return;
+        }
+        let filtered;
+        if (filter === 'today') {
+          filtered = (data.results||[]).filter(x=>x.expiry_at && x.expiry_at <= checkDate);
+        } else {
+          filtered = (data.results||[]).filter(x=>x.expiry_at === checkDate);
+        }
+        if(!filtered.length) {
+          title.innerHTML = filter === 'today'
+            ? "Нет позиций, у которых срок истекает сегодня или ранее!"
+            : "Нет позиций, которые просрочатся завтра!";
+          title.className = "success";
+          cardsDiv.innerHTML = "";
+          return;
+        }
+        title.innerHTML = filter === 'today'
+          ? "Сегодня и ранее истекают:"
+          : "Завтра истекают:";
+        title.className = "";
+        let cards = `<div class="card-list">`;
+        filtered.forEach(x=>{
+          cards += renderCard(x, false);
+        });
+        cards += `</div>`;
+        cardsDiv.innerHTML = cards;
+      });
+  }
+}
+function showGlobalLoader(show = true) {
+  const loader = document.getElementById('globalLoader');
+  const wrap = document.getElementById('wrap');
+  if (show) {
+    loader.style.display = 'flex';
+    wrap.style.display = 'none';
+    setTimeout(() => loader.style.opacity = "1", 10);
+  } else {
+    loader.style.opacity = "0";
+    setTimeout(() => {
+      loader.style.display = 'none';
+      wrap.style.display = '';
+    }, 370);
+  }
+}
+function fixIOSHeight() {
+  const wrap = document.getElementById('wrap');
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    wrap.style.height = window.innerHeight + 'px';
+    setTimeout(() => {
+      wrap.style.height = window.innerHeight + 'px';
+    }, 200);
+  } else {
+    wrap.style.height = '';
+  }
+}
+window.addEventListener('resize', fixIOSHeight);
+window.addEventListener('focusin', fixIOSHeight);
+window.addEventListener('focusout', fixIOSHeight);
+window.addEventListener('orientationchange', fixIOSHeight);
+fixIOSHeight();
+
+function showCheckAnim() {
+  closeModal();
+  let overlay = document.createElement('div');
+  overlay.className = 'modal-overlay show-blur visible';
+  overlay.innerHTML = `
+    <div class="modal-dialog modal-delete success-check" style="background:transparent;box-shadow:none;">
+      <div class="check-anim" style="background:transparent;">
+        <svg viewBox="0 0 110 110" style="width:94px;height:94px;display:block;">
+          <polyline points="30,58 50,80 82,36" style="stroke:#23c882;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none;" />
+        </svg>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => {
+    overlay.classList.add('visible');
+  }, 10);
+  setTimeout(() => {
+    overlay.classList.remove('visible');
+    setTimeout(() => overlay.remove(), 370);
+  }, 900);
+}
+
+async function startApp() {
+  showGlobalLoader(true);
+  const MIN_LOAD = 1200 + Math.floor(Math.random()*500);
+  let t0 = Date.now();
+  showPage(`
+    <div class="welcome-block">
+      <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
+    </div>
+  `);
+  try {
+    let r = await fetch("https://bar-backend-production.up.railway.app/userinfo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: userId })
+    });
+    let d = await r.json();
+    let dt = Date.now() - t0;
+    if (dt < MIN_LOAD) await new Promise(res => setTimeout(res, MIN_LOAD - dt));
+    showGlobalLoader(false);
+    if (!d.ok) {
+      setPageTitle('Добро пожаловать');
+      showPage(`
+        <div class="welcome-block">
+          <div class="welcome-greet">${escapeHtml(welcomeGreeting())}, гость!</div>
+          <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
+          <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#6f6af8 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
+        </div>
+      `);
+      return;
+    }
+    USER = { username: d.username, bar_name: d.bar_name };
+    showMenu();
+  } catch (e) {
+    showGlobalLoader(false);
+    setPageTitle('Ошибка');
+    showPage('<div class="error">Не удалось подключиться к серверу.<br>' + escapeHtml(e) + '</div>');
+  }
+}
+startApp();
+
+function showProfilePage() {
+  setPageTitle('Профиль');
+  showPage(`
+    <div class="welcome-block">
+      <div class="welcome-greet">${escapeHtml(USER?.username || "")}</div>
+      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
+      <div style="color:#888;font-size:1.13em;margin-top:18px;">Профиль временно недоступен</div>
+    </div>
+  `);
+}
+
+function setActiveNav(navId) {
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(navId).classList.add('active');
+}
+
+document.getElementById('nav-home').addEventListener('click', () => {
+  setActiveNav('nav-home');
+  showMenu();
+});
+document.getElementById('nav-search').addEventListener('click', () => {
+  setActiveNav('nav-search');
+  showSearchPage();
+});
+document.getElementById('nav-add').addEventListener('click', () => {
+  setActiveNav('nav-add');
+  showAddPage();
+});
+document.getElementById('nav-stats').addEventListener('click', () => {
+  setActiveNav('nav-stats');
+  showStatsPage();
+});
+document.getElementById('nav-profile').addEventListener('click', () => {
+  setActiveNav('nav-profile');
+  showProfilePage();
+});
+setActiveNav('nav-home');
