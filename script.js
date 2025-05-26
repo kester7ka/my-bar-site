@@ -109,21 +109,37 @@ function welcomeGreeting() {
   return "Доброй ночи";
 }
 function showMenu() {
-  setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
+  setPageTitle('');
   showPage(`
     <div class="welcome-block">
-      <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
+      <div class="welcome-greet">${escapeHtml(welcomeGreeting())}, ${USER ? escapeHtml(USER.username) : ""}! <span class='greet-emoji'>👋</span></div>
       ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
     </div>
-    <div class="expired-main-block beautiful-form" style="gap:12px;max-width:440px;margin-bottom:18px;">
-      <div class="filter-bar-wrap" style="margin-bottom:0;">
-        <div class="filter-bar-section" id="mainExpiredDayFilter"></div>
+    <div class="expired-main-block">
+      <div class="expired-title-row">
+        <span class="expired-icon">&#9888;</span>
+        <span class="expired-title-text">Просроченные и истекающие позиции</span>
+        <div class="filter-bar-wrap" style="margin-bottom:0;">
+          <div class="filter-bar-section" id="mainExpiredDayFilter"></div>
+        </div>
       </div>
-      <div id="mainExpiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>
+      <div id="mainExpiredTitle" style="text-align:center;color:#fff;font-size:1.07em;">Загрузка...</div>
       <div id="mainExpiredCards"></div>
     </div>
     <div id="mainContentAfterExpired"></div>
   `);
+
+  // Плавное появление панели навигации после загрузки
+  const nav = document.querySelector('.bottom-nav');
+  if (nav) {
+    nav.style.opacity = 0;
+    nav.style.pointerEvents = 'none';
+    setTimeout(() => {
+      nav.style.transition = 'opacity 0.7s cubic-bezier(.4,0,.2,1)';
+      nav.style.opacity = 1;
+      nav.style.pointerEvents = '';
+    }, 350);
+  }
 
   let filter = 'today';
   renderDayFilter();
