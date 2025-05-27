@@ -68,7 +68,7 @@ let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : nu
 let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
 let username = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "";
 let userPhoto = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : "";
-const backend = "https://bar-backend-production.up.railway.app";
+const backend = "https://web-production-2c7db.up.railway.app";
 const botLink = "https://t.me/BarHelperAB_bot";
 
 function forceExpand() {
