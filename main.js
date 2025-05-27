@@ -884,7 +884,7 @@ async function startApp() {
   `);
   ensureTheme();
   try {
-    let r = await fetch("https://bar-backend-production.up.railway.app/userinfo", {
+    let r = await fetch("https://web-production-2c7db.up.railway.app/userinfo", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user_id: userId })
