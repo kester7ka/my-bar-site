@@ -540,6 +540,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background: rgba(123,123,255,0.10);
   color: #fff;
 }
+.bottom-nav .ph {
+  font-size: 2.2em;
+  color: #fff;
+  filter: drop-shadow(0 2px 8px #232b3380);
+  transition: color 0.18s, filter 0.18s;
+}
+.nav-btn.active .ph,
+.nav-btn:focus .ph {
+  color: #7b7bff;
+  filter: drop-shadow(0 2px 12px #7b7bff99);
+}
+.nav-btn:hover:not(.active) .ph {
+  color: #b9dbff;
+  filter: drop-shadow(0 2px 8px #7b7bff55);
+}
 @media (max-width: 600px) {
   .bottom-nav {
     width: 98vw;
