@@ -81,11 +81,6 @@ function forceExpand() {
   if (tg && tg.expand) tg.expand();
 }
 if (tg && tg.expand) tg.expand();
-if (userPhoto) {
-  const avatar = document.getElementById('userAvatar');
-  avatar.src = userPhoto;
-  avatar.style.display = 'block';
-}
 document.getElementById('wrap').addEventListener('touchstart', function(e) {
   if (!e.target.closest('input, textarea, select, button')) {
     const active = document.activeElement;
