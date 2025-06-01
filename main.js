@@ -984,15 +984,6 @@ async function renderCategoryChart(animate = true) {
     }
   } catch(e) {}
   let max = Math.max(...Object.values(data), 1);
-  // Сетка: шаг и деления
-  let gridStep = 1;
-  if (max > 20) gridStep = 10;
-  else if (max > 10) gridStep = 5;
-  else if (max > 5) gridStep = 2;
-  let gridLines = [];
-  for (let y = 0; y <= max; y += gridStep) gridLines.push(y);
-  if (gridLines[gridLines.length-1] !== max) gridLines.push(max);
-  // SVG-иконки категорий (Phosphor)
   const icons = {
     '🍯 Сиропы': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7b7bff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
     '🥕 Ингредиенты': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7bffb7' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
@@ -1011,32 +1002,17 @@ async function renderCategoryChart(animate = true) {
     '☕ Кофе': 'Кофе',
     '📦 Прочее': 'Прочее'
   };
-  // Сетка (div-слои)
-  const chartHeight = 140; // px, высота области графика между осью X и верхней линией
-  let gridHtml = `<div class='chart-grid${animate ? ' chart-grid-animate' : ''}'>`;
-  gridLines.forEach((y, i) => {
-    if (y === 0) return; // не рисуем линию на оси X
-    let percent = 100 - (y / max) * 100;
-    let px = (y / max) * chartHeight;
-    gridHtml += `<div class='chart-grid-line' style='bottom:${38 + px}px;'><span class='chart-grid-label'>${y}</span></div>`;
-  });
-  gridHtml += `</div>`;
   let chart = `<div class=\"category-chart-tile\">
     <div class=\"chart-title\">Статистика по категориям</div>
-    <div class=\"chart-bars-wrap\">
-      <div class=\"chart-x-axis\"></div>
-      ${gridHtml}
-      <div class=\"chart-bars\">
-        ${Object.entries(data).map(([cat, val], i) => {
-          let barHeight = Math.round((val / max) * chartHeight);
-          return `<div class=\"chart-bar-wrap\">
-            <div class=\"chart-bar\" data-final=\"${barHeight}\" style=\"height:${animate ? 0 : barHeight}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 16px 16px 8px 8px / 24px 24px 8px 8px;\"></div>
-            <div class=\"chart-bar-label\">${icons[cat]}</div>
-            <div class=\"chart-bar-name\">${shortNames[cat]}</div>
-            <div class=\"chart-bar-value\">${val}</div>
-          </div>`;
-        }).join('')}
-      </div>
+    <div class=\"chart-bars\">
+      ${Object.entries(data).map(([cat, val], i) => `
+        <div class=\"chart-bar-wrap\">
+          <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 16px 16px 8px 8px / 24px 24px 8px 8px;\"></div>
+          <div class=\"chart-bar-label\">${icons[cat]}</div>
+          <div class=\"chart-bar-name\">${shortNames[cat]}</div>
+          <div class=\"chart-bar-value\">${val}</div>
+        </div>
+      `).join('')}
     </div>
   </div>`;
   let expiredBlock = mainDiv.querySelector('.beautiful-form');
@@ -1057,15 +1033,7 @@ async function renderCategoryChart(animate = true) {
           bar.style.borderRadius = '16px 16px 8px 8px / 24px 24px 8px 8px';
         }, 120 + idx * 120);
       });
-      // Анимация сетки
-      mainDiv.querySelectorAll('.chart-grid').forEach(grid => {
-        grid.classList.add('chart-grid-visible');
-      });
     }, 80);
-  } else {
-    mainDiv.querySelectorAll('.chart-grid').forEach(grid => {
-      grid.classList.add('chart-grid-visible');
-    });
   }
 }
 
