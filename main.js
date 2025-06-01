@@ -99,11 +99,94 @@ if (!userId) {
 }
 
 window.showMenu = function() {
-  showExpiredPage(true);
+  let greet = `<div class='welcome-block' style='text-align:center;margin-bottom:18px;'><div class='welcome-greet' style='font-size:2em;'>${getGreeting()}!</div></div>`;
+  let content = `
+    <div class=\"beautiful-form\" style=\"gap:12px;max-width:440px;\">
+      <div class=\"filter-bar-wrap\" style=\"margin-bottom:0;\">
+        <div class=\"filter-bar-section\" id=\"expiredDayFilter\"></div>
+      </div>
+      <div id=\"expiredTitle\" style=\"text-align:center;color:#aaa;font-size:1.07em;\">Загрузка...</div>
+      <div id=\"expiredCards\"></div>
+    </div>
+  `;
+  showPage(greet + content);
+  ensureTheme();
   showBottomNav(true);
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('nav-home').classList.add('active');
-};
+
+  let filter = 'today';
+  renderDayFilter();
+  fetchAndRender();
+
+  function renderDayFilter() {
+    const bar = document.getElementById('expiredDayFilter');
+    bar.innerHTML = '';
+    [['today', 'Сегодня и ранее'], ['tomorrow','Завтра']].forEach(([val, label]) => {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.className = "filter-btn" + (filter === val ? " selected" : "");
+      btn.innerHTML = label;
+      btn.onclick = () => {
+        filter = val;
+        renderDayFilter();
+        fetchAndRender();
+      };
+      bar.appendChild(btn);
+    });
+  }
+
+  function fetchAndRender() {
+    const title = document.getElementById('expiredTitle');
+    const cardsDiv = document.getElementById('expiredCards');
+    title.innerHTML = "Загрузка...";
+    cardsDiv.innerHTML = "";
+    let msNow = msTimeNow();
+    let dateToCheck = new Date(msNow);
+    if (filter === 'tomorrow') {
+      dateToCheck.setDate(dateToCheck.getDate() + 1);
+    }
+    let y = dateToCheck.getFullYear();
+    let m = ('0' + (dateToCheck.getMonth()+1)).slice(-2);
+    let d = ('0' + dateToCheck.getDate()).slice(-2);
+    let checkDate = `${y}-${m}-${d}`;
+
+    fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
+      .then(r=>r.json())
+      .then(data=>{
+        if(!data.ok) {
+          title.innerHTML = "Ошибка: "+escapeHtml(data.error);
+          cardsDiv.innerHTML = "";
+          return;
+        }
+        let filtered;
+        if (filter === 'today') {
+          filtered = (data.results||[]).filter(x=>x.expiry_at && x.expiry_at <= checkDate);
+        } else {
+          filtered = (data.results||[]).filter(x=>x.expiry_at === checkDate);
+        }
+        if(!filtered.length) {
+          title.innerHTML = filter === 'today'
+            ? "Нет позиций, у которых срок истекает сегодня или ранее!"
+            : "Нет позиций, которые просрочатся завтра!";
+          title.className = "success";
+          cardsDiv.innerHTML = "";
+          return;
+        }
+        title.innerHTML = filter === 'today'
+          ? "Сегодня и ранее истекают:"
+          : "Завтра истекают:";
+        title.className = "";
+        let cards = `<div class="card-list">`;
+        filtered.forEach(x=>{
+          cards += renderCard(x, false);
+        });
+        cards += `</div>`;
+        cardsDiv.innerHTML = cards;
+        ensureTheme();
+      });
+  }
+}
 window.showAddPage = showAddPage;
 window.showExpiredPage = showExpiredPage;
 window.showSearchPage = showSearchPage;
@@ -124,29 +207,12 @@ function addBackButton(html) {
 }
 function msg(m, type=''){ showPage(addBackButton(`<div class="${type} result">${escapeHtml(m)}</div>`)); }
 let USER = null;
-function welcomeGreeting() {
-  const now = new Date();
-  const h = now.getHours();
-  if (h >= 5 && h < 12) return "Доброе утро";
-  if (h >= 12 && h < 18) return "Добрый день";
-  if (h >= 18 && h < 23) return "Добрый вечер";
-  return "Доброй ночи";
-}
-function showMenu() {
-  setPageTitle('Ингредиенты <span style="color:#13c1e3;font-size:0.93em;">бара</span>');
-  showPage(`
-    <div class="welcome-block">
-      <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
-      ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
-    </div>
-    <div class="menu fadeIn" id="menuBlock">
-      <button class="menu-btn" onclick="showAddPage()">Добавить позицию</button>
-      <button class="menu-btn" onclick="showExpiredPage()">Проверить сроки</button>
-      <button class="menu-btn" onclick="showSearchPage()">Поиск</button>
-      <button class="menu-btn" onclick="showStatsPage()">Статистика бара</button>
-    </div>
-  `);
-  ensureTheme();
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return 'Доброе утро';
+  if (h >= 12 && h < 18) return 'Добрый день';
+  if (h >= 18 && h < 23) return 'Добрый вечер';
+  return 'Доброй ночи';
 }
 function vibrate(ms = 30) {
   if (window.navigator && window.navigator.vibrate) {
