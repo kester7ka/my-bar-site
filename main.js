@@ -79,8 +79,9 @@ let chartAnimated = false;
 window.showMenu = function() {
   setPageTitle('Главная');
   showExpiredPage(true, function() {
-    renderCategoryChart(!chartAnimated);
-    chartAnimated = true;
+    if (!document.querySelector('.category-chart-tile')) {
+      renderCategoryChart(true);
+    }
     let filler = document.getElementById('scrollFiller');
     if (!filler) {
       const mainDiv = document.getElementById('main');
@@ -148,7 +149,6 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     const cardsDiv = document.getElementById('expiredCards');
     const tile = document.getElementById('expiredTile');
     const statusIcon = document.getElementById('expiredStatusIcon');
-    title.innerHTML = "Загрузка...";
     cardsDiv.innerHTML = "";
     tile.classList.remove('has-expired');
     tile.style.minHeight = '140px';
@@ -996,13 +996,20 @@ async function renderCategoryChart(animate = true) {
     '☕ Кофе': '#ffb86b',
     '📦 Прочее': '#ff6b81'
   };
+  const shortNames = {
+    '🍯 Сиропы': 'Сиропы',
+    '🥕 Ингредиенты': 'Ингр.',
+    '☕ Кофе': 'Кофе',
+    '📦 Прочее': 'Прочее'
+  };
   let chart = `<div class=\"category-chart-tile\">
     <div class=\"chart-title\">Статистика по категориям</div>
     <div class=\"chart-bars\">
       ${Object.entries(data).map(([cat, val], i) => `
         <div class=\"chart-bar-wrap\">
-          <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 0 0 16px 16px / 0 0 24px 24px;\"></div>
+          <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 16px 16px 8px 8px / 24px 24px 8px 8px;\"></div>
           <div class=\"chart-bar-label\">${icons[cat]}</div>
+          <div class=\"chart-bar-name\">${shortNames[cat]}</div>
           <div class=\"chart-bar-value\">${val}</div>
         </div>
       `).join('')}
@@ -1010,7 +1017,7 @@ async function renderCategoryChart(animate = true) {
   </div>`;
   let expiredBlock = mainDiv.querySelector('.beautiful-form');
   let old = mainDiv.querySelector('.category-chart-tile');
-  if (old) old.remove();
+  if (old) return;
   if (expiredBlock) {
     expiredBlock.insertAdjacentHTML('afterend', chart);
   } else {
@@ -1020,7 +1027,7 @@ async function renderCategoryChart(animate = true) {
     setTimeout(() => {
       mainDiv.querySelectorAll('.category-chart-tile .chart-bar').forEach((bar, idx) => {
         let final = bar.getAttribute('data-final');
-        bar.style.transition = 'height 0.9s cubic-bezier(.4,0,.2,1)';
+        bar.style.transition = 'height 0.9s cubic-bezier(.4,0,.2,1), border-radius 0.5s';
         setTimeout(() => {
           bar.style.height = final + 'px';
           bar.style.borderRadius = '16px 16px 8px 8px / 24px 24px 8px 8px';
