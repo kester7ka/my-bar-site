@@ -978,17 +978,21 @@ body.dark .modal-title .modal-name-box {
 }
 .bottom-nav {
   position: fixed;
-  left: 0; right: 0; bottom: 0;
+  left: 0; right: 0; bottom: 18px;
   height: 66px;
-  background: linear-gradient(90deg, #151c24 0%, #190631 100%);
+  background: rgba(21,28,36,0.72);
   box-shadow: 0 -4px 32px #000a, 0 1.5px 0 #232b33 inset;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   z-index: 100;
-  border-radius: 18px 18px 0 0;
-  padding: 0 6px;
+  border-radius: 22px 22px 18px 18px;
+  padding: 0 18px;
   gap: 0;
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1.5px solid #232b33cc;
+  transition: background 0.23s, box-shadow 0.23s;
 }
 .nav-btn {
   background: none;
@@ -1037,13 +1041,13 @@ body.dark .modal-title .modal-name-box {
   pointer-events: none;
 }
 @media (max-width: 700px) {
-  .bottom-nav { height: 60px; }
+  .bottom-nav { height: 60px; bottom: 10px; padding: 0 6px; }
   .nav-btn { width: 42px; height: 42px; }
   .nav-btn.nav-add { width: 50px; height: 50px; }
   .nav-ico { width: 24px; height: 24px; }
 }
 @media (max-width: 400px) {
-  .bottom-nav { height: 54px; }
+  .bottom-nav { height: 54px; bottom: 4px; }
   .nav-btn { width: 36px; height: 36px; }
   .nav-btn.nav-add { width: 42px; height: 42px; }
   .nav-ico { width: 20px; height: 20px; }
