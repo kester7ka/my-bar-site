@@ -510,32 +510,51 @@ function showAddPage() {
   };
 }
 function renderCard(r, actions = true) {
-  let badgeCol = `<div class="card-header-col">
-    <div class="card-badge category-badge">${escapeHtml(r.category)}</div>
-    <div class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</div>
-  </div>`;
-  let title = `<div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>`;
-  let rows = `
-    <div class="card-row"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
-    <div class="card-row"><b>Открыто:</b> ${escapeHtml(r.opened_at)}</div>
-    <div class="card-row"><b>Годен до:</b> ${escapeHtml(r.expiry_at)}</div>
+  // Цвета и иконки по категориям
+  const accent = {
+    '🍯 Сиропы': '#7b7bff',
+    '🥕 Ингредиенты': '#7bffb7',
+    '☕ Кофе': '#ffb86b',
+    '📦 Прочее': '#ff6b81'
+  }[r.category] || '#7b7bff';
+  const icons = {
+    '🍯 Сиропы': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7b7bff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '🥕 Ингредиенты': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7bffb7' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '☕ Кофе': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ffb86b' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '📦 Прочее': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ff6b81' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`
+  };
+  let status = `<span class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</span>`;
+  let main = `
+    <div class="card-main">
+      <div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
+      <div class="card-row"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
+      <div class="card-row"><b>Открыто:</b> ${escapeHtml(r.opened_at)}</div>
+      <div class="card-row"><b>Годен до:</b> ${escapeHtml(r.expiry_at)}</div>
+    </div>
   `;
   let buttons = "";
   if (actions) {
-    if (r.opened == 1) {
-      buttons = `<div class="card-actions-bottom">
-        <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
-        <button class="deletebtn" onclick="showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
-      </div>`;
-    } else {
-      buttons = `<div class="card-actions-bottom">
-        <button class="openbtn" onclick="showOpenModal('${encodeURIComponent(JSON.stringify(r))}')">Открыть</button>
-        <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">Изменить</button>
-        <button class="deletebtn" onclick="showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
-      </div>`;
-    }
+    buttons = `<div class="card-actions-bottom">
+      <button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">
+        <svg width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216.49 79.51l-40-40a12 12 0 0 0-17 0l-96 96A12 12 0 0 0 56 143v40a12 12 0 0 0 12 12h40a12 12 0 0 0 8.49-3.51l96-96a12 12 0 0 0 0-17ZM104 188H68v-36l80-80 36 36ZM192 96l-32-32 16-16 32 32Z'/></svg>
+        Изменить
+      </button>
+      <button class="deletebtn" onclick="showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')">
+        <svg width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 48h-40V40a24 24 0 0 0-48 0v8H40a8 8 0 0 0 0 16h8v144a24 24 0 0 0 24 24h104a24 24 0 0 0 24-24V64h8a8 8 0 0 0 0-16ZM104 40a8 8 0 0 1 16 0v8h-16Zm96 168a8 8 0 0 1-8 8H88a8 8 0 0 1-8-8V64h120Zm-32-80a8 8 0 0 1-8 8h-48a8 8 0 0 1 0-16h48a8 8 0 0 1 8 8Z'/></svg>
+        Удалить
+      </button>
+      ${r.opened == 0 ? `<button class="openbtn" onclick="showOpenModal('${encodeURIComponent(JSON.stringify(r))}')">
+        <svg width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg>
+        Открыть
+      </button>` : ''}
+    </div>`;
   }
-  return `<div class="item-card">${badgeCol}${title}${rows}${buttons}</div>`;
+  return `<div class="item-card" style="--card-accent:${accent}">
+    <div class="card-category-icon">${icons[r.category]||''}</div>
+    ${main}
+    ${status}
+    ${buttons}
+  </div>`;
 }
 function showSearchPage() {
   setPageTitle('Поиск');
