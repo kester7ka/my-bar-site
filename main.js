@@ -552,7 +552,7 @@ function renderCard(r, actions = true) {
 function showSearchPage() {
   setPageTitle('Поиск');
   showPage(addBackButton(`
-    <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
+    <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:480px;">
       <input id="searchInput" type="text" placeholder="Поиск по TOB или названию" style="margin-bottom:7px;">
       <div id="categoryStatusBar"></div>
       <div id="searchResults" style="min-height:90px;"></div>
@@ -566,6 +566,24 @@ function showSearchPage() {
   const resultsDiv = document.getElementById('searchResults');
   const barDiv = document.getElementById('categoryStatusBar');
 
+  function closeDropdowns() {
+    document.querySelectorAll('.category-dropdown, .status-dropdown').forEach(d => d.classList.remove('open'));
+    let mb = document.getElementById('modalBackdrop');
+    if (mb) mb.remove();
+  }
+
+  function openModalDropdown(type) {
+    closeDropdowns();
+    let mb = document.createElement('div');
+    mb.className = 'modal-backdrop';
+    mb.id = 'modalBackdrop';
+    mb.onclick = closeDropdowns;
+    document.body.appendChild(mb);
+    setTimeout(() => {
+      document.getElementById(type).classList.add('open');
+    }, 10);
+  }
+
   function renderBar() {
     barDiv.innerHTML = renderCategoryStatusBar(filterCategory, filterOpened);
     // Категории dropdown
@@ -573,13 +591,12 @@ function showSearchPage() {
     const catDropdown = document.getElementById('categoryDropdown');
     catBtn.onclick = function(e) {
       e.stopPropagation();
-      catDropdown.classList.toggle('open');
-      statusDropdown.classList.remove('open');
+      openModalDropdown('categoryDropdown');
     };
     catDropdown.querySelectorAll('.category-dropdown-btn').forEach(btn => {
       btn.onclick = function(e) {
         filterCategory = this.getAttribute('data-value');
-        catDropdown.classList.remove('open');
+        closeDropdowns();
         renderBar();
         renderList();
       };
@@ -589,23 +606,16 @@ function showSearchPage() {
     const statusDropdown = document.getElementById('statusDropdown');
     statusBtn.onclick = function(e) {
       e.stopPropagation();
-      statusDropdown.classList.toggle('open');
-      catDropdown.classList.remove('open');
+      openModalDropdown('statusDropdown');
     };
     statusDropdown.querySelectorAll('.status-dropdown-btn').forEach(btn => {
       btn.onclick = function(e) {
         filterOpened = this.getAttribute('data-value');
-        statusDropdown.classList.remove('open');
+        closeDropdowns();
         renderBar();
         renderList();
       };
     });
-    // Закрытие dropdown по клику вне
-    document.addEventListener('click', closeDropdowns, { once: true });
-    function closeDropdowns() {
-      catDropdown.classList.remove('open');
-      statusDropdown.classList.remove('open');
-    }
   }
 
   resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
@@ -1050,9 +1060,9 @@ if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.disableC
 }
 
 // Фильтр категорий и статуса под поиском: одна строка, две кнопки, выпадающий список для категорий и статусов
-function renderCategoryStatusBar(filterCategory, filterOpened, onCategory, onStatus) {
+function renderCategoryStatusBar(filterCategory, filterOpened) {
   const categories = [
-    { value: "", label: "Все категории", color: "#7b7bff", icon: "🍯" },
+    { value: "", label: "Все категории", color: "#7b7bff", icon: "" },
     { value: "🍯 Сиропы", label: "Сиропы", color: "#7b7bff", icon: "🍯" },
     { value: "🥕 Ингредиенты", label: "Ингредиенты", color: "#7bffb7", icon: "🥕" },
     { value: "☕ Кофе", label: "Кофе", color: "#ffb86b", icon: "☕" },
@@ -1064,10 +1074,10 @@ function renderCategoryStatusBar(filterCategory, filterOpened, onCategory, onSta
     { value: "0", label: "Закрыто", color: "#ff6b81" }
   ];
   let cat = categories.find(c => c.value === filterCategory) || categories[0];
-  let catBtn = `<button class="category-filter-btn${filterCategory ? ' selected' : ''}" style="--cat-color:${cat.color}" id="categoryFilterBtn">${cat.icon} ${cat.label}</button>`;
+  let catBtn = `<button class="category-filter-btn${filterCategory ? ' selected' : ''}" style="--cat-color:${cat.color}" id="categoryFilterBtn">${cat.icon ? `<span class='cat-emoji'>${cat.icon}</span>` : ''} ${cat.label}</button>`;
   let status = statuses.find(s => s.value === filterOpened) || statuses[0];
   let statusBtn = `<button class="status-filter-btn${filterOpened !== '' ? ' selected' : ''}" data-status="${status.value}" id="statusFilterBtn">${status.label}</button>`;
-  let catDropdown = `<div class="category-dropdown" id="categoryDropdown">${categories.map(c => `<button class="category-dropdown-btn${c.value===filterCategory?' selected':''}" style="--cat-color:${c.color}" data-value="${c.value}">${c.icon} ${c.label}</button>`).join('')}</div>`;
+  let catDropdown = `<div class="category-dropdown" id="categoryDropdown">${categories.map((c,i) => `<button class="category-dropdown-btn${c.value===filterCategory?' selected':''}${i===0?' first':''}" style="--cat-color:${c.color}" data-value="${c.value}">${c.icon ? `<span class='cat-emoji'>${c.icon}</span>` : ''} ${c.label}</button>`).join('')}</div>`;
   let statusDropdown = `<div class="status-dropdown" id="statusDropdown">${statuses.map(s => `<button class="status-dropdown-btn${s.value===filterOpened?' selected':''}" style="--cat-color:${s.color}" data-value="${s.value}">${s.label}</button>`).join('')}</div>`;
   return `<div class="filter-bar-wrap" style="position:relative;">${catBtn}${catDropdown}${statusBtn}${statusDropdown}</div>`;
 }
