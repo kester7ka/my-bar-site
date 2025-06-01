@@ -409,27 +409,39 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   max-width: 100%;
 }
 .card-actions-bottom .editbtn {
-  background: linear-gradient(90deg, #7b7bff 60%, #232b33 100%);
+  background: #7b7bff;
   color: #fff;
-  box-shadow: 0 2px 16px #7b7bff55;
-  border: 1.5px solid #7b7bff44;
+  box-shadow: 0 2px 8px #7b7bff33;
+  border: 1.5px solid #7b7bff33;
+  font-size: 0.98em;
+  padding: 8px 0;
 }
-.card-actions-bottom .editbtn:active {
-  background: linear-gradient(90deg, #232b33 60%, #7b7bff 100%);
-  color: #fff;
+.card-actions-bottom .editbtn svg {
+  width: 22px;
+  height: 22px;
 }
 .card-actions-bottom .deletebtn {
-  background: linear-gradient(90deg, #ff6b81 60%, #232b33 100%);
+  background: #ff6b81;
   color: #fff;
-  box-shadow: 0 2px 16px #ff6b8155;
-  border: 1.5px solid #ff6b8144;
+  box-shadow: 0 2px 8px #ff6b8133;
+  border: 1.5px solid #ff6b8133;
+  font-size: 0.98em;
+  padding: 8px 0;
 }
-.card-actions-bottom .deletebtn:active {
-  background: linear-gradient(90deg, #232b33 60%, #ff6b81 100%);
+.card-actions-bottom .deletebtn svg {
+  width: 22px;
+  height: 22px;
+}
+.card-actions-bottom .openbtn {
+  background: #7b7bff;
   color: #fff;
+  font-size: 0.98em;
+  padding: 8px 0;
 }
-.card-actions-bottom .openbtn { background: linear-gradient(90deg, #7b7bff 60%, #232b33 100%); color: #fff; }
-.card-actions-bottom .openbtn:active { background: linear-gradient(90deg, #232b33 60%, #7b7bff 100%); color: #fff; }
+.card-actions-bottom .openbtn svg {
+  width: 22px;
+  height: 22px;
+}
 
 /* Категории и статус фильтр под поиском */
 .filter-bar-wrap {
@@ -897,9 +909,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: #fff;
   box-shadow: 0 2px 16px #7b7bff33;
 }
-.filter-native-select.cat-syrup { background: linear-gradient(90deg, #7b7bff 60%, #232b33 100%); color: #fff; }
-.filter-native-select.cat-ingr { background: linear-gradient(90deg, #7bffb7 60%, #232b33 100%); color: #232b33; }
-.filter-native-select.cat-coffee { background: linear-gradient(90deg, #ffb86b 60%, #232b33 100%); color: #232b33; }
-.filter-native-select.cat-other { background: linear-gradient(90deg, #ff6b81 60%, #232b33 100%); color: #fff; }
-.filter-native-select.status-open { background: linear-gradient(90deg, #7b7bff 60%, #232b33 100%); color: #fff; }
-.filter-native-select.status-closed { background: linear-gradient(90deg, #ff6b81 60%, #232b33 100%); color: #fff; }
+.filter-native-select.cat-syrup { background: #7b7bff; color: #fff; }
+.filter-native-select.cat-ingr { background: #7bffb7; color: #232b33; }
+.filter-native-select.cat-coffee { background: #ffb86b; color: #232b33; }
+.filter-native-select.cat-other { background: #ff6b81; color: #fff; }
+.filter-native-select.status-open { background: #7b7bff; color: #fff; }
+.filter-native-select.status-closed { background: #ff6b81; color: #fff; }
+.card-status-badge {
+  font-size: 0.93em;
+  padding: 5px 13px 5px 13px;
+}
