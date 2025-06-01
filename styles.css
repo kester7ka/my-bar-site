@@ -73,6 +73,7 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  padding-bottom: 90px;
 }
 h2 {
   text-align: left;
@@ -622,12 +623,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: block;
 }
 .chart-bar-label {
-  font-size: 1.05em;
-  color: #b9dbff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 2px;
   margin-top: 0;
   text-align: center;
   font-weight: 700;
+  font-size: 1.5em;
+  color: #b9dbff;
 }
 .chart-bar-value {
   font-size: 1.13em;
@@ -675,4 +679,37 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 50%;
   box-shadow: 0 2px 12px #ffb86b33;
   font-size: 2.1em;
+}
+.expired-tile {
+  position: relative;
+  padding-top: 18px;
+}
+.expired-status-icon {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(80,255,120,0.10);
+  box-shadow: 0 2px 8px #19c37d33;
+  font-size: 1.7em;
+  color: #19c37d;
+  transition: background 0.22s, color 0.22s, box-shadow 0.22s;
+}
+.expired-tile.has-expired .expired-status-icon {
+  background: rgba(255,80,80,0.10);
+  color: #ff6b81;
+  box-shadow: 0 2px 12px #ff6b8133;
+}
+.expired-title-center {
+  text-align: center;
+  font-size: 1.25em;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
+  letter-spacing: 0.01em;
 }
