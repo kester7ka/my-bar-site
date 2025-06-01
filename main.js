@@ -510,19 +510,13 @@ function showAddPage() {
   };
 }
 function renderCard(r, actions = true) {
-  // Цвета и иконки по категориям
+  // Цвета по категориям
   const accent = {
     '🍯 Сиропы': '#7b7bff',
     '🥕 Ингредиенты': '#7bffb7',
     '☕ Кофе': '#ffb86b',
     '📦 Прочее': '#ff6b81'
   }[r.category] || '#7b7bff';
-  const icons = {
-    '🍯 Сиропы': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7b7bff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
-    '🥕 Ингредиенты': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7bffb7' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
-    '☕ Кофе': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ffb86b' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
-    '📦 Прочее': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ff6b81' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`
-  };
   let status = `<span class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</span>`;
   let main = `
     <div class="card-main">
@@ -550,7 +544,6 @@ function renderCard(r, actions = true) {
     </div>`;
   }
   return `<div class="item-card" style="--card-accent:${accent}">
-    <div class="card-category-icon">${icons[r.category]||''}</div>
     ${main}
     ${status}
     ${buttons}
@@ -1059,4 +1052,25 @@ async function renderCategoryChart(animate = true) {
 // Отключаем свайп-вниз для закрытия Telegram WebApp
 if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.disableClosingConfirmation) {
   try { window.Telegram.WebApp.disableClosingConfirmation(); } catch(e) {}
+}
+
+// Фильтр категорий и статуса под поиском: одна строка, две кнопки, выпадающий список для категорий
+function renderCategoryStatusBar(filterCategory, filterOpened, onCategory, onStatus) {
+  const categories = [
+    { value: "", label: "Все категории", color: "#7b7bff", icon: "🍯" },
+    { value: "🍯 Сиропы", label: "Сиропы", color: "#7b7bff", icon: "🍯" },
+    { value: "🥕 Ингредиенты", label: "Ингредиенты", color: "#7bffb7", icon: "🥕" },
+    { value: "☕ Кофе", label: "Кофе", color: "#ffb86b", icon: "☕" },
+    { value: "📦 Прочее", label: "Прочее", color: "#ff6b81", icon: "📦" }
+  ];
+  const statuses = [
+    { value: "", label: "Все статусы" },
+    { value: "1", label: "Открыто" },
+    { value: "0", label: "Закрыто" }
+  ];
+  let cat = categories.find(c => c.value === filterCategory) || categories[0];
+  let catBtn = `<button class="category-filter-btn${filterCategory ? ' selected' : ''}" style="--cat-color:${cat.color}" id="categoryFilterBtn">${cat.icon} ${cat.label}</button>`;
+  let status = statuses.find(s => s.value === filterOpened) || statuses[0];
+  let statusBtn = `<button class="status-filter-btn${filterOpened !== '' ? ' selected' : ''}" id="statusFilterBtn">${status.label}</button>`;
+  return `<div class="filter-bar-wrap">${catBtn}${statusBtn}</div>`;
 }
