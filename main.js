@@ -1033,3 +1033,4 @@ async function renderCategoryChart(animate = true) {
 // Отключаем свайп-вниз для закрытия Telegram WebApp
 if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.disableClosingConfirmation) {
   try { window.Telegram.WebApp.disableClosingConfirmation(); } catch(e) {}
+}
