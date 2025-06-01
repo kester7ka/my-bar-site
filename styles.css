@@ -923,7 +923,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 24px auto 0 auto;
+  margin: 24px auto 32px auto;
   background: #ff6b81;
   color: #fff;
   border-radius: 999px;
@@ -948,5 +948,79 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .big-delete-btn:active {
   background: #e04a5f;
+  color: #fff;
+}
+/* Модалка подтверждения удаления */
+.modal-overlay {
+  position: fixed;
+  z-index: 4000;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(24,28,39,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.36s;
+  flex-direction: column;
+  pointer-events: all;
+  animation: fadeIn 0.33s;
+}
+.modal-dialog {
+  background: rgba(35,43,51,0.98);
+  border-radius: 28px;
+  box-shadow: 0 8px 40px #10131e99, 0 1.5px 7px #232b3340;
+  padding: 36px 28px 28px 28px;
+  min-width: 320px;
+  max-width: 94vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: popIn 0.4s cubic-bezier(.4,0,.2,1);
+}
+.modal-title {
+  font-size: 1.18em;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.modal-buttons-row {
+  display: flex;
+  gap: 18px;
+  margin-top: 18px;
+  width: 100%;
+  justify-content: center;
+}
+.modal-btn {
+  flex: 1 1 0;
+  border-radius: 999px;
+  font-size: 1.08em;
+  padding: 14px 0;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 12px #10131e33;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  transition: box-shadow 0.23s, background 0.23s, transform 0.16s;
+  margin: 0;
+  min-width: 120px;
+  max-width: 100%;
+}
+.modal-btn.deletebtn {
+  background: #ff6b81;
+  color: #fff;
+  box-shadow: 0 2px 16px #ff6b8133;
+}
+.modal-btn.deletebtn:active {
+  background: #e04a5f;
+}
+.modal-btn.cancelbtn {
+  background: #232b33;
+  color: #b9dbff;
+}
+.modal-btn.cancelbtn:active {
+  background: #181c27;
   color: #fff;
 }
