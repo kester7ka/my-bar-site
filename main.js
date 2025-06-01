@@ -98,7 +98,7 @@ if (!userId) {
   throw new Error("Not in Telegram Mini App");
 }
 
-window.showMenu = showMenu;
+window.showMenu = showExpiredPage;
 window.showAddPage = showAddPage;
 window.showExpiredPage = showExpiredPage;
 window.showSearchPage = showSearchPage;
