@@ -128,8 +128,11 @@ h2 {
 .item-card, .beautiful-form, .stat-block {
   padding: 32px 18px;
   background: rgba(35,43,51,0.92);
-  border-radius: 28px;
   box-shadow: 0 8px 40px #10131e99, 0 1.5px 7px #232b3340, 0 1.5px 0.5px #fff2 inset;
+  border-radius: 28px;
+  border: 1.5px solid rgba(255,255,255,0.07);
+  backdrop-filter: blur(18px);
+  transition: box-shadow 0.28s, background 0.22s, transform 0.21s;
   margin-top: 18px;
   margin-bottom: 28px;
   max-width: 440px;
@@ -141,17 +144,6 @@ h2 {
   gap: 22px;
   opacity: 1;
   transform: none;
-  transition: box-shadow 0.28s, background 0.22s, transform 0.21s;
-  border: 1.5px solid rgba(255,255,255,0.07);
-  backdrop-filter: blur(18px);
-}
-.item-card:hover, .beautiful-form:hover, .stat-block:hover {
-  box-shadow: 0 12px 48px #7b7bff33, 0 2px 12px #232b3340, 0 1.5px 0.5px #fff4 inset;
-  transform: translateY(-2px) scale(1.012);
-}
-.item-card:active, .beautiful-form:active, .stat-block:active {
-  box-shadow: 0 4px 16px #7b7bff22, 0 1.5px 7px #232b3340;
-  transform: scale(0.98);
 }
 .stat-row {
   display: flex;
@@ -628,4 +620,68 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .page-anim {
   animation: fadeInTab 0.6s cubic-bezier(.4,0,.2,1);
+}
+.category-chart-tile {
+  background: rgba(35,43,51,0.92);
+  border-radius: 28px;
+  box-shadow: 0 8px 40px #10131e99, 0 1.5px 7px #232b3340, 0 1.5px 0.5px #fff2 inset;
+  border: 1.5px solid rgba(255,255,255,0.07);
+  backdrop-filter: blur(18px);
+  margin: 0 0 28px 0;
+  padding: 28px 18px 22px 18px;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: popIn 0.7s;
+}
+.chart-title {
+  font-size: 1.18em;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 18px;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+.chart-bars {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  min-height: 120px;
+  margin-bottom: 0;
+}
+.chart-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 54px;
+}
+.chart-bar {
+  width: 32px;
+  border-radius: 13px 13px 8px 8px;
+  margin-bottom: 8px;
+  transition: height 0.5s, background 0.3s;
+  box-shadow: 0 4px 24px #7b7bff44;
+  display: block;
+}
+.chart-bar-label {
+  font-size: 1.05em;
+  color: #b9dbff;
+  margin-bottom: 2px;
+  margin-top: 0;
+  text-align: center;
+  font-weight: 700;
+}
+.chart-bar-value {
+  font-size: 1.13em;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 2px;
+  text-shadow: 0 2px 8px #232b3340;
 }
