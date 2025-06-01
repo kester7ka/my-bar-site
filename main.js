@@ -50,9 +50,12 @@ let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : nu
 let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
 console.log('userId:', userId);
 if (!userId) {
-  // Временно для локальной отладки, удалить на проде!
-  userId = 123456789;
-  console.warn('userId не найден, используется тестовый userId:', userId);
+  document.getElementById('main').innerHTML = `
+    <div style="padding:22px 0;text-align:center" class="error">
+      Откройте сайт через Telegram-бота, чтобы пользоваться баром.<br><br>
+      <a href="${botLink}" style="color:#007aff;font-weight:bold" target="_blank">Открыть бота</a>
+    </div>`;
+  throw new Error("Not in Telegram Mini App");
 }
 let username = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "";
 let userPhoto = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : "";
@@ -72,21 +75,13 @@ document.getElementById('wrap').addEventListener('touchstart', function(e) {
   }
 });
 
-if (!userId) {
-  document.getElementById('main').innerHTML = `
-    <div style="padding:22px 0;text-align:center" class="error">
-      Откройте сайт через Telegram-бота, чтобы пользоваться баром.<br><br>
-      <a href="${botLink}" style="color:#007aff;font-weight:bold" target="_blank">Открыть бота</a>
-    </div>`;
-  throw new Error("Not in Telegram Mini App");
-}
-
 window.showMenu = function() {
   setPageTitle('Ингредиенты бара');
   showExpiredPage(true);
   showBottomNav(true);
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('nav-home').classList.add('active');
+  renderCategoryChart();
 };
 
 function showExpiredPage(isMain = false) {
@@ -917,3 +912,46 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     if (fn) fn();
   });
 });
+
+async function renderCategoryChart() {
+  const mainDiv = document.getElementById('main');
+  // Получаем данные
+  let data = { '🍯 Сиропы': 0, '🥕 Ингредиенты': 0, '☕ Кофе': 0, '📦 Прочее': 0 };
+  try {
+    let resp = await fetch(`${backend}/search`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({user_id: userId, query: ""})
+    });
+    let res = await resp.json();
+    if (res.ok && Array.isArray(res.results)) {
+      res.results.forEach(x => { if (data[x.category] !== undefined) data[x.category]++; });
+    }
+  } catch(e) {}
+  // Максимум для нормализации высоты
+  let max = Math.max(...Object.values(data), 1);
+  // Цвета для категорий
+  const colors = {
+    '🍯 Сиропы': '#7b7bff',
+    '🥕 Ингредиенты': '#7bffb7',
+    '☕ Кофе': '#ffb86b',
+    '📦 Прочее': '#ff6b81'
+  };
+  // HTML графика
+  let chart = `<div class="category-chart-tile">
+    <div class="chart-title">Статистика по категориям</div>
+    <div class="chart-bars">
+      ${Object.entries(data).map(([cat, val]) => `
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" style="height:${40 + 80 * (val/max)}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44;"></div>
+          <div class="chart-bar-label">${cat}</div>
+          <div class="chart-bar-value">${val}</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+  // Вставляем плитку перед остальным контентом
+  let old = document.querySelector('.category-chart-tile');
+  if (old) old.remove();
+  mainDiv.insertAdjacentHTML('afterbegin', chart);
+}
