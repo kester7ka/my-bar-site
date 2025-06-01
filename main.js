@@ -100,6 +100,7 @@ if (!userId) {
 }
 
 window.showMenu = function() {
+  setPageTitle('Ингредиенты бара');
   showExpiredPage(true);
   showBottomNav(true);
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -109,7 +110,10 @@ window.showMenu = function() {
 function showExpiredPage(isMain = false) {
   let greet = '';
   if (isMain) {
-    greet = `<div class='welcome-block' style='text-align:center;margin-bottom:18px;'><div class='welcome-greet' style='font-size:2em;'>${getGreeting()}!</div></div>`;
+    let uname = username ? username : '';
+    greet = `<div class='welcome-block' style='text-align:center;margin-bottom:18px;'>
+      <div class='welcome-greet' style='font-size:2.2em;font-weight:800;letter-spacing:0.01em;'>${getGreeting()}, <span style="color:#7b7bff;">${uname}</span>!</div>
+    </div>`;
   }
   let content = `
     <div class="beautiful-form" style="gap:12px;max-width:440px;">
@@ -925,8 +929,14 @@ const navMap = {
   'nav-home': showMenu,
   'nav-search': showSearchPage,
   'nav-add': showAddPage,
-  'nav-info': () => showPage('<div class="beautiful-form" style="text-align:center;font-size:1.2em;">Информация<br><br><span style="color:#888;">Скоро здесь появится что-то полезное!</span></div>'),
-  'nav-profile': () => showPage('<div class="beautiful-form" style="text-align:center;font-size:1.2em;">Профиль<br><br><span style="color:#888;">Скоро здесь появится ваш профиль!</span></div>'),
+  'nav-info': () => {
+    setPageTitle('Информация');
+    showPage('<div class="beautiful-form" style="text-align:center;font-size:1.2em;">Информация<br><br><span style="color:#888;">Скоро здесь появится что-то полезное!</span></div>');
+  },
+  'nav-profile': () => {
+    setPageTitle('Профиль');
+    showPage('<div class="beautiful-form" style="text-align:center;font-size:1.2em;">Профиль<br><br><span style="color:#888;">Скоро здесь появится ваш профиль!</span></div>');
+  },
 };
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', function() {
