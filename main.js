@@ -915,3 +915,20 @@ async function startApp() {
   }
 }
 startApp();
+
+// Нижняя навигация
+const navMap = {
+  'nav-home': showMenu,
+  'nav-search': showSearchPage,
+  'nav-add': showAddPage,
+  'nav-info': () => showPage('<div class="beautiful-form" style="text-align:center;font-size:1.2em;">Информация<br><br><span style="color:#888;">Скоро здесь появится что-то полезное!</span></div>'),
+  'nav-profile': () => showPage('<div class="beautiful-form" style="text-align:center;font-size:1.2em;">Профиль<br><br><span style="color:#888;">Скоро здесь появится ваш профиль!</span></div>'),
+};
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const fn = navMap[this.id];
+    if (fn) fn();
+  });
+});
