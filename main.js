@@ -77,10 +77,21 @@ document.getElementById('wrap').addEventListener('touchstart', function(e) {
 
 let chartAnimated = false;
 window.showMenu = function() {
-  setPageTitle('Ингредиенты бара');
+  setPageTitle('Главная');
   showExpiredPage(true, function() {
     renderCategoryChart(!chartAnimated);
     chartAnimated = true;
+    let filler = document.getElementById('scrollFiller');
+    if (!filler) {
+      const mainDiv = document.getElementById('main');
+      const div = document.createElement('div');
+      div.id = 'scrollFiller';
+      div.style.height = '30vh';
+      div.style.minHeight = '120px';
+      div.style.width = '100%';
+      div.style.pointerEvents = 'none';
+      mainDiv.appendChild(div);
+    }
   });
   showBottomNav(true);
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -142,6 +153,7 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     tile.classList.remove('has-expired');
     tile.style.minHeight = '140px';
     tile.style.maxHeight = '340px';
+    tile.style.transition = 'max-height 0.9s cubic-bezier(.4,0,.2,1)';
     let msNow = msTimeNow();
     let dateToCheck = new Date(msNow);
     if (filter === 'tomorrow') {
@@ -202,10 +214,8 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         });
         cards += `</div>`;
         cardsDiv.innerHTML = cards;
-        // Плавное расширение плитки
         setTimeout(() => {
           tile.classList.add('has-expired');
-          tile.style.minHeight = (140 + filtered.length * 110) + 'px';
           tile.style.maxHeight = (340 + filtered.length * 110) + 'px';
           statusIcon.style.color = '#ff6b81';
           statusIcon.style.background = 'rgba(255,80,80,0.10)';
@@ -975,17 +985,23 @@ async function renderCategoryChart(animate = true) {
   } catch(e) {}
   let max = Math.max(...Object.values(data), 1);
   const icons = {
-    '🍯 Сиропы': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><path d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z' fill='#7b7bff'/></svg>`,
-    '🥕 Ингредиенты': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><path d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z' fill='#7bffb7'/></svg>`,
-    '☕ Кофе': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><path d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z' fill='#ffb86b'/></svg>`,
-    '📦 Прочее': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><path d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z' fill='#ff6b81'/></svg>`
+    '🍯 Сиропы': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7b7bff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '🥕 Ингредиенты': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7bffb7' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '☕ Кофе': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ffb86b' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '📦 Прочее': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ff6b81' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`
+  };
+  const colors = {
+    '🍯 Сиропы': '#7b7bff',
+    '🥕 Ингредиенты': '#7bffb7',
+    '☕ Кофе': '#ffb86b',
+    '📦 Прочее': '#ff6b81'
   };
   let chart = `<div class=\"category-chart-tile\">
     <div class=\"chart-title\">Статистика по категориям</div>
     <div class=\"chart-bars\">
       ${Object.entries(data).map(([cat, val], i) => `
         <div class=\"chart-bar-wrap\">
-          <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${icons[cat] ? '' : '#7b7bff'};box-shadow:0 4px 24px #0002; border-radius: 0 0 16px 16px / 0 0 24px 24px;\"></div>
+          <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 0 0 16px 16px / 0 0 24px 24px;\"></div>
           <div class=\"chart-bar-label\">${icons[cat]}</div>
           <div class=\"chart-bar-value\">${val}</div>
         </div>
@@ -1017,4 +1033,3 @@ async function renderCategoryChart(animate = true) {
 // Отключаем свайп-вниз для закрытия Telegram WebApp
 if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.disableClosingConfirmation) {
   try { window.Telegram.WebApp.disableClosingConfirmation(); } catch(e) {}
-}
