@@ -558,7 +558,6 @@ function showSearchPage() {
       <div id="searchResults" style="min-height:90px;"></div>
     </div>
   `));
-  ensureTheme && ensureTheme();
 
   let filterCategory = "";
   let filterOpened = "";
