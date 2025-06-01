@@ -1012,11 +1012,13 @@ async function renderCategoryChart(animate = true) {
     '📦 Прочее': 'Прочее'
   };
   // Сетка (div-слои)
+  const chartHeight = 140; // px, высота области графика между осью X и верхней линией
   let gridHtml = `<div class='chart-grid${animate ? ' chart-grid-animate' : ''}'>`;
   gridLines.forEach((y, i) => {
     if (y === 0) return; // не рисуем линию на оси X
     let percent = 100 - (y / max) * 100;
-    gridHtml += `<div class='chart-grid-line' style='bottom:${percent}%;'><span class='chart-grid-label'>${y}</span></div>`;
+    let px = (y / max) * chartHeight;
+    gridHtml += `<div class='chart-grid-line' style='bottom:${38 + px}px;'><span class='chart-grid-label'>${y}</span></div>`;
   });
   gridHtml += `</div>`;
   let chart = `<div class=\"category-chart-tile\">
@@ -1025,14 +1027,15 @@ async function renderCategoryChart(animate = true) {
       <div class=\"chart-x-axis\"></div>
       ${gridHtml}
       <div class=\"chart-bars\">
-        ${Object.entries(data).map(([cat, val], i) => `
-          <div class=\"chart-bar-wrap\">
-            <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 16px 16px 8px 8px / 24px 24px 8px 8px;\"></div>
+        ${Object.entries(data).map(([cat, val], i) => {
+          let barHeight = Math.round((val / max) * chartHeight);
+          return `<div class=\"chart-bar-wrap\">
+            <div class=\"chart-bar\" data-final=\"${barHeight}\" style=\"height:${animate ? 0 : barHeight}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 16px 16px 8px 8px / 24px 24px 8px 8px;\"></div>
             <div class=\"chart-bar-label\">${icons[cat]}</div>
             <div class=\"chart-bar-name\">${shortNames[cat]}</div>
             <div class=\"chart-bar-value\">${val}</div>
-          </div>
-        `).join('')}
+          </div>`;
+        }).join('')}
       </div>
     </div>
   </div>`;
