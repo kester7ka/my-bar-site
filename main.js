@@ -882,7 +882,7 @@ async function startApp() {
   let t0 = Date.now();
   showPage(`
     <div class="welcome-block">
-      <div class="welcome-greet">${escapeHtml(welcomeGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
+      <div class="welcome-greet">${escapeHtml(getGreeting())},<br>${USER ? escapeHtml(USER.username) : ""}!</div>
       ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
     </div>
   `);
@@ -901,7 +901,7 @@ async function startApp() {
       setPageTitle('Добро пожаловать');
       showPage(`
         <div class="welcome-block">
-          <div class="welcome-greet">${escapeHtml(welcomeGreeting())}, гость!</div>
+          <div class="welcome-greet">${escapeHtml(getGreeting())}, гость!</div>
           <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
           <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
         </div>
