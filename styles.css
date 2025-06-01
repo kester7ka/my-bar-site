@@ -919,3 +919,34 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-size: 0.93em;
   padding: 5px 13px 5px 13px;
 }
+.big-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24px auto 0 auto;
+  background: #ff6b81;
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: 0 2px 16px #ff6b8133;
+  border: none;
+  font-size: 1.13em;
+  font-weight: 700;
+  padding: 18px 0;
+  width: 90%;
+  max-width: 420px;
+  min-width: 0;
+  min-height: 54px;
+  cursor: pointer;
+  transition: background 0.22s, color 0.22s, box-shadow 0.22s;
+  outline: none;
+  gap: 12px;
+}
+.big-delete-btn svg {
+  width: 26px;
+  height: 26px;
+  margin-right: 8px;
+}
+.big-delete-btn:active {
+  background: #e04a5f;
+  color: #fff;
+}
