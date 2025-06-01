@@ -75,9 +75,13 @@ document.getElementById('wrap').addEventListener('touchstart', function(e) {
   }
 });
 
+let chartAnimated = false;
 window.showMenu = function() {
   setPageTitle('Ингредиенты бара');
-  showExpiredPage(true, renderCategoryChart);
+  showExpiredPage(true, function() {
+    renderCategoryChart(!chartAnimated);
+    chartAnimated = true;
+  });
   showBottomNav(true);
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('nav-home').classList.add('active');
@@ -88,19 +92,20 @@ function showExpiredPage(isMain = false, afterRenderCb) {
   if (isMain) {
     let uname = username ? username : '';
     greet = `<div class='welcome-block' style='text-align:center;margin-bottom:18px;'>
-      <div class='welcome-greet' style='font-size:2.2em;font-weight:800;letter-spacing:0.01em;'>${getGreeting()}, <span style="color:#7b7bff;">${uname}</span>!</div>
+      <div class='welcome-greet' style='font-size:2.2em;font-weight:800;letter-spacing:0.01em;'>${getGreeting()}, <span style=\"color:#7b7bff;\">${uname}</span>!</div>
     </div>`;
   }
   let content = `
-    <div class="beautiful-form expired-tile" id="expiredTile" style="gap:12px;max-width:440px;">
-      <div class="expired-icon">
-        <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='currentColor' opacity='0.15'/><path fill='currentColor' d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Zm0 88a16 16 0 1 0 0-32 16 16 0 0 0 0 32Z'/></svg>
+    <div class=\"beautiful-form expired-tile\" id=\"expiredTile\">
+      <div class=\"expired-status-icon\" id=\"expiredStatusIcon\">
+        <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='currentColor' opacity='0.15'/><path fill='currentColor' d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Zm0 88a16 16 0 1 0 0-32 16 16 0 0 0 0 32Z'/></svg>
       </div>
-      <div class="filter-bar-wrap" style="margin-bottom:0;">
-        <div class="filter-bar-section" id="expiredDayFilter"></div>
+      <div class=\"expired-title-center\">Некондиция</div>
+      <div class=\"filter-bar-wrap\" style=\"margin-bottom:0;\">
+        <div class=\"filter-bar-section\" id=\"expiredDayFilter\"></div>
       </div>
-      <div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>
-      <div id="expiredCards"></div>
+      <div id=\"expiredTitle\" style=\"text-align:center;color:#aaa;font-size:1.07em;\">Загрузка...</div>
+      <div id=\"expiredCards\"></div>
     </div>
   `;
   if (!isMain) content = addBackButton(content);
@@ -131,8 +136,10 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     const title = document.getElementById('expiredTitle');
     const cardsDiv = document.getElementById('expiredCards');
     const tile = document.getElementById('expiredTile');
+    const statusIcon = document.getElementById('expiredStatusIcon');
     title.innerHTML = "Загрузка...";
     cardsDiv.innerHTML = "";
+    tile.classList.remove('has-expired');
     tile.style.minHeight = '140px';
     tile.style.maxHeight = '340px';
     let msNow = msTimeNow();
@@ -148,19 +155,27 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
       .then(r=>r.json())
       .then(data=>{
+        let filtered;
+        if (data.ok) {
+          if (filter === 'today') {
+            filtered = (data.results||[]).filter(x=>x.expiry_at && x.expiry_at <= checkDate);
+          } else {
+            filtered = (data.results||[]).filter(x=>x.expiry_at === checkDate);
+          }
+        } else {
+          filtered = [];
+        }
         if(!data.ok) {
           title.innerHTML = "Ошибка: "+escapeHtml(data.error);
           cardsDiv.innerHTML = "";
+          tile.classList.remove('has-expired');
           tile.style.minHeight = '140px';
           tile.style.maxHeight = '340px';
+          statusIcon.style.color = '#19c37d';
+          statusIcon.style.background = 'rgba(80,255,120,0.10)';
+          statusIcon.style.boxShadow = '0 2px 8px #19c37d33';
           if (afterRenderCb) afterRenderCb();
           return;
-        }
-        let filtered;
-        if (filter === 'today') {
-          filtered = (data.results||[]).filter(x=>x.expiry_at && x.expiry_at <= checkDate);
-        } else {
-          filtered = (data.results||[]).filter(x=>x.expiry_at === checkDate);
         }
         if(!filtered.length) {
           title.innerHTML = filter === 'today'
@@ -168,8 +183,12 @@ function showExpiredPage(isMain = false, afterRenderCb) {
             : "Нет позиций, которые просрочатся завтра!";
           title.className = "success";
           cardsDiv.innerHTML = "";
+          tile.classList.remove('has-expired');
           tile.style.minHeight = '140px';
           tile.style.maxHeight = '340px';
+          statusIcon.style.color = '#19c37d';
+          statusIcon.style.background = 'rgba(80,255,120,0.10)';
+          statusIcon.style.boxShadow = '0 2px 8px #19c37d33';
           if (afterRenderCb) afterRenderCb();
           return;
         }
@@ -177,7 +196,7 @@ function showExpiredPage(isMain = false, afterRenderCb) {
           ? "Сегодня и ранее истекают:"
           : "Завтра истекают:";
         title.className = "";
-        let cards = `<div class="card-list">`;
+        let cards = `<div class=\"card-list\">`;
         filtered.forEach(x=>{
           cards += renderCard(x, false);
         });
@@ -185,16 +204,24 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         cardsDiv.innerHTML = cards;
         // Плавное расширение плитки
         setTimeout(() => {
+          tile.classList.add('has-expired');
           tile.style.minHeight = (140 + filtered.length * 110) + 'px';
           tile.style.maxHeight = (340 + filtered.length * 110) + 'px';
+          statusIcon.style.color = '#ff6b81';
+          statusIcon.style.background = 'rgba(255,80,80,0.10)';
+          statusIcon.style.boxShadow = '0 2px 12px #ff6b8133';
         }, 60);
         if (afterRenderCb) afterRenderCb();
       })
       .catch(e => {
         title.innerHTML = "Ошибка сети: " + escapeHtml(e.message);
         cardsDiv.innerHTML = "";
+        tile.classList.remove('has-expired');
         tile.style.minHeight = '140px';
         tile.style.maxHeight = '340px';
+        statusIcon.style.color = '#19c37d';
+        statusIcon.style.background = 'rgba(80,255,120,0.10)';
+        statusIcon.style.boxShadow = '0 2px 8px #19c37d33';
         if (afterRenderCb) afterRenderCb();
       });
   }
@@ -932,7 +959,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
   });
 });
 
-async function renderCategoryChart() {
+async function renderCategoryChart(animate = true) {
   const mainDiv = document.getElementById('main');
   let data = { '🍯 Сиропы': 0, '🥕 Ингредиенты': 0, '☕ Кофе': 0, '📦 Прочее': 0 };
   try {
@@ -947,20 +974,20 @@ async function renderCategoryChart() {
     }
   } catch(e) {}
   let max = Math.max(...Object.values(data), 1);
-  const colors = {
-    '🍯 Сиропы': '#7b7bff',
-    '🥕 Ингредиенты': '#7bffb7',
-    '☕ Кофе': '#ffb86b',
-    '📦 Прочее': '#ff6b81'
+  const icons = {
+    '🍯 Сиропы': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><path d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z' fill='#7b7bff'/></svg>`,
+    '🥕 Ингредиенты': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><path d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z' fill='#7bffb7'/></svg>`,
+    '☕ Кофе': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><path d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z' fill='#ffb86b'/></svg>`,
+    '📦 Прочее': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><path d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z' fill='#ff6b81'/></svg>`
   };
-  let chart = `<div class="category-chart-tile">
-    <div class="chart-title">Статистика по категориям</div>
-    <div class="chart-bars">
+  let chart = `<div class=\"category-chart-tile\">
+    <div class=\"chart-title\">Статистика по категориям</div>
+    <div class=\"chart-bars\">
       ${Object.entries(data).map(([cat, val], i) => `
-        <div class="chart-bar-wrap">
-          <div class="chart-bar" data-final="${40 + 80 * (val/max)}" style="height:0px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 0 0 16px 16px / 0 0 24px 24px;"></div>
-          <div class="chart-bar-label">${cat}</div>
-          <div class="chart-bar-value">${val}</div>
+        <div class=\"chart-bar-wrap\">
+          <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${icons[cat] ? '' : '#7b7bff'};box-shadow:0 4px 24px #0002; border-radius: 0 0 16px 16px / 0 0 24px 24px;\"></div>
+          <div class=\"chart-bar-label\">${icons[cat]}</div>
+          <div class=\"chart-bar-value\">${val}</div>
         </div>
       `).join('')}
     </div>
@@ -973,14 +1000,21 @@ async function renderCategoryChart() {
   } else {
     mainDiv.insertAdjacentHTML('beforeend', chart);
   }
-  setTimeout(() => {
-    mainDiv.querySelectorAll('.category-chart-tile .chart-bar').forEach((bar, idx) => {
-      let final = bar.getAttribute('data-final');
-      bar.style.transition = 'height 0.9s cubic-bezier(.4,0,.2,1)';
-      setTimeout(() => {
-        bar.style.height = final + 'px';
-        bar.style.borderRadius = '16px 16px 8px 8px / 24px 24px 8px 8px';
-      }, 120 + idx * 120);
-    });
-  }, 80);
+  if (animate) {
+    setTimeout(() => {
+      mainDiv.querySelectorAll('.category-chart-tile .chart-bar').forEach((bar, idx) => {
+        let final = bar.getAttribute('data-final');
+        bar.style.transition = 'height 0.9s cubic-bezier(.4,0,.2,1)';
+        setTimeout(() => {
+          bar.style.height = final + 'px';
+          bar.style.borderRadius = '16px 16px 8px 8px / 24px 24px 8px 8px';
+        }, 120 + idx * 120);
+      });
+    }, 80);
+  }
+}
+
+// Отключаем свайп-вниз для закрытия Telegram WebApp
+if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.disableClosingConfirmation) {
+  try { window.Telegram.WebApp.disableClosingConfirmation(); } catch(e) {}
 }
