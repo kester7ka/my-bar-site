@@ -1014,6 +1014,7 @@ async function renderCategoryChart(animate = true) {
   // Сетка (div-слои)
   let gridHtml = `<div class='chart-grid${animate ? ' chart-grid-animate' : ''}'>`;
   gridLines.forEach((y, i) => {
+    if (y === 0) return; // не рисуем линию на оси X
     let percent = 100 - (y / max) * 100;
     gridHtml += `<div class='chart-grid-line' style='bottom:${percent}%;'><span class='chart-grid-label'>${y}</span></div>`;
   });
@@ -1021,6 +1022,7 @@ async function renderCategoryChart(animate = true) {
   let chart = `<div class=\"category-chart-tile\">
     <div class=\"chart-title\">Статистика по категориям</div>
     <div class=\"chart-bars-wrap\">
+      <div class=\"chart-x-axis\"></div>
       ${gridHtml}
       <div class=\"chart-bars\">
         ${Object.entries(data).map(([cat, val], i) => `
