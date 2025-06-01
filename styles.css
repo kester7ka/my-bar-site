@@ -504,7 +504,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   position: fixed;
   left: 50%;
   bottom: 32px;
-  transform: translateX(-50%);
+  right: auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -554,11 +554,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 @media (max-width: 600px) {
   .bottom-nav {
-    width: 98vw;
-    max-width: 100vw;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-width: none;
     padding: 10px 4vw 8px 4vw;
     border-radius: 22px;
     bottom: 14px;
+    transform: none;
   }
   .nav-btn {
     width: 42px;
