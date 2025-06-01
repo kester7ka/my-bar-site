@@ -66,6 +66,12 @@ ensureTheme();
 
 let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+console.log('userId:', userId);
+if (!userId) {
+  // Временно для локальной отладки, удалить на проде!
+  userId = 123456789;
+  console.warn('userId не найден, используется тестовый userId:', userId);
+}
 let username = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? (tg.initDataUnsafe.user.username||tg.initDataUnsafe.user.first_name) : "";
 let userPhoto = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url ? tg.initDataUnsafe.user.photo_url : "";
 const backend = "https://web-production-2c7db.up.railway.app";
@@ -162,6 +168,7 @@ function showExpiredPage(isMain = false) {
     fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
       .then(r=>r.json())
       .then(data=>{
+        console.log('Ответ сервера:', data);
         if(!data.ok) {
           title.innerHTML = "Ошибка: "+escapeHtml(data.error);
           cardsDiv.innerHTML = "";
@@ -192,6 +199,10 @@ function showExpiredPage(isMain = false) {
         cards += `</div>`;
         cardsDiv.innerHTML = cards;
         ensureTheme();
+      })
+      .catch(e => {
+        title.innerHTML = "Ошибка сети: " + escapeHtml(e.message);
+        cardsDiv.innerHTML = "";
       });
   }
 }
