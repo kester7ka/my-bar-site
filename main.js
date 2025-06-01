@@ -99,21 +99,29 @@ if (!userId) {
 }
 
 window.showMenu = function() {
-  let greet = `<div class='welcome-block' style='text-align:center;margin-bottom:18px;'><div class='welcome-greet' style='font-size:2em;'>${getGreeting()}!</div></div>`;
-  let content = `
-    <div class=\"beautiful-form\" style=\"gap:12px;max-width:440px;\">
-      <div class=\"filter-bar-wrap\" style=\"margin-bottom:0;\">
-        <div class=\"filter-bar-section\" id=\"expiredDayFilter\"></div>
-      </div>
-      <div id=\"expiredTitle\" style=\"text-align:center;color:#aaa;font-size:1.07em;\">Загрузка...</div>
-      <div id=\"expiredCards\"></div>
-    </div>
-  `;
-  showPage(greet + content);
-  ensureTheme();
+  showExpiredPage(true);
   showBottomNav(true);
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('nav-home').classList.add('active');
+};
+
+function showExpiredPage(isMain = false) {
+  let greet = '';
+  if (isMain) {
+    greet = `<div class='welcome-block' style='text-align:center;margin-bottom:18px;'><div class='welcome-greet' style='font-size:2em;'>${getGreeting()}!</div></div>`;
+  }
+  let content = `
+    <div class="beautiful-form" style="gap:12px;max-width:440px;">
+      <div class="filter-bar-wrap" style="margin-bottom:0;">
+        <div class="filter-bar-section" id="expiredDayFilter"></div>
+      </div>
+      <div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>
+      <div id="expiredCards"></div>
+    </div>
+  `;
+  if (!isMain) content = addBackButton(content);
+  showPage(greet + content);
+  ensureTheme();
 
   let filter = 'today';
   renderDayFilter();
@@ -188,7 +196,6 @@ window.showMenu = function() {
   }
 }
 window.showAddPage = showAddPage;
-window.showExpiredPage = showExpiredPage;
 window.showSearchPage = showSearchPage;
 window.showStatsPage = showStatsPage;
 
@@ -802,93 +809,6 @@ function openReopenForm(rJson, openAfterEdit = false) {
       showSearchPage();
     }
   };
-}
-function showExpiredPage(isMain = false) {
-  setPageTitle('Проверка сроков');
-  let content = `
-    <div class="beautiful-form" style="gap:12px;max-width:440px;">
-      <div class="filter-bar-wrap" style="margin-bottom:0;">
-        <div class="filter-bar-section" id="expiredDayFilter"></div>
-      </div>
-      <div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>
-      <div id="expiredCards"></div>
-    </div>
-  `;
-  if (!isMain) content = addBackButton(content);
-  showPage(content);
-  ensureTheme();
-
-  let filter = 'today';
-  renderDayFilter();
-  fetchAndRender();
-
-  function renderDayFilter() {
-    const bar = document.getElementById('expiredDayFilter');
-    bar.innerHTML = '';
-    [['today', 'Сегодня и ранее'], ['tomorrow','Завтра']].forEach(([val, label]) => {
-      const btn = document.createElement('button');
-      btn.type = "button";
-      btn.className = "filter-btn" + (filter === val ? " selected" : "");
-      btn.innerHTML = label;
-      btn.onclick = () => {
-        filter = val;
-        renderDayFilter();
-        fetchAndRender();
-      };
-      bar.appendChild(btn);
-    });
-  }
-
-  function fetchAndRender() {
-    const title = document.getElementById('expiredTitle');
-    const cardsDiv = document.getElementById('expiredCards');
-    title.innerHTML = "Загрузка...";
-    cardsDiv.innerHTML = "";
-    let msNow = msTimeNow();
-    let dateToCheck = new Date(msNow);
-    if (filter === 'tomorrow') {
-      dateToCheck.setDate(dateToCheck.getDate() + 1);
-    }
-    let y = dateToCheck.getFullYear();
-    let m = ('0' + (dateToCheck.getMonth()+1)).slice(-2);
-    let d = ('0' + dateToCheck.getDate()).slice(-2);
-    let checkDate = `${y}-${m}-${d}`;
-
-    fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
-      .then(r=>r.json())
-      .then(data=>{
-        if(!data.ok) {
-          title.innerHTML = "Ошибка: "+escapeHtml(data.error);
-          cardsDiv.innerHTML = "";
-          return;
-        }
-        let filtered;
-        if (filter === 'today') {
-          filtered = (data.results||[]).filter(x=>x.expiry_at && x.expiry_at <= checkDate);
-        } else {
-          filtered = (data.results||[]).filter(x=>x.expiry_at === checkDate);
-        }
-        if(!filtered.length) {
-          title.innerHTML = filter === 'today'
-            ? "Нет позиций, у которых срок истекает сегодня или ранее!"
-            : "Нет позиций, которые просрочатся завтра!";
-          title.className = "success";
-          cardsDiv.innerHTML = "";
-          return;
-        }
-        title.innerHTML = filter === 'today'
-          ? "Сегодня и ранее истекают:"
-          : "Завтра истекают:";
-        title.className = "";
-        let cards = `<div class="card-list">`;
-        filtered.forEach(x=>{
-          cards += renderCard(x, false);
-        });
-        cards += `</div>`;
-        cardsDiv.innerHTML = cards;
-        ensureTheme();
-      });
-  }
 }
 function showBottomNav(show = true) {
   const nav = document.querySelector('.bottom-nav');
