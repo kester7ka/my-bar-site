@@ -916,6 +916,40 @@ async function startApp() {
 }
 startApp();
 
+function showDefectivePage() {
+  setPageTitle('Некондиционные позиции');
+  showPage(`
+    <div class="beautiful-form defective-panel" style="max-width:440px;">
+      <div style="font-size:1.13em;color:#ee4747;font-weight:700;text-align:center;margin-bottom:12px;">Некондиционные позиции</div>
+      <div id="defectiveList" style="min-height:60px;"></div>
+    </div>
+  `);
+  ensureTheme();
+  const defectiveList = document.getElementById('defectiveList');
+  defectiveList.innerHTML = '<div style="color:#aaa;text-align:center;">Загрузка...</div>';
+  fetch(`${backend}/defective`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: userId})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.ok) {
+      defectiveList.innerHTML = `<div class="error">Ошибка: ${escapeHtml(data.error)}</div>`;
+      return;
+    }
+    if (!data.results || !data.results.length) {
+      defectiveList.innerHTML = `<div style="color:#888;text-align:center;">Некондиционных позиций нет!</div>`;
+      return;
+    }
+    let cards = `<div class="card-list">`;
+    data.results.forEach(r => {
+      cards += renderCard(r, false);
+    });
+    cards += `</div>`;
+    defectiveList.innerHTML = cards;
+  });
+}
 window.addEventListener('DOMContentLoaded', () => {
   function setNavActive(id) {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('selected'));
@@ -923,7 +957,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (btn) btn.classList.add('selected');
   }
   const navMap = {
-    navHome: showMenu,
+    navHome: showDefectivePage,
     navSearch: showSearchPage,
     navAdd: showAddPage,
     navInfo: () => msg('Информация о приложении появится здесь!', 'success'),
@@ -934,9 +968,14 @@ window.addEventListener('DOMContentLoaded', () => {
     if (btn) {
       btn.addEventListener('click', () => {
         setNavActive(id);
-        fn();
+        if (id === 'navSearch') {
+          showSearchPage(); // всегда открывает страницу поиска с фильтрами и результатами
+        } else {
+          fn();
+        }
       });
     }
   });
   setNavActive('navHome');
+  showDefectivePage();
 });
