@@ -20,13 +20,12 @@ body {
   transition: background 0.23s cubic-bezier(.4,0,.2,1), color 0.23s cubic-bezier(.4,0,.2,1);
 }
 .wrap {
-  min-height: 100dvh;
+  min-height: 100vh;
   width: 100vw;
   background: transparent;
   border-radius: 0;
   padding-top: 58px;
   padding-bottom: 0;
-  position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
@@ -636,4 +635,44 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: #fff;
   margin-top: 2px;
   text-shadow: 0 2px 8px #232b3340;
+}
+.beautiful-form {
+  transition: box-shadow 0.28s, background 0.22s, transform 0.21s, max-height 0.5s cubic-bezier(.4,0,.2,1), min-height 0.5s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+}
+.filter-btn {
+  border-radius: 999px;
+  background: rgba(123,123,255,0.10);
+  color: #b9dbff;
+  border: none;
+  padding: 10px 22px;
+  font-weight: 700;
+  font-size: 1.08em;
+  margin: 0 6px 0 0;
+  transition: background 0.22s, color 0.22s, box-shadow 0.22s;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 2px 8px #10131e22;
+}
+.filter-btn.selected, .filter-btn:active {
+  background: linear-gradient(90deg, #7b7bff 60%, #232b33 100%);
+  color: #fff;
+  box-shadow: 0 2px 16px #7b7bff33;
+}
+.filter-btn:hover:not(.selected) {
+  background: rgba(123,123,255,0.18);
+  color: #fff;
+}
+.expired-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 12px auto;
+  width: 44px;
+  height: 44px;
+  color: #ffb86b;
+  background: rgba(255,184,107,0.10);
+  border-radius: 50%;
+  box-shadow: 0 2px 12px #ffb86b33;
+  font-size: 2.1em;
 }
