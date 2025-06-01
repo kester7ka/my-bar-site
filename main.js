@@ -46,24 +46,6 @@ document.addEventListener('touchend', function(e){
   lastTouch = now;
 }, { passive: false });
 
-const themeBtn = document.getElementById('themeToggle');
-const themeText = document.getElementById('themeText');
-function ensureTheme() {
-  let theme = localStorage.getItem('theme');
-  if(!theme) {
-    if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
-    else theme = 'light';
-  }
-  document.body.classList.toggle('dark', theme === 'dark');
-  themeText.textContent = theme === 'dark' ? "Светлая тема" : "Тёмная тема";
-}
-function setTheme(dark) {
-  localStorage.setItem('theme', dark ? 'dark' : 'light');
-  ensureTheme();
-}
-themeBtn.addEventListener('click', () => setTheme(!document.body.classList.contains('dark')));
-ensureTheme();
-
 let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
 console.log('userId:', userId);
@@ -126,7 +108,6 @@ function showExpiredPage(isMain = false) {
   `;
   if (!isMain) content = addBackButton(content);
   showPage(greet + content);
-  ensureTheme();
 
   let filter = 'today';
   renderDayFilter();
@@ -197,7 +178,6 @@ function showExpiredPage(isMain = false) {
         });
         cards += `</div>`;
         cardsDiv.innerHTML = cards;
-        ensureTheme();
       })
       .catch(e => {
         title.innerHTML = "Ошибка сети: " + escapeHtml(e.message);
@@ -215,7 +195,6 @@ function setPageTitle(title) {
 function showPage(contentHtml) {
   const el = document.getElementById("main");
   el.innerHTML = `<div class="page-anim">${contentHtml}</div>`;
-  ensureTheme();
   window.scrollTo({top: 0, behavior: 'smooth'});
   forceExpand();
 }
@@ -335,7 +314,6 @@ function showAddPage() {
       </div>
     </form>
   `));
-  ensureTheme();
   setTimeout(() => {
     let inputs = document.querySelectorAll('.beautiful-form input, .beautiful-form select');
     inputs.forEach(inp => {
@@ -520,7 +498,6 @@ function showSearchPage() {
       <div id="searchResults" style="min-height:90px;"></div>
     </div>
   `));
-  ensureTheme();
 
   const categories = [
     { value: "", label: "Все категории", icon: "" },
@@ -636,7 +613,6 @@ function showDeleteModal(rJson) {
   `;
   document.body.appendChild(overlay);
   setTimeout(() => overlay.classList.add('visible'), 10);
-  ensureTheme();
 }
 async function deleteItem(rJson) {
   if (!canProceed("delete", 1200)) return;
@@ -709,7 +685,6 @@ function showOpenModal(rJson) {
     }
     document.body.appendChild(overlay);
     setTimeout(() => overlay.classList.add('visible'), 10);
-    ensureTheme();
   });
 }
 function closeModal() {
@@ -790,7 +765,6 @@ function openReopenForm(rJson, openAfterEdit = false) {
       </div>
     </form>
   `));
-  ensureTheme();
   document.getElementById('editf').onsubmit = async function(e) {
     e.preventDefault();
     let d = Object.fromEntries(new FormData(this));
@@ -890,7 +864,6 @@ async function startApp() {
       ${USER && USER.bar_name ? `<span class="welcome-bar">Бар: ${escapeHtml(USER.bar_name)}</span>` : ""}
     </div>
   `);
-  ensureTheme();
   try {
     let r = await fetch("https://web-production-2c7db.up.railway.app/userinfo", {
       method: "POST",
@@ -910,7 +883,6 @@ async function startApp() {
           <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
         </div>
       `);
-      ensureTheme();
       return;
     }
     USER = { username: d.username, bar_name: d.bar_name };
@@ -919,7 +891,6 @@ async function startApp() {
     showGlobalLoader(false);
     setPageTitle('Ошибка');
     showPage('<div class="error">Не удалось подключиться к серверу.<br>' + escapeHtml(e) + '</div>');
-    ensureTheme();
   }
 }
 startApp();
