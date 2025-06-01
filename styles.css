@@ -588,6 +588,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   flex-direction: column;
   align-items: center;
   animation: popIn 0.7s;
+  margin-bottom: 0;
 }
 .chart-title {
   font-size: 1.18em;
@@ -616,22 +617,24 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .chart-bar {
   width: 32px;
-  border-radius: 0 0 16px 16px / 0 0 24px 24px;
+  border-radius: 16px 16px 8px 8px / 24px 24px 8px 8px;
   margin-bottom: 8px;
   transition: height 0.9s cubic-bezier(.4,0,.2,1), border-radius 0.5s;
   box-shadow: 0 4px 24px #7b7bff44;
   display: block;
 }
-.chart-bar-label {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 2px;
-  margin-top: 0;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1.5em;
+.chart-bar-name {
+  font-size: 0.93em;
   color: #b9dbff;
+  text-align: center;
+  margin-top: 2px;
+  margin-bottom: 0;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60px;
 }
 .chart-bar-value {
   font-size: 1.13em;
@@ -712,4 +715,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: #fff;
   margin-bottom: 10px;
   letter-spacing: 0.01em;
+}
+@media (max-width: 600px) {
+  .chart-bar-wrap {
+    min-width: 48px;
+  }
+  .chart-bar-name {
+    font-size: 0.85em;
+    max-width: 44px;
+  }
 }
