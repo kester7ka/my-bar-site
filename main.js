@@ -554,67 +554,61 @@ function showSearchPage() {
   showPage(addBackButton(`
     <div id="searchBlock" class="beautiful-form" style="gap:10px;max-width:440px;">
       <input id="searchInput" type="text" placeholder="Поиск по TOB или названию" style="margin-bottom:7px;">
-      <div class="filter-bar-wrap">
-        <div class="filter-bar-section" id="categoryFilterBar"></div>
-        <div class="filter-bar-section" id="statusFilterBar"></div>
-      </div>
+      <div id="categoryStatusBar"></div>
       <div id="searchResults" style="min-height:90px;"></div>
     </div>
   `));
+  ensureTheme && ensureTheme();
 
-  const categories = [
-    { value: "", label: "Все категории", icon: "" },
-    { value: "🍯 Сиропы", label: "🍯 Сиропы", icon: "" },
-    { value: "🥕 Ингредиенты", label: "🥕 Ингредиенты", icon: "" },
-    { value: "☕ Кофе", label: "☕ Кофе", icon: "" },
-    { value: "📦 Прочее", label: "📦 Прочее", icon: "" }
-  ];
-  const statuses = [
-    { value: "", label: "Все статусы" },
-    { value: "1", label: "Открыто" },
-    { value: "0", label: "Закрыто" }
-  ];
   let filterCategory = "";
   let filterOpened = "";
-
-  function renderCategoryBar() {
-    const bar = document.getElementById('categoryFilterBar');
-    bar.innerHTML = '';
-    categories.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.type = "button";
-      btn.className = "filter-btn" + (filterCategory === cat.value ? " selected" : "");
-      btn.innerHTML = cat.label;
-      btn.onclick = () => {
-        filterCategory = cat.value;
-        renderCategoryBar();
-        renderList();
-      };
-      bar.appendChild(btn);
-    });
-  }
-  function renderStatusBar() {
-    const bar = document.getElementById('statusFilterBar');
-    bar.innerHTML = '';
-    statuses.forEach(status => {
-      const btn = document.createElement('button');
-      btn.type = "button";
-      btn.className = "filter-btn status" + (filterOpened === status.value ? " selected" : "");
-      btn.innerHTML = status.label;
-      btn.onclick = () => {
-        filterOpened = status.value;
-        renderStatusBar();
-        renderList();
-      };
-      bar.appendChild(btn);
-    });
-  }
-  renderCategoryBar();
-  renderStatusBar();
-
   const input = document.getElementById('searchInput');
   let allItems = [];
   const resultsDiv = document.getElementById('searchResults');
+  const barDiv = document.getElementById('categoryStatusBar');
+
+  function renderBar() {
+    barDiv.innerHTML = renderCategoryStatusBar(filterCategory, filterOpened);
+    // Категории dropdown
+    const catBtn = document.getElementById('categoryFilterBtn');
+    const catDropdown = document.getElementById('categoryDropdown');
+    catBtn.onclick = function(e) {
+      e.stopPropagation();
+      catDropdown.classList.toggle('open');
+      statusDropdown.classList.remove('open');
+    };
+    catDropdown.querySelectorAll('.category-dropdown-btn').forEach(btn => {
+      btn.onclick = function(e) {
+        filterCategory = this.getAttribute('data-value');
+        catDropdown.classList.remove('open');
+        renderBar();
+        renderList();
+      };
+    });
+    // Статус dropdown
+    const statusBtn = document.getElementById('statusFilterBtn');
+    const statusDropdown = document.getElementById('statusDropdown');
+    statusBtn.onclick = function(e) {
+      e.stopPropagation();
+      statusDropdown.classList.toggle('open');
+      catDropdown.classList.remove('open');
+    };
+    statusDropdown.querySelectorAll('.status-dropdown-btn').forEach(btn => {
+      btn.onclick = function(e) {
+        filterOpened = this.getAttribute('data-value');
+        statusDropdown.classList.remove('open');
+        renderBar();
+        renderList();
+      };
+    });
+    // Закрытие dropdown по клику вне
+    document.addEventListener('click', closeDropdowns, { once: true });
+    function closeDropdowns() {
+      catDropdown.classList.remove('open');
+      statusDropdown.classList.remove('open');
+    }
+  }
+
   resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
   fetch(`${backend}/search`, {
     method: "POST",
@@ -625,8 +619,10 @@ function showSearchPage() {
   .then(data => {
     if (!data.ok) return resultsDiv.innerHTML = `<div class="error">Ошибка: ${escapeHtml(data.error)}</div>`;
     allItems = data.results;
+    renderBar();
     renderList();
   });
+
   function renderList() {
     let filter = (input.value||"").trim().toLowerCase();
     let items = allItems;
@@ -1054,7 +1050,7 @@ if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.disableC
   try { window.Telegram.WebApp.disableClosingConfirmation(); } catch(e) {}
 }
 
-// Фильтр категорий и статуса под поиском: одна строка, две кнопки, выпадающий список для категорий
+// Фильтр категорий и статуса под поиском: одна строка, две кнопки, выпадающий список для категорий и статусов
 function renderCategoryStatusBar(filterCategory, filterOpened, onCategory, onStatus) {
   const categories = [
     { value: "", label: "Все категории", color: "#7b7bff", icon: "🍯" },
@@ -1064,13 +1060,15 @@ function renderCategoryStatusBar(filterCategory, filterOpened, onCategory, onSta
     { value: "📦 Прочее", label: "Прочее", color: "#ff6b81", icon: "📦" }
   ];
   const statuses = [
-    { value: "", label: "Все статусы" },
-    { value: "1", label: "Открыто" },
-    { value: "0", label: "Закрыто" }
+    { value: "", label: "Все статусы", color: "#7b7bff" },
+    { value: "1", label: "Открыто", color: "#7b7bff" },
+    { value: "0", label: "Закрыто", color: "#ff6b81" }
   ];
   let cat = categories.find(c => c.value === filterCategory) || categories[0];
   let catBtn = `<button class="category-filter-btn${filterCategory ? ' selected' : ''}" style="--cat-color:${cat.color}" id="categoryFilterBtn">${cat.icon} ${cat.label}</button>`;
   let status = statuses.find(s => s.value === filterOpened) || statuses[0];
-  let statusBtn = `<button class="status-filter-btn${filterOpened !== '' ? ' selected' : ''}" id="statusFilterBtn">${status.label}</button>`;
-  return `<div class="filter-bar-wrap">${catBtn}${statusBtn}</div>`;
+  let statusBtn = `<button class="status-filter-btn${filterOpened !== '' ? ' selected' : ''}" data-status="${status.value}" id="statusFilterBtn">${status.label}</button>`;
+  let catDropdown = `<div class="category-dropdown" id="categoryDropdown">${categories.map(c => `<button class="category-dropdown-btn${c.value===filterCategory?' selected':''}" style="--cat-color:${c.color}" data-value="${c.value}">${c.icon} ${c.label}</button>`).join('')}</div>`;
+  let statusDropdown = `<div class="status-dropdown" id="statusDropdown">${statuses.map(s => `<button class="status-dropdown-btn${s.value===filterOpened?' selected':''}" style="--cat-color:${s.color}" data-value="${s.value}">${s.label}</button>`).join('')}</div>`;
+  return `<div class="filter-bar-wrap" style="position:relative;">${catBtn}${catDropdown}${statusBtn}${statusDropdown}</div>`;
 }
