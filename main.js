@@ -77,14 +77,13 @@ document.getElementById('wrap').addEventListener('touchstart', function(e) {
 
 window.showMenu = function() {
   setPageTitle('Ингредиенты бара');
-  showExpiredPage(true);
+  showExpiredPage(true, renderCategoryChart);
   showBottomNav(true);
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('nav-home').classList.add('active');
-  renderCategoryChart();
 };
 
-function showExpiredPage(isMain = false) {
+function showExpiredPage(isMain = false, afterRenderCb) {
   let greet = '';
   if (isMain) {
     let uname = username ? username : '';
@@ -147,6 +146,7 @@ function showExpiredPage(isMain = false) {
         if(!data.ok) {
           title.innerHTML = "Ошибка: "+escapeHtml(data.error);
           cardsDiv.innerHTML = "";
+          if (afterRenderCb) afterRenderCb();
           return;
         }
         let filtered;
@@ -161,6 +161,7 @@ function showExpiredPage(isMain = false) {
             : "Нет позиций, которые просрочатся завтра!";
           title.className = "success";
           cardsDiv.innerHTML = "";
+          if (afterRenderCb) afterRenderCb();
           return;
         }
         title.innerHTML = filter === 'today'
@@ -173,10 +174,12 @@ function showExpiredPage(isMain = false) {
         });
         cards += `</div>`;
         cardsDiv.innerHTML = cards;
+        if (afterRenderCb) afterRenderCb();
       })
       .catch(e => {
         title.innerHTML = "Ошибка сети: " + escapeHtml(e.message);
         cardsDiv.innerHTML = "";
+        if (afterRenderCb) afterRenderCb();
       });
   }
 }
@@ -915,7 +918,6 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 
 async function renderCategoryChart() {
   const mainDiv = document.getElementById('main');
-  // Получаем данные
   let data = { '🍯 Сиропы': 0, '🥕 Ингредиенты': 0, '☕ Кофе': 0, '📦 Прочее': 0 };
   try {
     let resp = await fetch(`${backend}/search`, {
@@ -928,30 +930,41 @@ async function renderCategoryChart() {
       res.results.forEach(x => { if (data[x.category] !== undefined) data[x.category]++; });
     }
   } catch(e) {}
-  // Максимум для нормализации высоты
   let max = Math.max(...Object.values(data), 1);
-  // Цвета для категорий
   const colors = {
     '🍯 Сиропы': '#7b7bff',
     '🥕 Ингредиенты': '#7bffb7',
     '☕ Кофе': '#ffb86b',
     '📦 Прочее': '#ff6b81'
   };
-  // HTML графика
   let chart = `<div class="category-chart-tile">
     <div class="chart-title">Статистика по категориям</div>
     <div class="chart-bars">
-      ${Object.entries(data).map(([cat, val]) => `
+      ${Object.entries(data).map(([cat, val], i) => `
         <div class="chart-bar-wrap">
-          <div class="chart-bar" style="height:${40 + 80 * (val/max)}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44;"></div>
+          <div class="chart-bar" data-final="${40 + 80 * (val/max)}" style="height:0px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 0 0 16px 16px / 0 0 24px 24px;"></div>
           <div class="chart-bar-label">${cat}</div>
           <div class="chart-bar-value">${val}</div>
         </div>
       `).join('')}
     </div>
   </div>`;
-  // Вставляем плитку перед остальным контентом
-  let old = document.querySelector('.category-chart-tile');
+  let expiredBlock = mainDiv.querySelector('.beautiful-form');
+  let old = mainDiv.querySelector('.category-chart-tile');
   if (old) old.remove();
-  mainDiv.insertAdjacentHTML('afterbegin', chart);
+  if (expiredBlock) {
+    expiredBlock.insertAdjacentHTML('afterend', chart);
+  } else {
+    mainDiv.insertAdjacentHTML('beforeend', chart);
+  }
+  setTimeout(() => {
+    mainDiv.querySelectorAll('.category-chart-tile .chart-bar').forEach((bar, idx) => {
+      let final = bar.getAttribute('data-final');
+      bar.style.transition = 'height 0.9s cubic-bezier(.4,0,.2,1)';
+      setTimeout(() => {
+        bar.style.height = final + 'px';
+        bar.style.borderRadius = '16px 16px 8px 8px / 24px 24px 8px 8px';
+      }, 120 + idx * 120);
+    });
+  }, 80);
 }
