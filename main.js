@@ -92,7 +92,10 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     </div>`;
   }
   let content = `
-    <div class="beautiful-form" style="gap:12px;max-width:440px;">
+    <div class="beautiful-form expired-tile" id="expiredTile" style="gap:12px;max-width:440px;">
+      <div class="expired-icon">
+        <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='currentColor' opacity='0.15'/><path fill='currentColor' d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Zm0 88a16 16 0 1 0 0-32 16 16 0 0 0 0 32Z'/></svg>
+      </div>
       <div class="filter-bar-wrap" style="margin-bottom:0;">
         <div class="filter-bar-section" id="expiredDayFilter"></div>
       </div>
@@ -127,8 +130,11 @@ function showExpiredPage(isMain = false, afterRenderCb) {
   function fetchAndRender() {
     const title = document.getElementById('expiredTitle');
     const cardsDiv = document.getElementById('expiredCards');
+    const tile = document.getElementById('expiredTile');
     title.innerHTML = "Загрузка...";
     cardsDiv.innerHTML = "";
+    tile.style.minHeight = '140px';
+    tile.style.maxHeight = '340px';
     let msNow = msTimeNow();
     let dateToCheck = new Date(msNow);
     if (filter === 'tomorrow') {
@@ -142,10 +148,11 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
       .then(r=>r.json())
       .then(data=>{
-        console.log('Ответ сервера:', data);
         if(!data.ok) {
           title.innerHTML = "Ошибка: "+escapeHtml(data.error);
           cardsDiv.innerHTML = "";
+          tile.style.minHeight = '140px';
+          tile.style.maxHeight = '340px';
           if (afterRenderCb) afterRenderCb();
           return;
         }
@@ -161,6 +168,8 @@ function showExpiredPage(isMain = false, afterRenderCb) {
             : "Нет позиций, которые просрочатся завтра!";
           title.className = "success";
           cardsDiv.innerHTML = "";
+          tile.style.minHeight = '140px';
+          tile.style.maxHeight = '340px';
           if (afterRenderCb) afterRenderCb();
           return;
         }
@@ -174,11 +183,18 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         });
         cards += `</div>`;
         cardsDiv.innerHTML = cards;
+        // Плавное расширение плитки
+        setTimeout(() => {
+          tile.style.minHeight = (140 + filtered.length * 110) + 'px';
+          tile.style.maxHeight = (340 + filtered.length * 110) + 'px';
+        }, 60);
         if (afterRenderCb) afterRenderCb();
       })
       .catch(e => {
         title.innerHTML = "Ошибка сети: " + escapeHtml(e.message);
         cardsDiv.innerHTML = "";
+        tile.style.minHeight = '140px';
+        tile.style.maxHeight = '340px';
         if (afterRenderCb) afterRenderCb();
       });
   }
