@@ -98,7 +98,12 @@ if (!userId) {
   throw new Error("Not in Telegram Mini App");
 }
 
-window.showMenu = showExpiredPage;
+window.showMenu = function() {
+  showExpiredPage(true);
+  showBottomNav(true);
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-home').classList.add('active');
+};
 window.showAddPage = showAddPage;
 window.showExpiredPage = showExpiredPage;
 window.showSearchPage = showSearchPage;
@@ -732,9 +737,9 @@ function openReopenForm(rJson, openAfterEdit = false) {
     }
   };
 }
-function showExpiredPage() {
+function showExpiredPage(isMain = false) {
   setPageTitle('Проверка сроков');
-  showPage(addBackButton(`
+  let content = `
     <div class="beautiful-form" style="gap:12px;max-width:440px;">
       <div class="filter-bar-wrap" style="margin-bottom:0;">
         <div class="filter-bar-section" id="expiredDayFilter"></div>
@@ -742,7 +747,9 @@ function showExpiredPage() {
       <div id="expiredTitle" style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>
       <div id="expiredCards"></div>
     </div>
-  `));
+  `;
+  if (!isMain) content = addBackButton(content);
+  showPage(content);
   ensureTheme();
 
   let filter = 'today';
@@ -817,12 +824,17 @@ function showExpiredPage() {
       });
   }
 }
+function showBottomNav(show = true) {
+  const nav = document.querySelector('.bottom-nav');
+  if (nav) nav.style.display = show ? '' : 'none';
+}
 function showGlobalLoader(show = true) {
   const loader = document.getElementById('globalLoader');
   const wrap = document.getElementById('wrap');
   if (show) {
     loader.style.display = 'flex';
     wrap.style.display = 'none';
+    showBottomNav(false);
     setTimeout(() => loader.style.opacity = "1", 10);
   } else {
     loader.style.opacity = "0";
