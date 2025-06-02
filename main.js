@@ -171,9 +171,13 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         let filtered;
         if (data.ok) {
           if (filter === 'today') {
-            filtered = (data.results||[]).filter(x=>x.expiry_final && x.expiry_final <= checkDate);
+            filtered = (data.results||[]).filter(x=>
+              [x.expiry_by_opened, x.expiry_by_total, x.expiry_final].some(date => date && date <= checkDate)
+            );
           } else {
-            filtered = (data.results||[]).filter(x=>x.expiry_final === checkDate);
+            filtered = (data.results||[]).filter(x=>
+              [x.expiry_by_opened, x.expiry_by_total, x.expiry_final].some(date => date === checkDate)
+            );
           }
         } else {
           filtered = [];
@@ -1136,3 +1140,13 @@ function renderCategoryStatusBar(filterCategory, filterOpened) {
   let statusSelect = `<select class="filter-native-select ${statusClass}" id="statusNativeSelect">${statuses.map(s => `<option value="${s.value}"${s.value===filterOpened?' selected':''}>${s.label}</option>`).join('')}</select>`;
   return `<div class="filter-bar-wrap">${catSelect}${statusSelect}</div>`;
 }
+
+// Скрытие bottom-nav при открытии клавиатуры
+window.addEventListener('focusin', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+    document.querySelector('.bottom-nav').classList.add('bottom-nav--hidden');
+  }
+});
+window.addEventListener('focusout', function(e) {
+  document.querySelector('.bottom-nav').classList.remove('bottom-nav--hidden');
+});
