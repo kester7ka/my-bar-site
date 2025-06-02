@@ -354,12 +354,20 @@ function showAddPage() {
         <input name="name" id="name" required placeholder="Название позиции">
       </div>
       <div class="field-row">
-        <label class="field-label" for="shelf_life_days">Срок хранения (дней)</label>
-        <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="30">
+        <label class="field-label" for="manufactured_at">Дата производства</label>
+        <input name="manufactured_at" id="manufactured_at" type="date" required>
       </div>
       <div class="field-row">
-        <label class="field-label" for="opened_at">Дата открытия</label>
-        <input name="opened_at" id="opened_at" type="date" required>
+        <label class="field-label" for="shelf_life_days">Срок годности (дней)</label>
+        <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="180">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="opened_shelf_life_days">Срок после вскрытия (дней)</label>
+        <input name="opened_shelf_life_days" id="opened_shelf_life_days" type="number" min="1" required placeholder="30">
+      </div>
+      <div class="field-row" id="openedAtRow" style="display:none;">
+        <label class="field-label" for="opened_at">Дата вскрытия</label>
+        <input name="opened_at" id="opened_at" type="date">
       </div>
       <div class="btns">
         <button type="submit" id="addSubmitBtn" disabled>Добавить</button>
@@ -378,13 +386,16 @@ function showAddPage() {
   let opened = true;
   const btnOpened = document.getElementById('btnOpened');
   const btnClosed = document.getElementById('btnClosed');
+  const openedAtRow = document.getElementById('openedAtRow');
   function updateStatusButtons() {
     if (opened) {
       btnOpened.classList.add("selected", "opened");
       btnClosed.classList.remove("selected", "closed");
+      openedAtRow.style.display = '';
     } else {
       btnOpened.classList.remove("selected", "opened");
       btnClosed.classList.add("selected", "closed");
+      openedAtRow.style.display = 'none';
     }
   }
   btnOpened.onclick = function() {
@@ -407,7 +418,9 @@ function showAddPage() {
   const tobWarning = document.getElementById('tobWarning');
   const nameInput = document.getElementById('name');
   const shelfInput = document.getElementById('shelf_life_days');
-  const dateInput = document.getElementById('opened_at');
+  const manufacturedInput = document.getElementById('manufactured_at');
+  const openedShelfInput = document.getElementById('opened_shelf_life_days');
+  const openedAtInput = document.getElementById('opened_at');
   const catInput = document.getElementById('category');
   const submitBtn = document.getElementById('addSubmitBtn');
   tobInput.addEventListener('keydown', function(e){
@@ -423,7 +436,9 @@ function showAddPage() {
     if (!isValidTob(tobInput.value)) allOk = false;
     if (!isValidName(nameInput.value.trim())) allOk = false;
     if (!isValidShelf(shelfInput.value)) allOk = false;
-    if (!dateInput.value) allOk = false;
+    if (!isValidShelf(openedShelfInput.value)) allOk = false;
+    if (!manufacturedInput.value) allOk = false;
+    if (opened && !openedAtInput.value) allOk = false;
     if (opened && openTobExists) allOk = false;
     submitBtn.disabled = !allOk;
   }
@@ -470,14 +485,16 @@ function showAddPage() {
   });
   nameInput.addEventListener('input', validateForm);
   shelfInput.addEventListener('input', validateForm);
-  dateInput.addEventListener('input', validateForm);
+  manufacturedInput.addEventListener('input', validateForm);
+  openedShelfInput.addEventListener('input', validateForm);
+  openedAtInput.addEventListener('input', validateForm);
   catInput.addEventListener('change', validateForm);
 
   document.getElementById('addf').onsubmit = async function(e){
     e.preventDefault();
     let d = Object.fromEntries(new FormData(this));
     d.opened = opened ? 1 : 0;
-    if (!isValidCategory(d.category) || !isValidTob(d.tob) || !isValidName(d.name) || !isValidShelf(d.shelf_life_days)) {
+    if (!isValidCategory(d.category) || !isValidTob(d.tob) || !isValidName(d.name) || !isValidShelf(d.shelf_life_days) || !isValidShelf(d.opened_shelf_life_days) || !d.manufactured_at || (opened && !d.opened_at)) {
       msg("Некорректные данные, проверьте поля.", "error");
       return;
     }
@@ -488,9 +505,11 @@ function showAddPage() {
       category: d.category,
       tob: d.tob,
       name: d.name,
+      manufactured_at: d.manufactured_at,
       shelf_life_days: d.shelf_life_days,
+      opened_shelf_life_days: d.opened_shelf_life_days,
       opened: d.opened,
-      opened_at: d.opened_at
+      opened_at: opened ? d.opened_at : null
     };
     let url = `${backend}/add`;
     let resp = await fetch(url, {
@@ -511,7 +530,6 @@ function showAddPage() {
   };
 }
 function renderCard(r, actions = true, isExpired = false) {
-  // Цвета по категориям
   const accent = {
     '🍯 Сиропы': '#7b7bff',
     '🥕 Ингредиенты': '#7bffb7',
@@ -519,15 +537,29 @@ function renderCard(r, actions = true, isExpired = false) {
     '📦 Прочее': '#ff6b81'
   }[r.category] || '#7b7bff';
   let status = `<span class=\"card-status-badge ${r.opened == 1 ? "opened" : "closed"}\">${r.opened == 1 ? "Открыто" : "Закрыто"}</span>`;
-  let main = `
-    <div class=\"card-main\">
+  let highlight = '';
+  let main = '';
+  if (r.opened == 1) {
+    let expiry1 = r.expiry_by_opened;
+    let expiry2 = r.expiry_by_total;
+    let minExpiry = r.expiry_final;
+    main = `<div class=\"card-main\">
       <div class=\"card-title\" title=\"${escapeHtml(r.name)}\">${escapeHtml(r.name)}</div>
       <div class=\"card-row\"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
-      <div class=\"card-row\"><b>Открыто:</b> ${escapeHtml(r.opened_at)}</div>
-      <div class=\"card-row\"><b>Годен до:</b> ${escapeHtml(r.expiry_at)}</div>
-    </div>
-  `;
-  // Для некондиции — одна кнопка удалить по стилю обычной deletebtn, по центру, шире
+      <div class=\"card-row\"><b>Дата вскрытия:</b> ${escapeHtml(r.opened_at||'—')}</div>
+      <div class=\"card-row\"><b>Годен после вскрытия до:</b> <span class=\"${minExpiry===expiry1?'highlight-expiry':''}\">${escapeHtml(expiry1||'—')}</span></div>
+      <div class=\"card-row\"><b>Годен по общему сроку до:</b> <span class=\"${minExpiry===expiry2?'highlight-expiry':''}\">${escapeHtml(expiry2||'—')}</span></div>
+      <div class=\"card-row\"><b>Финальная дата годности:</b> <span class=\"highlight-expiry\">${escapeHtml(minExpiry||'—')}</span></div>
+    </div>`;
+  } else {
+    let expiry = r.expiry_by_total;
+    main = `<div class=\"card-main\">
+      <div class=\"card-title\" title=\"${escapeHtml(r.name)}\">${escapeHtml(r.name)}</div>
+      <div class=\"card-row\"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
+      <div class=\"card-row\"><b>Дата производства:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
+      <div class=\"card-row\"><b>Годен до:</b> <span class=\"highlight-expiry\">${escapeHtml(expiry||'—')}</span></div>
+    </div>`;
+  }
   let bigDelete = '';
   if (isExpired) {
     bigDelete = `<div style=\"display:flex;justify-content:center;width:100%;margin-bottom:8px;margin-top:-8px;\">
@@ -670,7 +702,7 @@ async function deleteItem(rJson, source) {
         if (source === 'expired') {
           showMenu();
         } else {
-          showSearchPage();
+        showSearchPage();
         }
       }, 1000);
     }
@@ -791,18 +823,53 @@ function openReopenForm(rJson, openAfterEdit = false) {
         </select>
       </div>
       <div class="field-row">
-        <label class="field-label" for="edit_shelf_life_days">Срок хранения (дней)</label>
+        <label class="field-label" for="edit_manufactured_at">Дата производства</label>
+        <input name="edit_manufactured_at" id="edit_manufactured_at" type="date" required value="${escapeHtml(r.manufactured_at||'')}">
+      </div>
+      <div class="field-row">
+        <label class="field-label" for="edit_shelf_life_days">Срок годности (дней)</label>
         <input name="edit_shelf_life_days" id="edit_shelf_life_days" type="number" min="1" required value="${escapeHtml(""+r.shelf_life_days)}">
       </div>
       <div class="field-row">
-        <label class="field-label" for="edit_opened_at">Дата открытия</label>
-        <input name="edit_opened_at" id="edit_opened_at" type="date" required value="${escapeHtml(r.opened_at)}">
+        <label class="field-label" for="edit_opened_shelf_life_days">Срок после вскрытия (дней)</label>
+        <input name="edit_opened_shelf_life_days" id="edit_opened_shelf_life_days" type="number" min="1" required value="${escapeHtml(""+(r.opened_shelf_life_days||''))}">
+      </div>
+      <div class="field-row" id="editOpenedAtRow" style="display:${r.opened==1?'':'none'};">
+        <label class="field-label" for="edit_opened_at">Дата вскрытия</label>
+        <input name="edit_opened_at" id="edit_opened_at" type="date" value="${escapeHtml(r.opened_at||'')}">
       </div>
       <div class="btns">
         <button type="submit" id="editSubmitBtn">Сохранить</button>
       </div>
     </form>
   `));
+  setTimeout(() => {
+    let inputs = document.querySelectorAll('.beautiful-form input, .beautiful-form select');
+    inputs.forEach(inp => {
+      inp.addEventListener('focus', function() {
+        scrollInputIntoView(this);
+      });
+    });
+  }, 100);
+  const openedAtRow = document.getElementById('editOpenedAtRow');
+  let opened = r.opened == 1;
+  document.getElementById('edit_category').onchange = validateForm;
+  document.getElementById('edit_name').oninput = validateForm;
+  document.getElementById('edit_manufactured_at').oninput = validateForm;
+  document.getElementById('edit_shelf_life_days').oninput = validateForm;
+  document.getElementById('edit_opened_shelf_life_days').oninput = validateForm;
+  document.getElementById('edit_opened_at').oninput = validateForm;
+  function validateForm() {
+    let allOk = true;
+    if (!isValidCategory(document.getElementById('edit_category').value)) allOk = false;
+    if (!isValidName(document.getElementById('edit_name').value.trim())) allOk = false;
+    if (!isValidShelf(document.getElementById('edit_shelf_life_days').value)) allOk = false;
+    if (!isValidShelf(document.getElementById('edit_opened_shelf_life_days').value)) allOk = false;
+    if (!document.getElementById('edit_manufactured_at').value) allOk = false;
+    if (opened && !document.getElementById('edit_opened_at').value) allOk = false;
+    document.getElementById('editSubmitBtn').disabled = !allOk;
+  }
+  validateForm();
   document.getElementById('editf').onsubmit = async function(e) {
     e.preventDefault();
     let d = Object.fromEntries(new FormData(this));
@@ -811,10 +878,13 @@ function openReopenForm(rJson, openAfterEdit = false) {
       id: r.id,
       category: d.edit_category,
       name: d.edit_name,
+      manufactured_at: d.edit_manufactured_at,
       shelf_life_days: d.edit_shelf_life_days,
-      opened_at: d.edit_opened_at
+      opened_shelf_life_days: d.edit_opened_shelf_life_days,
+      opened: r.opened,
+      opened_at: r.opened == 1 ? d.edit_opened_at : null
     };
-    if (!isValidCategory(req.category) || !isValidName(req.name) || !isValidShelf(req.shelf_life_days)) {
+    if (!isValidCategory(req.category) || !isValidName(req.name) || !isValidShelf(req.shelf_life_days) || !isValidShelf(req.opened_shelf_life_days) || !req.manufactured_at || (r.opened == 1 && !req.opened_at)) {
       msg("Некорректные данные, проверьте поля.", "error");
       return;
     }
