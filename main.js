@@ -543,13 +543,15 @@ function renderCard(r, actions = true, isExpired = false) {
       </button>` : ''}
     </div>`;
   }
-  // Для некондиции — большая кнопка удалить на всю карточку
+  // Для некондиции — одна кнопка удалить по стилю обычной deletebtn, по центру, шире
   let bigDelete = '';
   if (isExpired) {
-    bigDelete = `<button class=\"deletebtn big-delete-btn\" onclick=\"showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')\" style=\"margin:18px 0 0 0;width:calc(100% - 16px);display:block;font-size:1.13em;padding:18px 0;\">
-      <svg width='26' height='26' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg>
-      Удалить
-    </button>`;
+    bigDelete = `<div style=\"display:flex;justify-content:center;width:100%;margin-top:18px;\">
+      <button class=\"deletebtn big-delete-btn\" onclick=\"showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')\">
+        <svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg>
+        Удалить
+      </button>
+    </div>`;
   }
   return `<div class=\"item-card\" style=\"--card-accent:${accent}\">${main}${status}${buttons}${bigDelete}</div>`;
 }
@@ -727,7 +729,10 @@ function closeModal() {
   let overlay = document.querySelector('.modal-overlay');
   if (!overlay) return;
   overlay.classList.remove('visible');
-  setTimeout(() => overlay.remove(), 370);
+  overlay.classList.add('fade-out');
+  setTimeout(() => {
+    overlay.remove();
+  }, 330);
 }
 async function autoOpen(rJson) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
