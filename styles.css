@@ -152,19 +152,20 @@ h2 {
   transform: none;
 }
 .item-card {
-  max-width: 480px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 98vw;
+  width: 100%;
+  min-width: 0;
+  max-width: 520px;
 }
 .item-card.opened {
-  min-height: 200px;
-  max-height: 200px;
-  height: 200px;
+  min-height: 230px;
+  max-height: 230px;
+  height: 230px;
 }
 .item-card.closed {
-  min-height: 170px;
-  max-height: 170px;
-  height: 170px;
+  min-height: 190px;
+  max-height: 190px;
+  height: 190px;
 }
 .stat-row {
   display: flex;
@@ -670,7 +671,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .bottom-nav {
   position: fixed;
   left: 50%;
-  bottom: 32px;
+  bottom: env(safe-area-inset-bottom, 0);
   right: auto;
   display: flex;
   justify-content: space-between;
@@ -685,6 +686,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   z-index: 100;
   border: 1.5px solid rgba(80,80,120,0.13);
   transition: box-shadow 0.28s, background 0.22s;
+  pointer-events: auto;
 }
 .bottom-nav:hover {
   box-shadow: 0 16px 56px #7b7bff44, 0 2px 12px #232b3340;
@@ -1059,4 +1061,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background: linear-gradient(90deg, #232b33 60%, #7b7bff 100%);
   color: #b9dbff;
   box-shadow: none;
+}
+.bottom-nav--hidden {
+  display: none !important;
 }
