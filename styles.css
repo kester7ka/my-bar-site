@@ -1067,3 +1067,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   pointer-events: none !important;
   display: block !important;
 }
+.card-list {
+  width: 100vw;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
