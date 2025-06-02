@@ -93,6 +93,7 @@ window.showMenu = function() {
       div.style.pointerEvents = 'none';
       mainDiv.appendChild(div);
     }
+    setTimeout(()=>{window.scrollTo(0,1);}, 60);
   });
   showBottomNav(true);
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -526,34 +527,26 @@ function renderCard(r, actions = true, isExpired = false) {
       <div class=\"card-row\"><b>Годен до:</b> ${escapeHtml(r.expiry_at)}</div>
     </div>
   `;
-  let buttons = "";
-  if (actions) {
-    buttons = `<div class=\"card-actions-bottom\">
-      <button class=\"editbtn\" onclick=\"openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;\">
-        <svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216.49 79.51l-40-40a12 12 0 0 0-17 0l-96 96A12 12 0 0 0 56 143v40a12 12 0 0 0 12 12h40a12 12 0 0 0 8.49-3.51l96-96a12 12 0 0 0 0-17ZM104 188H68v-36l80-80 36 36ZM192 96l-32-32 16-16 32 32Z'/></svg>
-        Изменить
-      </button>
-      <button class=\"deletebtn\" onclick=\"showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')\">
-        <svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg>
-        Удалить
-      </button>
-      ${r.opened == 0 ? `<button class=\"openbtn\" onclick=\"showOpenModal('${encodeURIComponent(JSON.stringify(r))}')\">
-        <svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg>
-        Открыть
-      </button>` : ''}
-    </div>`;
-  }
   // Для некондиции — одна кнопка удалить по стилю обычной deletebtn, по центру, шире
   let bigDelete = '';
   if (isExpired) {
-    bigDelete = `<div style=\"display:flex;justify-content:center;width:100%;margin-bottom:18px;\">
-      <button class=\"deletebtn big-delete-btn\" onclick=\"showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')\">
-        <svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg>
-        Удалить
-      </button>
-    </div>`;
+    bigDelete = `<div style=\"display:flex;justify-content:center;width:100%;margin-bottom:8px;margin-top:-8px;\">
+      <button class=\"deletebtn big-delete-btn\" onclick=\"showDeleteModal('${encodeURIComponent(JSON.stringify(r))}','expired')\">`
+      + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg>`
+      + `Удалить</button></div>`;
   }
-  return `<div class=\"item-card\" style=\"--card-accent:${accent}\">${main}${status}${buttons}${bigDelete}</div>`;
+  let buttons = "";
+  if (actions) {
+    buttons = `<div class=\"card-actions-bottom\">`
+      + `<button class=\"editbtn\" onclick=\"openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;\">`
+      + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216.49 79.51l-40-40a12 12 0 0 0-17 0l-96 96A12 12 0 0 0 56 143v40a12 12 0 0 0 12 12h40a12 12 0 0 0 8.49-3.51l96-96a12 12 0 0 0 0-17ZM104 188H68v-36l80-80 36 36ZM192 96l-32-32 16-16 32 32Z'/></svg>Изменить</button>`
+      + `<button class=\"deletebtn\" onclick=\"showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')\">`
+      + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg>Удалить</button>`
+      + (r.opened == 0 ? `<button class=\"openbtn\" onclick=\"showOpenModal('${encodeURIComponent(JSON.stringify(r))}')\">`
+      + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg>Открыть</button>` : '')
+      + `</div>`;
+  }
+  return `<div class=\"item-card\" style=\"--card-accent:${accent}\">${main}${bigDelete}${status}${buttons}</div>`;
 }
 function showSearchPage() {
   setPageTitle('Поиск');
@@ -579,13 +572,13 @@ function showSearchPage() {
     catSelect.onchange = function() {
       filterCategory = this.value;
       renderBar();
-      renderList();
-    };
+        renderList();
+      };
     statusSelect.onchange = function() {
       filterOpened = this.value;
       renderBar();
-      renderList();
-    };
+        renderList();
+      };
   }
 
   resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
@@ -632,7 +625,7 @@ function showSearchPage() {
   }
   input.addEventListener('input', renderList);
 }
-function showDeleteModal(rJson) {
+function showDeleteModal(rJson, source) {
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   closeModal();
   let overlay = document.createElement('div');
@@ -644,7 +637,7 @@ function showDeleteModal(rJson) {
         <span class="modal-name-box">${escapeHtml(r.name)}</span>?
       </div>
       <div class="modal-buttons-row">
-        <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}')">Удалить</button>
+        <button class="modal-btn deletebtn" onclick="deleteItem('${encodeURIComponent(JSON.stringify(r))}','${source||''}')">Удалить</button>
         <button class="modal-btn cancelbtn" onclick="closeModal()">Отмена</button>
       </div>
     </div>
@@ -652,7 +645,7 @@ function showDeleteModal(rJson) {
   document.body.appendChild(overlay);
   setTimeout(() => overlay.classList.add('visible'), 10);
 }
-async function deleteItem(rJson) {
+async function deleteItem(rJson, source) {
   if (!canProceed("delete", 1200)) return;
   let r = typeof rJson === "string" ? JSON.parse(decodeURIComponent(rJson)) : rJson;
   let overlay = document.querySelector('.modal-overlay.show-blur');
@@ -674,7 +667,11 @@ async function deleteItem(rJson) {
     } else {
       setTimeout(() => {
         closeModal();
-        showSearchPage();
+        if (source === 'expired') {
+          showMenu();
+        } else {
+          showSearchPage();
+        }
       }, 1000);
     }
   } catch (e) {
