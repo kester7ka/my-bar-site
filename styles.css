@@ -152,10 +152,10 @@ h2 {
   transform: none;
 }
 .item-card {
-  max-width: 98vw;
+  max-width: 100vw;
   width: 100%;
   min-width: 0;
-  max-width: 520px;
+  max-width: 600px;
 }
 .item-card.opened {
   min-height: 230px;
@@ -685,7 +685,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding: 12px 22px 10px 22px;
   z-index: 100;
   border: 1.5px solid rgba(80,80,120,0.13);
-  transition: box-shadow 0.28s, background 0.22s;
+  transition: box-shadow 0.28s, background 0.22s, opacity 0.33s cubic-bezier(.4,0,.2,1);
   pointer-events: auto;
 }
 .bottom-nav:hover {
@@ -1063,5 +1063,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow: none;
 }
 .bottom-nav--hidden {
-  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: block !important;
 }
