@@ -156,6 +156,16 @@ h2 {
   margin-left: auto;
   margin-right: auto;
 }
+.item-card.opened {
+  min-height: 200px;
+  max-height: 200px;
+  height: 200px;
+}
+.item-card.closed {
+  min-height: 170px;
+  max-height: 170px;
+  height: 170px;
+}
 .stat-row {
   display: flex;
   align-items: center;
