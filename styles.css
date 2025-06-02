@@ -302,9 +302,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   overflow: hidden;
   transition: box-shadow 0.24s, background 0.18s, transform 0.21s;
   animation: cardFadeIn 0.6s cubic-bezier(.4,0,.2,1);
-  min-height: 192px;
-  max-height: 192px;
-  height: 192px;
+  min-height: 210px;
+  max-height: 210px;
+  height: 210px;
   box-sizing: border-box;
 }
 .item-card::before {
