@@ -558,6 +558,7 @@ function renderCard(r, actions = true, isExpired = false) {
   let status = `<span class=\"card-status-badge ${r.opened == 1 ? "opened" : "closed"}\">${r.opened == 1 ? "Открыто" : "Закрыто"}</span>`;
   let highlight = '';
   let main = '';
+  let cardStyle = '';
   if (r.opened == 1) {
     let expiry1 = r.expiry_by_opened;
     let expiry2 = r.expiry_by_total;
@@ -569,7 +570,7 @@ function renderCard(r, actions = true, isExpired = false) {
       <div class=\"card-row\"><b>Годен посл. вскр.:</b> <span class=\"${minExpiry===expiry1?'highlight-expiry':''}\">${escapeHtml(expiry1||'—')}</span></div>
       <div class=\"card-row\"><b>Общ. срок до:</b> <span class=\"${minExpiry===expiry2?'highlight-expiry':''}\">${escapeHtml(expiry2||'—')}</span></div>
     </div>`;
-    let cardStyle = 'min-height:230px;max-height:230px;height:230px;';
+    cardStyle = 'min-height:230px;max-height:230px;height:230px;';
   } else {
     let expiry = r.expiry_by_total;
     main = `<div class=\"card-main\">
@@ -578,7 +579,7 @@ function renderCard(r, actions = true, isExpired = false) {
       <div class=\"card-row\"><b>Дата произв.:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
       <div class=\"card-row\"><b>Годен до:</b> <span class=\"highlight-expiry\">${escapeHtml(expiry||'—')}</span></div>
     </div>`;
-    let cardStyle = 'min-height:170px;max-height:170px;height:170px;';
+    cardStyle = 'min-height:170px;max-height:170px;height:170px;';
   }
   let bigDelete = '';
   if (isExpired) {
