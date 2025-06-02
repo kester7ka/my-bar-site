@@ -549,9 +549,8 @@ function renderCard(r, actions = true, isExpired = false) {
       <div class=\"card-title\" title=\"${escapeHtml(r.name)}\">${escapeHtml(r.name)}</div>
       <div class=\"card-row\"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
       <div class=\"card-row\"><b>Дата вскрытия:</b> ${escapeHtml(r.opened_at||'—')}</div>
-      <div class=\"card-row\"><b>Годен после вскрытия до:</b> <span class=\"${minExpiry===expiry1?'highlight-expiry':''}\">${escapeHtml(expiry1||'—')}</span></div>
-      <div class=\"card-row\"><b>Годен по общему сроку до:</b> <span class=\"${minExpiry===expiry2?'highlight-expiry':''}\">${escapeHtml(expiry2||'—')}</span></div>
-      <div class=\"card-row\"><b>Финальная дата годности:</b> <span class=\"highlight-expiry\">${escapeHtml(minExpiry||'—')}</span></div>
+      <div class=\"card-row\"><b>Годен посл. вскр.:</b> <span class=\"${minExpiry===expiry1?'highlight-expiry':''}\">${escapeHtml(expiry1||'—')}</span></div>
+      <div class=\"card-row\"><b>Общ. срок до:</b> <span class=\"${minExpiry===expiry2?'highlight-expiry':''}\">${escapeHtml(expiry2||'—')}</span></div>
     </div>`;
   } else {
     let expiry = r.expiry_by_total;
@@ -580,7 +579,7 @@ function renderCard(r, actions = true, isExpired = false) {
       + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg>Открыть</button>` : '')
       + `</div>`;
   }
-  let cardStyle = r.opened == 1 ? 'min-height:260px;max-height:260px;height:260px;' : '';
+  let cardStyle = r.opened == 1 ? 'min-height:210px;max-height:210px;height:210px;' : '';
   return `<div class=\"item-card\" style=\"--card-accent:${accent};${cardStyle}\">${main}${bigDelete}${status}${buttons}</div>`;
 }
 function showSearchPage() {
