@@ -546,7 +546,7 @@ function renderCard(r, actions = true, isExpired = false) {
   // Для некондиции — одна кнопка удалить по стилю обычной deletebtn, по центру, шире
   let bigDelete = '';
   if (isExpired) {
-    bigDelete = `<div style=\"display:flex;justify-content:center;width:100%;margin-top:18px;\">
+    bigDelete = `<div style=\"display:flex;justify-content:center;width:100%;margin-bottom:18px;\">
       <button class=\"deletebtn big-delete-btn\" onclick=\"showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')\">
         <svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg>
         Удалить
