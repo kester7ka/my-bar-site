@@ -171,9 +171,9 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         let filtered;
         if (data.ok) {
           if (filter === 'today') {
-            filtered = (data.results||[]).filter(x=>x.expiry_at && x.expiry_at <= checkDate);
+            filtered = (data.results||[]).filter(x=>x.expiry_final && x.expiry_final <= checkDate);
           } else {
-            filtered = (data.results||[]).filter(x=>x.expiry_at === checkDate);
+            filtered = (data.results||[]).filter(x=>x.expiry_final === checkDate);
           }
         } else {
           filtered = [];
@@ -441,6 +441,8 @@ function showAddPage() {
     if (opened && !openedAtInput.value) allOk = false;
     if (opened && openTobExists) allOk = false;
     submitBtn.disabled = !allOk;
+    if (!allOk) submitBtn.classList.add('disabled');
+    else submitBtn.classList.remove('disabled');
   }
 
   async function fetchItemsOnce() {
@@ -578,7 +580,8 @@ function renderCard(r, actions = true, isExpired = false) {
       + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg>Открыть</button>` : '')
       + `</div>`;
   }
-  return `<div class=\"item-card\" style=\"--card-accent:${accent}\">${main}${bigDelete}${status}${buttons}</div>`;
+  let cardStyle = r.opened == 1 ? 'min-height:260px;max-height:260px;height:260px;' : '';
+  return `<div class=\"item-card\" style=\"--card-accent:${accent};${cardStyle}\">${main}${bigDelete}${status}${buttons}</div>`;
 }
 function showSearchPage() {
   setPageTitle('Поиск');
@@ -868,6 +871,8 @@ function openReopenForm(rJson, openAfterEdit = false) {
     if (!document.getElementById('edit_manufactured_at').value) allOk = false;
     if (opened && !document.getElementById('edit_opened_at').value) allOk = false;
     document.getElementById('editSubmitBtn').disabled = !allOk;
+    if (!allOk) document.getElementById('editSubmitBtn').classList.add('disabled');
+    else document.getElementById('editSubmitBtn').classList.remove('disabled');
   }
   validateForm();
   document.getElementById('editf').onsubmit = async function(e) {
