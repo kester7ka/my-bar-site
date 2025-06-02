@@ -923,28 +923,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 24px auto 32px auto;
   background: #ff6b81;
   color: #fff;
   border-radius: 999px;
-  box-shadow: 0 2px 16px #ff6b8133;
-  border: none;
-  font-size: 1.13em;
+  box-shadow: 0 2px 8px #ff6b8133;
+  border: 1.5px solid #ff6b8133;
+  font-size: 0.98em;
   font-weight: 700;
-  padding: 18px 0;
-  width: 90%;
-  max-width: 420px;
+  padding: 8px 0;
+  width: 80%;
   min-width: 0;
-  min-height: 54px;
+  min-height: 44px;
+  max-width: 340px;
+  margin: 0 auto 18px auto;
   cursor: pointer;
-  transition: background 0.22s, color 0.22s, box-shadow 0.22s;
+  transition: box-shadow 0.23s, background 0.23s, transform 0.16s, opacity 0.33s;
   outline: none;
-  gap: 12px;
+  gap: 7px;
 }
 .big-delete-btn svg {
-  width: 26px;
-  height: 26px;
-  margin-right: 8px;
+  width: 22px;
+  height: 22px;
+  margin-right: 7px;
 }
 .big-delete-btn:active {
   background: #e04a5f;
@@ -1023,4 +1023,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .modal-btn.cancelbtn:active {
   background: #181c27;
   color: #fff;
+}
+/* Анимация исчезновения модалки */
+.modal-overlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.33s cubic-bezier(.4,0,.2,1);
 }
