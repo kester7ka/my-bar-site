@@ -155,8 +155,8 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     tile.style.minHeight = '140px';
     tile.style.maxHeight = '340px';
     tile.style.transition = 'max-height 0.9s cubic-bezier(.4,0,.2,1)';
-    let msNow = msTimeNow();
-    let dateToCheck = new Date(msNow);
+    let msNow = new Date();
+    let dateToCheck = new Date(msNow.getFullYear(), msNow.getMonth(), msNow.getDate());
     if (filter === 'tomorrow') {
       dateToCheck.setDate(dateToCheck.getDate() + 1);
     }
@@ -221,7 +221,10 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         cardsDiv.innerHTML = cards;
         setTimeout(() => {
           tile.classList.add('has-expired');
-          tile.style.maxHeight = (340 + filtered.length * 110) + 'px';
+          let count = filtered.length;
+          let base = 340;
+          let maxh = count <= 2 ? base : (base + (count-2)*110);
+          tile.style.maxHeight = maxh + 'px';
           statusIcon.style.color = '#ff6b81';
           statusIcon.style.background = 'rgba(255,80,80,0.10)';
           statusIcon.style.boxShadow = '0 2px 12px #ff6b8133';
@@ -578,7 +581,7 @@ function renderCard(r, actions = true, isExpired = false) {
       <div class="card-row"><b>Дата произв.:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
       <div class="card-row"><b>Годен до:</b> <span class="highlight-expiry">${escapeHtml(expiry||'—')}</span></div>
     </div>`;
-    cardStyle = 'min-height:170px;max-height:170px;height:170px;';
+    cardStyle = 'min-height:210px;max-height:210px;height:210px;';
   }
   let bigDelete = '';
   if (isExpired) {
