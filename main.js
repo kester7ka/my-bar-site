@@ -171,13 +171,13 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         let filtered;
         if (data.ok) {
           if (filter === 'today') {
-            filtered = (data.results||[]).filter(x=>
-              [x.expiry_by_opened, x.expiry_by_total, x.expiry_final].some(date => date && date <= checkDate)
-            );
+            filtered = (data.results||[]).filter(x=>x.expiry_final && x.expiry_final <= checkDate);
           } else {
-            filtered = (data.results||[]).filter(x=>
-              [x.expiry_by_opened, x.expiry_by_total, x.expiry_final].some(date => date === checkDate)
-            );
+            filtered = (data.results||[]).filter(x=>[
+              x.expiry_final,
+              x.expiry_by_opened,
+              x.expiry_by_total
+            ].some(dt => dt === checkDate));
           }
         } else {
           filtered = [];
@@ -429,17 +429,7 @@ function showAddPage() {
   const submitBtn = document.getElementById('addSubmitBtn');
   tobInput.setAttribute('inputmode', 'numeric');
   tobInput.setAttribute('pattern', '\\d*');
-  tobInput.addEventListener('input', function(e){
-    this.value = this.value.replace(/\D/g, '').slice(0,6);
-  });
-  shelfInput.setAttribute('inputmode', 'numeric');
-  shelfInput.setAttribute('pattern', '\\d*');
-  shelfInput.addEventListener('input', function(e){
-    this.value = this.value.replace(/\D/g, '');
-  });
-  openedShelfInput.setAttribute('inputmode', 'numeric');
-  openedShelfInput.setAttribute('pattern', '\\d*');
-  openedShelfInput.addEventListener('input', function(e){
+  tobInput.addEventListener('input', function(e) {
     this.value = this.value.replace(/\D/g, '');
   });
 
@@ -484,14 +474,25 @@ function showAddPage() {
       let exists = allItems.find(x => x.tob === tobVal);
       if (exists) {
         nameInput.value = exists.name;
-        nameInput.readOnly = true;
         shelfInput.value = exists.shelf_life_days;
         openedShelfInput.value = exists.opened_shelf_life_days;
+        nameInput.readOnly = true;
+        shelfInput.readOnly = true;
+        openedShelfInput.readOnly = true;
+        openedItemName = exists.name;
+        if (exists.opened == 1) {
+          openTobExists = true;
+          tobWarning.innerHTML = `<span class="tob-warning">Добавление открытой позиции с этим TOB запрещено. Сначала закройте или удалите открытую позицию с этим TOB.</span>`;
+          tobWarning.style.display = "block";
+        }
       } else {
-        nameInput.value = '';
         nameInput.readOnly = false;
+        shelfInput.readOnly = false;
+        openedShelfInput.readOnly = false;
+        nameInput.value = '';
         shelfInput.value = '';
         openedShelfInput.value = '';
+        openedItemName = '';
       }
     }
     validateForm();
@@ -568,6 +569,7 @@ function renderCard(r, actions = true, isExpired = false) {
       <div class=\"card-row\"><b>Годен посл. вскр.:</b> <span class=\"${minExpiry===expiry1?'highlight-expiry':''}\">${escapeHtml(expiry1||'—')}</span></div>
       <div class=\"card-row\"><b>Общ. срок до:</b> <span class=\"${minExpiry===expiry2?'highlight-expiry':''}\">${escapeHtml(expiry2||'—')}</span></div>
     </div>`;
+    let cardStyle = 'min-height:230px;max-height:230px;height:230px;';
   } else {
     let expiry = r.expiry_by_total;
     main = `<div class=\"card-main\">
@@ -576,6 +578,7 @@ function renderCard(r, actions = true, isExpired = false) {
       <div class=\"card-row\"><b>Дата произв.:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
       <div class=\"card-row\"><b>Годен до:</b> <span class=\"highlight-expiry\">${escapeHtml(expiry||'—')}</span></div>
     </div>`;
+    let cardStyle = 'min-height:170px;max-height:170px;height:170px;';
   }
   let bigDelete = '';
   if (isExpired) {
@@ -595,9 +598,7 @@ function renderCard(r, actions = true, isExpired = false) {
       + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg>Открыть</button>` : '')
       + `</div>`;
   }
-  let cardStyle = r.opened == 1 ? 'min-height:200px;max-height:200px;height:200px;' : 'min-height:170px;max-height:170px;height:170px;';
-  let cardClass = r.opened == 1 ? 'item-card opened' : 'item-card closed';
-  return `<div class=\"${cardClass}\" style=\"--card-accent:${accent};${cardStyle}\">${main}${bigDelete}${status}${buttons}</div>`;
+  return `<div class=\"item-card\" style=\"--card-accent:${accent};${cardStyle}\">${main}${bigDelete}${status}${buttons}</div>`;
 }
 function showSearchPage() {
   setPageTitle('Поиск');
@@ -875,8 +876,15 @@ function openReopenForm(rJson, openAfterEdit = false) {
   document.getElementById('edit_category').onchange = validateForm;
   document.getElementById('edit_name').oninput = validateForm;
   document.getElementById('edit_manufactured_at').oninput = validateForm;
-  document.getElementById('edit_shelf_life_days').oninput = validateForm;
-  document.getElementById('edit_opened_shelf_life_days').oninput = validateForm;
+  const editShelfInput = document.getElementById('edit_shelf_life_days');
+  const editOpenedShelfInput = document.getElementById('edit_opened_shelf_life_days');
+  [editShelfInput, editOpenedShelfInput].forEach(inp => {
+    inp.setAttribute('inputmode', 'numeric');
+    inp.setAttribute('pattern', '\\d*');
+    inp.addEventListener('input', function(e) {
+      this.value = this.value.replace(/\D/g, '');
+    });
+  });
   document.getElementById('edit_opened_at').oninput = validateForm;
   function validateForm() {
     let allOk = true;
@@ -1141,17 +1149,33 @@ function renderCategoryStatusBar(filterCategory, filterOpened) {
   return `<div class="filter-bar-wrap">${catSelect}${statusSelect}</div>`;
 }
 
-// Скрытие bottom-nav при открытии клавиатуры только на мобилке и только для input/textarea
-function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 900;
-}
-window.addEventListener('focusin', function(e) {
-  if (!isMobile()) return;
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-    document.querySelector('.bottom-nav').classList.add('bottom-nav--hidden');
+(function() {
+  const nav = document.querySelector('.bottom-nav');
+  if (!nav) return;
+  nav.style.transition = 'opacity 0.33s cubic-bezier(.4,0,.2,1)';
+  function hideNav() {
+    nav.style.opacity = '0';
+    nav.style.pointerEvents = 'none';
   }
-});
-window.addEventListener('focusout', function(e) {
-  if (!isMobile()) return;
-  document.querySelector('.bottom-nav').classList.remove('bottom-nav--hidden');
-});
+  function showNav() {
+    nav.style.opacity = '1';
+    nav.style.pointerEvents = '';
+  }
+  let keyboardOpen = false;
+  document.body.addEventListener('focusin', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+      keyboardOpen = true;
+      hideNav();
+    }
+  });
+  document.body.addEventListener('focusout', function(e) {
+    setTimeout(() => {
+      if (!document.activeElement || ['INPUT','TEXTAREA','SELECT'].indexOf(document.activeElement.tagName) === -1) {
+        keyboardOpen = false;
+        showNav();
+      }
+    }, 120);
+  });
+  // Инициализация
+  showNav();
+})();
