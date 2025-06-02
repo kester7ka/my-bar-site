@@ -332,11 +332,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-size: 1.18em;
   color: #fff;
   margin: 0 0 2px 0;
-  word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: anywhere;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
   line-height: 1.18;
 }
 .card-row {
@@ -344,6 +344,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: #b9dbff;
   line-height: 1.19;
   word-break: break-word;
+  overflow-wrap: anywhere;
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0 0 2px 0;
@@ -372,7 +373,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transition: background 0.23s, color 0.23s;
 }
 .card-status-badge.closed {
-  background: linear-gradient(90deg, #ff6b81 0%, #232b33 100%);
+  background: #ff6b81;
   color: #fff;
 }
 .card-actions-bottom {
@@ -723,7 +724,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     width: 42px;
     height: 42px;
     font-size: 1.7em;
-  }
+}
 }
 @keyframes fadeInTab {
   from { opacity:0; transform: translateY(32px);}
@@ -1029,4 +1030,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.33s cubic-bezier(.4,0,.2,1);
+}
+.highlight-expiry {
+  color: #ffb86b;
+  font-weight: 800;
+  background: rgba(255,184,107,0.10);
+  border-radius: 8px;
+  padding: 2px 7px;
+  box-shadow: 0 1px 8px #ffb86b33;
+  transition: background 0.22s, color 0.22s;
+}
+.beautiful-form .btns button.disabled,
+.beautiful-form .btns button:disabled {
+  opacity: 0.45;
+  filter: grayscale(0.2);
+  cursor: not-allowed !important;
+  pointer-events: none;
+  background: linear-gradient(90deg, #232b33 60%, #7b7bff 100%);
+  color: #b9dbff;
+  box-shadow: none;
 }
