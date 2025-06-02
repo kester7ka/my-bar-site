@@ -423,11 +423,20 @@ function showAddPage() {
   const openedAtInput = document.getElementById('opened_at');
   const catInput = document.getElementById('category');
   const submitBtn = document.getElementById('addSubmitBtn');
-  tobInput.addEventListener('keydown', function(e){
-    if (e.key.length === 1 && !/[0-9]/.test(e.key)) e.preventDefault();
-  });
+  tobInput.setAttribute('inputmode', 'numeric');
+  tobInput.setAttribute('pattern', '\\d*');
   tobInput.addEventListener('input', function(e){
     this.value = this.value.replace(/\D/g, '').slice(0,6);
+  });
+  shelfInput.setAttribute('inputmode', 'numeric');
+  shelfInput.setAttribute('pattern', '\\d*');
+  shelfInput.addEventListener('input', function(e){
+    this.value = this.value.replace(/\D/g, '');
+  });
+  openedShelfInput.setAttribute('inputmode', 'numeric');
+  openedShelfInput.setAttribute('pattern', '\\d*');
+  openedShelfInput.addEventListener('input', function(e){
+    this.value = this.value.replace(/\D/g, '');
   });
 
   function validateForm() {
@@ -468,14 +477,17 @@ function showAddPage() {
     nameInput.value = '';
     openedItemName = '';
     if (tobVal.length === 6) {
-      let exists = allItems.find(x => x.tob === tobVal && x.opened == 1);
+      let exists = allItems.find(x => x.tob === tobVal);
       if (exists) {
-        openTobExists = true;
         nameInput.value = exists.name;
         nameInput.readOnly = true;
-        openedItemName = exists.name;
-        tobWarning.innerHTML = `<span class="tob-warning">Добавление открытой позиции с этим TOB запрещено. Сначала закройте или удалите открытую позицию с этим TOB.</span>`;
-        tobWarning.style.display = "block";
+        shelfInput.value = exists.shelf_life_days;
+        openedShelfInput.value = exists.opened_shelf_life_days;
+      } else {
+        nameInput.value = '';
+        nameInput.readOnly = false;
+        shelfInput.value = '';
+        openedShelfInput.value = '';
       }
     }
     validateForm();
@@ -557,7 +569,7 @@ function renderCard(r, actions = true, isExpired = false) {
     main = `<div class=\"card-main\">
       <div class=\"card-title\" title=\"${escapeHtml(r.name)}\">${escapeHtml(r.name)}</div>
       <div class=\"card-row\"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
-      <div class=\"card-row\"><b>Дата производства:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
+      <div class=\"card-row\"><b>Дата произв.:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
       <div class=\"card-row\"><b>Годен до:</b> <span class=\"highlight-expiry\">${escapeHtml(expiry||'—')}</span></div>
     </div>`;
   }
@@ -579,8 +591,9 @@ function renderCard(r, actions = true, isExpired = false) {
       + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg>Открыть</button>` : '')
       + `</div>`;
   }
-  let cardStyle = r.opened == 1 ? 'min-height:210px;max-height:210px;height:210px;' : '';
-  return `<div class=\"item-card\" style=\"--card-accent:${accent};${cardStyle}\">${main}${bigDelete}${status}${buttons}</div>`;
+  let cardStyle = r.opened == 1 ? 'min-height:200px;max-height:200px;height:200px;' : 'min-height:170px;max-height:170px;height:170px;';
+  let cardClass = r.opened == 1 ? 'item-card opened' : 'item-card closed';
+  return `<div class=\"${cardClass}\" style=\"--card-accent:${accent};${cardStyle}\">${main}${bigDelete}${status}${buttons}</div>`;
 }
 function showSearchPage() {
   setPageTitle('Поиск');
