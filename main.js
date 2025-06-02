@@ -1141,12 +1141,17 @@ function renderCategoryStatusBar(filterCategory, filterOpened) {
   return `<div class="filter-bar-wrap">${catSelect}${statusSelect}</div>`;
 }
 
-// Скрытие bottom-nav при открытии клавиатуры
+// Скрытие bottom-nav при открытии клавиатуры только на мобилке и только для input/textarea
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 900;
+}
 window.addEventListener('focusin', function(e) {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+  if (!isMobile()) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
     document.querySelector('.bottom-nav').classList.add('bottom-nav--hidden');
   }
 });
 window.addEventListener('focusout', function(e) {
+  if (!isMobile()) return;
   document.querySelector('.bottom-nav').classList.remove('bottom-nav--hidden');
 });
