@@ -555,51 +555,50 @@ function renderCard(r, actions = true, isExpired = false) {
     '☕ Кофе': '#ffb86b',
     '📦 Прочее': '#ff6b81'
   }[r.category] || '#7b7bff';
-  let status = `<span class=\"card-status-badge ${r.opened == 1 ? "opened" : "closed"}\">${r.opened == 1 ? "Открыто" : "Закрыто"}</span>`;
-  let highlight = '';
+  let status = `<span class="card-status-badge ${r.opened == 1 ? "opened" : "closed"}">${r.opened == 1 ? "Открыто" : "Закрыто"}</span>`;
   let main = '';
   let cardStyle = '';
   if (r.opened == 1) {
     let expiry1 = r.expiry_by_opened;
     let expiry2 = r.expiry_by_total;
     let minExpiry = r.expiry_final;
-    main = `<div class=\"card-main\">
-      <div class=\"card-title\" title=\"${escapeHtml(r.name)}\">${escapeHtml(r.name)}</div>
-      <div class=\"card-row\"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
-      <div class=\"card-row\"><b>Дата вскрытия:</b> ${escapeHtml(r.opened_at||'—')}</div>
-      <div class=\"card-row\"><b>Годен посл. вскр.:</b> <span class=\"${minExpiry===expiry1?'highlight-expiry':''}\">${escapeHtml(expiry1||'—')}</span></div>
-      <div class=\"card-row\"><b>Общ. срок до:</b> <span class=\"${minExpiry===expiry2?'highlight-expiry':''}\">${escapeHtml(expiry2||'—')}</span></div>
+    main = `<div class="card-main">
+      <div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
+      <div class="card-row"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
+      <div class="card-row"><b>Дата вскрытия:</b> ${escapeHtml(r.opened_at||'—')}</div>
+      <div class="card-row"><b>Годен посл. вскр.:</b> <span class="${minExpiry===expiry1?'highlight-expiry':''}">${escapeHtml(expiry1||'—')}</span></div>
+      <div class="card-row"><b>Общ. срок до:</b> <span class="${minExpiry===expiry2?'highlight-expiry':''}">${escapeHtml(expiry2||'—')}</span></div>
     </div>`;
     cardStyle = 'min-height:230px;max-height:230px;height:230px;';
   } else {
     let expiry = r.expiry_by_total;
-    main = `<div class=\"card-main\">
-      <div class=\"card-title\" title=\"${escapeHtml(r.name)}\">${escapeHtml(r.name)}</div>
-      <div class=\"card-row\"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
-      <div class=\"card-row\"><b>Дата произв.:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
-      <div class=\"card-row\"><b>Годен до:</b> <span class=\"highlight-expiry\">${escapeHtml(expiry||'—')}</span></div>
+    main = `<div class="card-main">
+      <div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
+      <div class="card-row"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
+      <div class="card-row"><b>Дата произв.:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
+      <div class="card-row"><b>Годен до:</b> <span class="highlight-expiry">${escapeHtml(expiry||'—')}</span></div>
     </div>`;
     cardStyle = 'min-height:170px;max-height:170px;height:170px;';
   }
   let bigDelete = '';
   if (isExpired) {
-    bigDelete = `<div style=\"display:flex;justify-content:center;width:100%;margin-bottom:8px;margin-top:-8px;\">
-      <button class=\"deletebtn big-delete-btn\" onclick=\"showDeleteModal('${encodeURIComponent(JSON.stringify(r))}','expired')\">`
+    bigDelete = `<div style="display:flex;justify-content:center;width:100%;margin-bottom:8px;margin-top:-8px;">
+      <button class="deletebtn big-delete-btn" onclick="showDeleteModal('${encodeURIComponent(JSON.stringify(r))}','expired')">`
       + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg>`
       + `Удалить</button></div>`;
   }
   let buttons = "";
   if (actions) {
-    buttons = `<div class=\"card-actions-bottom\">`
-      + `<button class=\"editbtn\" onclick=\"openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;\">`
+    buttons = `<div class="card-actions-bottom">`
+      + `<button class="editbtn" onclick="openReopenForm('${encodeURIComponent(JSON.stringify(r))}');return false;">`
       + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216.49 79.51l-40-40a12 12 0 0 0-17 0l-96 96A12 12 0 0 0 56 143v40a12 12 0 0 0 12 12h40a12 12 0 0 0 8.49-3.51l96-96a12 12 0 0 0 0-17ZM104 188H68v-36l80-80 36 36ZM192 96l-32-32 16-16 32 32Z'/></svg>Изменить</button>`
-      + `<button class=\"deletebtn\" onclick=\"showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')\">`
+      + `<button class="deletebtn" onclick="showDeleteModal('${encodeURIComponent(JSON.stringify(r))}')">`
       + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg>Удалить</button>`
-      + (r.opened == 0 ? `<button class=\"openbtn\" onclick=\"showOpenModal('${encodeURIComponent(JSON.stringify(r))}')\">`
+      + (r.opened == 0 ? `<button class="openbtn" onclick="showOpenModal('${encodeURIComponent(JSON.stringify(r))}')">`
       + `<svg width='22' height='22' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg>Открыть</button>` : '')
       + `</div>`;
   }
-  return `<div class=\"item-card\" style=\"--card-accent:${accent};${cardStyle}\">${main}${bigDelete}${status}${buttons}</div>`;
+  return `<div class="item-card" style="--card-accent:${accent};${cardStyle}">${main}${bigDelete}${status}${buttons}</div>`;
 }
 function showSearchPage() {
   setPageTitle('Поиск');
