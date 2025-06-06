@@ -152,6 +152,17 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     const statusIcon = document.getElementById('expiredStatusIcon');
     cardsDiv.innerHTML = "";
     tile.classList.remove('has-expired');
+    // Сбросить стили
+    tile.style.transition = 'all 0.5s cubic-bezier(.4,0,.2,1)';
+    tile.style.minHeight = '';
+    tile.style.paddingTop = '';
+    tile.style.paddingBottom = '';
+    statusIcon.style.transition = 'all 0.5s cubic-bezier(.4,0,.2,1)';
+    statusIcon.style.background = 'rgba(35,43,51,0.92)';
+    statusIcon.style.color = '#fff';
+    statusIcon.style.boxShadow = '0 2px 8px #232b3340';
+    title.style.transition = 'color 0.5s';
+    title.style.color = '#fff';
     let msNow = new Date();
     let dateToCheck = new Date(msNow.getFullYear(), msNow.getMonth(), msNow.getDate());
     if (filter === 'tomorrow') {
@@ -183,9 +194,14 @@ function showExpiredPage(isMain = false, afterRenderCb) {
           title.innerHTML = "Ошибка: "+escapeHtml(data.error);
           cardsDiv.innerHTML = "";
           tile.classList.remove('has-expired');
-          statusIcon.style.color = '#19c37d';
-          statusIcon.style.background = 'rgba(80,255,120,0.10)';
-          statusIcon.style.boxShadow = '0 2px 8px #19c37d33';
+          // Сбросить стили
+          tile.style.minHeight = '140px';
+          tile.style.paddingTop = '28px';
+          tile.style.paddingBottom = '28px';
+          statusIcon.style.background = 'rgba(35,43,51,0.92)';
+          statusIcon.style.color = '#fff';
+          statusIcon.style.boxShadow = '0 2px 8px #232b3340';
+          title.style.color = '#fff';
           if (afterRenderCb) afterRenderCb();
           return;
         }
@@ -196,12 +212,17 @@ function showExpiredPage(isMain = false, afterRenderCb) {
           title.className = "success";
           cardsDiv.innerHTML = "";
           tile.classList.remove('has-expired');
-          statusIcon.style.color = '#19c37d';
-          statusIcon.style.background = 'rgba(80,255,120,0.10)';
-          statusIcon.style.boxShadow = '0 2px 8px #19c37d33';
-          if (afterRenderCb) afterRenderCb();
+          // Меньше и невыделенная плитка
+          tile.style.minHeight = '120px';
+          tile.style.paddingTop = '18px';
+          tile.style.paddingBottom = '18px';
+          statusIcon.style.background = 'rgba(35,43,51,0.92)';
+          statusIcon.style.color = '#fff';
+          statusIcon.style.boxShadow = '0 2px 8px #232b3340';
+          title.style.color = '#fff';
           return;
         }
+        // Есть карточки — выделяем плитку
         title.innerHTML = filter === 'today'
           ? "Сегодня и ранее истекают:"
           : "Завтра истекают:";
@@ -214,9 +235,13 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         cardsDiv.innerHTML = cards;
         setTimeout(() => {
           tile.classList.add('has-expired');
+          tile.style.minHeight = '340px';
+          tile.style.paddingTop = '36px';
+          tile.style.paddingBottom = '32px';
           statusIcon.style.color = '#ffb86b';
           statusIcon.style.background = 'rgba(255,184,107,0.13)';
           statusIcon.style.boxShadow = '0 2px 16px #ffb86b33';
+          title.style.color = '#ffb86b';
         }, 60);
         if (afterRenderCb) afterRenderCb();
       })
@@ -224,9 +249,13 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         title.innerHTML = "Ошибка сети: " + escapeHtml(e.message);
         cardsDiv.innerHTML = "";
         tile.classList.remove('has-expired');
-        statusIcon.style.color = '#19c37d';
-        statusIcon.style.background = 'rgba(80,255,120,0.10)';
-        statusIcon.style.boxShadow = '0 2px 8px #19c37d33';
+        tile.style.minHeight = '140px';
+        tile.style.paddingTop = '28px';
+        tile.style.paddingBottom = '28px';
+        statusIcon.style.background = 'rgba(35,43,51,0.92)';
+        statusIcon.style.color = '#fff';
+        statusIcon.style.boxShadow = '0 2px 8px #232b3340';
+        title.style.color = '#fff';
         if (afterRenderCb) afterRenderCb();
       });
   }
@@ -324,47 +353,74 @@ function msDaysBetween(dateStr1, dateStr2) {
 function showAddPage() {
   setPageTitle('Добавить позицию');
   showPage(addBackButton(`
-    <form id="addf" class="beautiful-form" autocomplete="off">
+    <form id="addf" class="beautiful-form add-form-modern" autocomplete="off" style="max-width:440px;padding:36px 18px 32px 18px;box-shadow:0 8px 40px #7b7bff33, 0 1.5px 7px #232b3340, 0 1.5px 0.5px #fff2 inset;border:2px solid #7b7bff33;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+        <div style="background:#232b33;border-radius:16px;padding:12px 16px;box-shadow:0 2px 12px #7b7bff22;display:flex;align-items:center;justify-content:center;">
+          <svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' fill='none' viewBox='0 0 256 256'><path fill='#7b7bff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/><path fill='#7b7bff' d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Zm0 88a16 16 0 1 0 0-32 16 16 0 0 0 0 32Z'/></svg>
+        </div>
+        <div style="font-size:1.35em;font-weight:900;color:#7b7bff;letter-spacing:0.01em;">Добавить позицию</div>
+      </div>
       <div class="field-row">
         <label class="field-label" for="category">Категория</label>
-        <select name="category" id="category" required>
-          <option value="🍯 Сиропы">🍯 Сиропы</option>
-          <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
-          <option value="☕ Кофе">☕ Кофе</option>
-          <option value="📦 Прочее">📦 Прочее</option>
-        </select>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='#7b7bff' stroke-width='16'/><path d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Z' fill='#7b7bff'/></svg>
+          <select name="category" id="category" required style="flex:1;">
+            <option value="🍯 Сиропы">🍯 Сиропы</option>
+            <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
+            <option value="☕ Кофе">☕ Кофе</option>
+            <option value="📦 Прочее">📦 Прочее</option>
+          </select>
+        </div>
       </div>
-      <div class="status-toggle-bar" id="statusToggleBar">
-        <button type="button" class="status-toggle-btn opened selected" id="btnOpened">Открыто</button>
-        <button type="button" class="status-toggle-btn closed" id="btnClosed">Закрыто</button>
+      <div class="status-toggle-bar" id="statusToggleBar" style="margin-bottom:10px;margin-top:10px;">
+        <button type="button" class="status-toggle-btn opened selected" id="btnOpened"><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='#7b7bff' stroke-width='16'/><path d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Z' fill='#7b7bff'/></svg> Открыто</button>
+        <button type="button" class="status-toggle-btn closed" id="btnClosed"><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='#ff6b81' stroke-width='16'/><path d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Z' fill='#ff6b81'/></svg> Закрыто</button>
       </div>
       <div class="field-row">
         <label class="field-label" for="tob">TOB (6 цифр)</label>
-        <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456" autocomplete="off" inputmode="numeric">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect x='32' y='48' width='192' height='160' rx='16' fill='none' stroke='#7b7bff' stroke-width='16'/><line x1='76' y1='88' x2='76' y2='168' fill='none' stroke='#7b7bff' stroke-width='12' stroke-linecap='round'/><line x1='108' y1='88' x2='108' y2='168' fill='none' stroke='#7b7bff' stroke-width='8' stroke-linecap='round'/><line x1='148' y1='88' x2='148' y2='168' fill='none' stroke='#7b7bff' stroke-width='8' stroke-linecap='round'/><line x1='180' y1='88' x2='180' y2='168' fill='none' stroke='#7b7bff' stroke-width='12' stroke-linecap='round'/></svg>
+          <input name="tob" id="tob" maxlength="6" pattern="\\d{6}" required placeholder="123456" autocomplete="off" inputmode="numeric" style="flex:1;">
+        </div>
         <div id="tobWarning" style="display:none"></div>
       </div>
       <div class="field-row">
         <label class="field-label" for="name">Название</label>
-        <input name="name" id="name" required placeholder="Название позиции">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='#7b7bff' stroke-width='16'/></svg>
+          <input name="name" id="name" required placeholder="Название позиции" style="flex:1;">
+        </div>
       </div>
       <div class="field-row">
         <label class="field-label" for="manufactured_at">Дата производства</label>
-        <input name="manufactured_at" id="manufactured_at" type="date" required>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='#7b7bff' stroke-width='16'/><line x1='176' y1='24' x2='176' y2='56' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='80' y1='24' x2='80' y2='56' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='40' y1='88' x2='216' y2='88' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg>
+          <input name="manufactured_at" id="manufactured_at" type="date" required style="flex:1;">
+        </div>
       </div>
       <div class="field-row">
         <label class="field-label" for="shelf_life_days">Срок годности (дней)</label>
-        <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="180">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='#7b7bff' stroke-width='16'/><polyline points='128 72 128 128 184 128' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg>
+          <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="180" style="flex:1;">
+        </div>
       </div>
       <div class="field-row">
         <label class="field-label" for="opened_shelf_life_days">Срок после вскрытия (дней)</label>
-        <input name="opened_shelf_life_days" id="opened_shelf_life_days" type="number" min="1" required placeholder="30">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='#7b7bff' stroke-width='16'/><polyline points='128 72 128 128 184 128' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg>
+          <input name="opened_shelf_life_days" id="opened_shelf_life_days" type="number" min="1" required placeholder="30" style="flex:1;">
+        </div>
       </div>
       <div class="field-row" id="openedAtRow" style="display:none;">
         <label class="field-label" for="opened_at">Дата вскрытия</label>
-        <input name="opened_at" id="opened_at" type="date">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='#7b7bff' stroke-width='16'/><line x1='176' y1='24' x2='176' y2='56' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='80' y1='24' x2='80' y2='56' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='40' y1='88' x2='216' y2='88' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg>
+          <input name="opened_at" id="opened_at" type="date" style="flex:1;">
+        </div>
       </div>
-      <div class="btns">
-        <button type="submit" id="addSubmitBtn" disabled>Добавить</button>
+      <div class="btns" style="margin-top:18px;gap:18px;">
+        <button type="submit" id="addSubmitBtn" disabled style="font-size:1.18em;padding:18px 0;border-radius:16px;background:linear-gradient(90deg,#7b7bff 60%,#232b33 100%);color:#fff;font-weight:700;border:none;box-shadow:0 2px 12px #10131e33;cursor:pointer;transition:background 0.25s,transform 0.17s;animation:popIn 0.33s;flex:1;width:100%;margin:0;letter-spacing:0.03em;">Добавить</button>
       </div>
     </form>
   `));
@@ -555,7 +611,7 @@ function renderCard(r, actions = true, isExpired = false) {
     main = `<div class="card-main">
       <div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
       <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg></span> <b>TOB:</b> ${escapeHtml(r.tob)}</div>
-      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='currentColor' stroke-width='16'/><line x1='176' y1='24' x2='176' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='80' y1='24' x2='80' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='40' y1='88' x2='216' y2='88' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg></span> <b>Дата вскрытия:</b> ${escapeHtml(r.opened_at||'—')}</div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect x='32' y='48' width='192' height='160' rx='16' fill='none' stroke='currentColor' stroke-width='16'/><line x1='76' y1='88' x2='76' y2='168' fill='none' stroke='currentColor' stroke-width='12' stroke-linecap='round'/><line x1='108' y1='88' x2='108' y2='168' fill='none' stroke='currentColor' stroke-width='8' stroke-linecap='round'/><line x1='148' y1='88' x2='148' y2='168' fill='none' stroke='currentColor' stroke-width='8' stroke-linecap='round'/><line x1='180' y1='88' x2='180' y2='168' fill='none' stroke='currentColor' stroke-width='12' stroke-linecap='round'/></svg></span> <b>TOB:</b> ${escapeHtml(r.tob)}</div>
       <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg></span> <b>Годен посл. вскр.:</b> <span class="${minExpiry===expiry1?'highlight-expiry':''}">${escapeHtml(expiry1||'—')}</span></div>
       <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='currentColor' stroke-width='16'/><polyline points='128 72 128 128 184 128' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg></span> <b>Общ. срок до:</b> <span class="${minExpiry===expiry2?'highlight-expiry':''}">${escapeHtml(expiry2||'—')}</span></div>
     </div>`;
