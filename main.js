@@ -109,15 +109,15 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     </div>`;
   }
   let content = `
-    <div class=\"beautiful-form expired-tile\" id=\"expiredTile\">
-      <div class=\"expired-status-icon\" id=\"expiredStatusIcon\">
-        <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='currentColor' opacity='0.15'/><path fill='currentColor' d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Zm0 88a16 16 0 1 0 0-32 16 16 0 0 0 0 32Z'/></svg>
+    <div class=\"expired-tile beautiful-form\" id=\"expiredTile\" style=\"box-shadow:0 8px 40px #ff6b8133, 0 1.5px 7px #232b3340, 0 1.5px 0.5px #fff2 inset; border: 2px solid #ffb86b33; padding:36px 18px 32px 18px; margin-bottom:32px;\">
+      <div class=\"expired-status-icon\" id=\"expiredStatusIcon\" style=\"left:24px;top:24px;width:48px;height:48px;font-size:2.2em;background:rgba(255,184,107,0.13);color:#ffb86b;box-shadow:0 2px 16px #ffb86b33;\">
+        <svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/><path fill='currentColor' d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Zm0 88a16 16 0 1 0 0-32 16 16 0 0 0 0 32Z'/></svg>
       </div>
-      <div class=\"expired-title-center\">Некондиция</div>
-      <div class=\"filter-bar-wrap\" style=\"margin-bottom:0;\">
+      <div class=\"expired-title-center\" style=\"font-size:1.45em;font-weight:900;color:#ffb86b;margin-bottom:18px;letter-spacing:0.01em;text-align:center;\">Некондиция</div>
+      <div class=\"filter-bar-wrap\" style=\"margin-bottom:0;justify-content:center;\">
         <div class=\"filter-bar-section\" id=\"expiredDayFilter\"></div>
       </div>
-      <div id=\"expiredTitle\" style=\"text-align:center;color:#aaa;font-size:1.07em;\">Загрузка...</div>
+      <div id=\"expiredTitle\" style=\"text-align:center;color:#aaa;font-size:1.07em;margin-bottom:10px;\">Загрузка...</div>
       <div id=\"expiredCards\"></div>
     </div>
   `;
@@ -152,9 +152,6 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     const statusIcon = document.getElementById('expiredStatusIcon');
     cardsDiv.innerHTML = "";
     tile.classList.remove('has-expired');
-    tile.style.minHeight = '140px';
-    tile.style.maxHeight = '340px';
-    tile.style.transition = 'max-height 0.9s cubic-bezier(.4,0,.2,1)';
     let msNow = new Date();
     let dateToCheck = new Date(msNow.getFullYear(), msNow.getMonth(), msNow.getDate());
     if (filter === 'tomorrow') {
@@ -186,8 +183,6 @@ function showExpiredPage(isMain = false, afterRenderCb) {
           title.innerHTML = "Ошибка: "+escapeHtml(data.error);
           cardsDiv.innerHTML = "";
           tile.classList.remove('has-expired');
-          tile.style.minHeight = '140px';
-          tile.style.maxHeight = '340px';
           statusIcon.style.color = '#19c37d';
           statusIcon.style.background = 'rgba(80,255,120,0.10)';
           statusIcon.style.boxShadow = '0 2px 8px #19c37d33';
@@ -201,8 +196,6 @@ function showExpiredPage(isMain = false, afterRenderCb) {
           title.className = "success";
           cardsDiv.innerHTML = "";
           tile.classList.remove('has-expired');
-          tile.style.minHeight = '140px';
-          tile.style.maxHeight = '340px';
           statusIcon.style.color = '#19c37d';
           statusIcon.style.background = 'rgba(80,255,120,0.10)';
           statusIcon.style.boxShadow = '0 2px 8px #19c37d33';
@@ -213,7 +206,7 @@ function showExpiredPage(isMain = false, afterRenderCb) {
           ? "Сегодня и ранее истекают:"
           : "Завтра истекают:";
         title.className = "";
-        let cards = `<div class=\"card-list\">`;
+        let cards = `<div class=\"card-list\" style=\"gap:22px;\">`;
         filtered.forEach(x=>{
           cards += renderCard(x, false, true);
         });
@@ -221,13 +214,9 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         cardsDiv.innerHTML = cards;
         setTimeout(() => {
           tile.classList.add('has-expired');
-          let count = filtered.length;
-          let base = 340;
-          let maxh = count <= 2 ? base : (base + (count-2)*110);
-          tile.style.maxHeight = maxh + 'px';
-          statusIcon.style.color = '#ff6b81';
-          statusIcon.style.background = 'rgba(255,80,80,0.10)';
-          statusIcon.style.boxShadow = '0 2px 12px #ff6b8133';
+          statusIcon.style.color = '#ffb86b';
+          statusIcon.style.background = 'rgba(255,184,107,0.13)';
+          statusIcon.style.boxShadow = '0 2px 16px #ffb86b33';
         }, 60);
         if (afterRenderCb) afterRenderCb();
       })
@@ -235,8 +224,6 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         title.innerHTML = "Ошибка сети: " + escapeHtml(e.message);
         cardsDiv.innerHTML = "";
         tile.classList.remove('has-expired');
-        tile.style.minHeight = '140px';
-        tile.style.maxHeight = '340px';
         statusIcon.style.color = '#19c37d';
         statusIcon.style.background = 'rgba(80,255,120,0.10)';
         statusIcon.style.boxShadow = '0 2px 8px #19c37d33';
@@ -567,19 +554,19 @@ function renderCard(r, actions = true, isExpired = false) {
     let minExpiry = r.expiry_final;
     main = `<div class="card-main">
       <div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
-      <div class="card-row"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
-      <div class="card-row"><b>Дата вскрытия:</b> ${escapeHtml(r.opened_at||'—')}</div>
-      <div class="card-row"><b>Годен посл. вскр.:</b> <span class="${minExpiry===expiry1?'highlight-expiry':''}">${escapeHtml(expiry1||'—')}</span></div>
-      <div class="card-row"><b>Общ. срок до:</b> <span class="${minExpiry===expiry2?'highlight-expiry':''}">${escapeHtml(expiry2||'—')}</span></div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg></span> <b>TOB:</b> ${escapeHtml(r.tob)}</div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='currentColor' stroke-width='16'/><line x1='176' y1='24' x2='176' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='80' y1='24' x2='80' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='40' y1='88' x2='216' y2='88' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg></span> <b>Дата вскрытия:</b> ${escapeHtml(r.opened_at||'—')}</div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg></span> <b>Годен посл. вскр.:</b> <span class="${minExpiry===expiry1?'highlight-expiry':''}">${escapeHtml(expiry1||'—')}</span></div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='currentColor' stroke-width='16'/><polyline points='128 72 128 128 184 128' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg></span> <b>Общ. срок до:</b> <span class="${minExpiry===expiry2?'highlight-expiry':''}">${escapeHtml(expiry2||'—')}</span></div>
     </div>`;
     cardStyle = 'min-height:230px;max-height:230px;height:230px;';
   } else {
     let expiry = r.expiry_by_total;
     main = `<div class="card-main">
       <div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
-      <div class="card-row"><b>TOB:</b> ${escapeHtml(r.tob)}</div>
-      <div class="card-row"><b>Дата произв.:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
-      <div class="card-row"><b>Годен до:</b> <span class="highlight-expiry">${escapeHtml(expiry||'—')}</span></div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M216 56a8 8 0 0 1-8 8h-8v136a24 24 0 0 1-24 24H80a24 24 0 0 1-24-24V64h-8a8 8 0 0 1 0-16h48V40a24 24 0 0 1 48 0v8h48a8 8 0 0 1 8 8ZM104 40a8 8 0 0 1 16 0v8h-16Zm88 24H64v136a8 8 0 0 0 8 8h104a8 8 0 0 0 8-8Zm-40 32a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Zm-32 0a8 8 0 0 0-16 0v64a8 8 0 0 0 16 0Z'/></svg></span> <b>TOB:</b> ${escapeHtml(r.tob)}</div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='currentColor' stroke-width='16'/><line x1='176' y1='24' x2='176' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='80' y1='24' x2='80' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='40' y1='88' x2='216' y2='88' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg></span> <b>Дата произв.:</b> ${escapeHtml(r.manufactured_at||'—')}</div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg></span> <b>Годен до:</b> <span class="highlight-expiry">${escapeHtml(expiry||'—')}</span></div>
     </div>`;
     cardStyle = 'min-height:210px;max-height:210px;height:210px;';
   }
@@ -630,6 +617,11 @@ function showSearchPage() {
       renderList();
       showBottomNav(true);
       this.blur();
+      setTimeout(() => {
+        if (typeof showNav === 'function') showNav();
+        const nav = document.querySelector('.bottom-nav');
+        if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; }
+      }, 200);
     };
     statusSelect.onchange = function() {
       filterOpened = this.value;
@@ -637,6 +629,11 @@ function showSearchPage() {
       renderList();
       showBottomNav(true);
       this.blur();
+      setTimeout(() => {
+        if (typeof showNav === 'function') showNav();
+        const nav = document.querySelector('.bottom-nav');
+        if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; }
+      }, 200);
     };
   }
 
