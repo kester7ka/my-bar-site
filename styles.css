@@ -851,6 +851,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding-top: 18px;
   transition: max-height 0.7s cubic-bezier(.4,0,.2,1);
 }
+.expired-tile.beautiful-form {
+  overflow: visible !important;
+}
 .expired-status-icon {
   position: absolute;
   top: 14px;
