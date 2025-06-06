@@ -627,13 +627,15 @@ function showSearchPage() {
     catSelect.onchange = function() {
       filterCategory = this.value;
       renderBar();
-        renderList();
-      };
+      renderList();
+      showBottomNav(true);
+    };
     statusSelect.onchange = function() {
       filterOpened = this.value;
       renderBar();
-        renderList();
-      };
+      renderList();
+      showBottomNav(true);
+    };
   }
 
   resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
