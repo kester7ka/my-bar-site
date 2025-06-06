@@ -629,12 +629,14 @@ function showSearchPage() {
       renderBar();
       renderList();
       showBottomNav(true);
+      this.blur();
     };
     statusSelect.onchange = function() {
       filterOpened = this.value;
       renderBar();
       renderList();
       showBottomNav(true);
+      this.blur();
     };
   }
 
