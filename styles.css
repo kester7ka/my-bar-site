@@ -848,8 +848,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .expired-tile {
   position: relative;
-  padding-top: 18px;
-  transition: max-height 0.7s cubic-bezier(.4,0,.2,1);
+  padding-top: 28px;
+  padding-bottom: 28px;
+  min-height: 340px;
+  transition: min-height 0.7s cubic-bezier(.4,0,.2,1);
 }
 .expired-tile.beautiful-form {
   overflow: visible !important;
