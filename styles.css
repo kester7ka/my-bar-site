@@ -851,7 +851,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding-top: 28px;
   padding-bottom: 28px;
   min-height: 340px;
-  transition: min-height 0.7s cubic-bezier(.4,0,.2,1);
+  transition: min-height 0.9s cubic-bezier(.4,0,.2,1), padding 0.9s cubic-bezier(.4,0,.2,1), background 0.7s, box-shadow 0.7s, color 0.7s;
 }
 .expired-tile.beautiful-form {
   overflow: visible !important;
