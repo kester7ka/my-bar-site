@@ -1301,3 +1301,12 @@ function showServerUnavailable() {
     </div>
   `);
 }
+
+// Глобальный обработчик ошибок для отладки
+window.addEventListener('error', function(e) {
+  alert('JS Error: ' + e.message + '\n' + e.filename + ':' + e.lineno);
+});
+window.addEventListener('unhandledrejection', function(e) {
+  alert('Promise Error: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
+});
+
