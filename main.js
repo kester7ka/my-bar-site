@@ -184,7 +184,7 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     let d = ('0' + dateToCheck.getDate()).slice(-2);
     let checkDate = `${y}-${m}-${d}`;
 
-    fetch(backend+"/expired",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId})})
+    secureFetch(backend+"/expired", {user_id:userId})
       .then(r=>r.json())
       .then(data=>{
         let filtered;
@@ -326,7 +326,7 @@ function showStatsPage() {
   setPageTitle('Статистика бара');
   showPage(addBackButton(`<div class="stat-block" id="statBlock"><div style="text-align:center;color:#aaa;">Загрузка...</div></div>`));
   setTimeout(()=>document.getElementById('statBlock').classList.add('fadeIn'),50);
-  fetch(`${backend}/search`, {
+  secureFetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({user_id: userId, query: ""})
@@ -592,7 +592,7 @@ function showAddPage() {
       opened_at: opened ? d.opened_at : null
     };
     let url = `${backend}/add`;
-    let resp = await fetch(url, {
+    let resp = await secureFetch(url, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(req)
@@ -709,7 +709,7 @@ function showSearchPage() {
   }
 
   resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
-  fetch(`${backend}/search`, {
+  secureFetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({user_id: userId, query: ""})
@@ -783,7 +783,7 @@ async function deleteItem(rJson, source) {
     vibrate();
   }
   try {
-    let resp = await fetch(`${backend}/delete`, {
+    let resp = await secureFetch(`${backend}/delete`, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({user_id: userId, id: r.id})
@@ -808,7 +808,7 @@ async function deleteItem(rJson, source) {
   }
 }
 async function findOpenedByTOB(tob) {
-  let resp = await fetch(`${backend}/search`, {
+  let resp = await secureFetch(`${backend}/search`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({user_id: userId, query: tob})
@@ -868,13 +868,13 @@ async function autoOpen(rJson) {
   let expiry_at = r.expiry_at;
   if (opened) {
     expiry_at = opened.expiry_at;
-    await fetch(`${backend}/delete`, {
+    await secureFetch(`${backend}/delete`, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({user_id: userId, id: opened.id})
     });
   }
-  await fetch(`${backend}/update`, {
+  await secureFetch(`${backend}/update`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({
@@ -993,7 +993,7 @@ function openReopenForm(rJson, openAfterEdit = false) {
       return;
     }
     if (!canProceed("edit", 1200)) return;
-    await fetch(`${backend}/update`, {
+    await secureFetch(`${backend}/update`, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(req)
@@ -1077,7 +1077,7 @@ async function startApp() {
     </div>
   `);
   try {
-    let r = await fetch("https://web-production-2c7db.up.railway.app/userinfo", {
+    let r = await secureFetch("https://web-production-2c7db.up.railway.app/userinfo", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user_id: userId })
@@ -1273,3 +1273,27 @@ function renderCategoryStatusBar(filterCategory, filterOpened) {
   showNav();
 })();
 
+window.API_SECRET = 'testsecret'; // Для теста, потом заменить на безопасное хранение
+
+function hmacSHA256(key, message) {
+  // Используем встроенный SubtleCrypto (Web Crypto API)
+  const enc = new TextEncoder();
+  return window.crypto.subtle.importKey(
+    'raw', enc.encode(key), {name: 'HMAC', hash: 'SHA-256'}, false, ['sign']
+  ).then(cryptoKey =>
+    window.crypto.subtle.sign('HMAC', cryptoKey, enc.encode(message))
+  ).then(sig =>
+    Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('')
+  );
+}
+
+async function secureFetch(url, data) {
+  const payload = JSON.stringify(data);
+  const timestamp = Math.floor(Date.now() / 1000);
+  const hmac = await hmacSHA256(window.API_SECRET, payload + timestamp);
+  return fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({payload, timestamp, hmac})
+  });
+}
