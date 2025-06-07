@@ -53,10 +53,10 @@ if (!userId) {
   document.getElementById('main').innerHTML = `
     <div class="beautiful-form" style="max-width:420px;margin:38px auto 0 auto;padding:38px 18px 34px 18px;box-shadow:0 8px 40px #7b7bff33,0 1.5px 7px #232b3340,0 1.5px 0.5px #fff2 inset;border:2px solid #7b7bff33;border-radius:32px;animation:popIn 0.7s;display:flex;flex-direction:column;align-items:center;gap:18px;">
       <div style="background:#232b33;border-radius:18px;padding:13px 18px;box-shadow:0 2px 12px #7b7bff22;display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
-        <svg xmlns='http://www.w3.org/2000/svg' width='44' height='44' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='28' fill='none' stroke='#7b7bff' stroke-width='16'/><path d='M80 128h96' stroke='#7b7bff' stroke-width='16' stroke-linecap='round'/><path d='M128 80v96' stroke='#7b7bff' stroke-width='16' stroke-linecap='round'/></svg>
+        <svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='28' fill='none' stroke='#7b7bff' stroke-width='16'/><path d='M80 128h96' stroke='#7b7bff' stroke-width='16' stroke-linecap='round'/><path d='M128 80v96' stroke='#7b7bff' stroke-width='16' stroke-linecap='round'/></svg>
       </div>
       <div class="welcome-greet" style="font-size:1.45em;font-weight:900;color:#7b7bff;letter-spacing:0.01em;text-align:center;margin-bottom:8px;">Добро пожаловать!</div>
-      <div style="color:#b9dbff;font-size:1.08em;text-align:center;margin-bottom:10px;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
+      <div style="color:#b9dbff;font-size:1.08em;text-align:center;margin-bottom:10px;">Откройте сайт через Telegram-бота, чтобы пользоваться баром.</div>
       <a href="${botLink}" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 32px;background:linear-gradient(90deg,#7b7bff 60%,#232b33 100%);color:#fff;border-radius:16px;font-size:1.18em;font-weight:700;text-decoration:none;box-shadow:0 3px 16px #7b7bff30;margin-top:8px;transition:background 0.24s;">
         <svg xmlns='http://www.w3.org/2000/svg' width='26' height='26' fill='none' viewBox='0 0 256 256'><path fill='#fff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/><path fill='#7b7bff' d='M195.88 70.12a16 16 0 0 0-16.88-3.75l-112 40A16 16 0 0 0 72 144.44l24.44 8.15l8.15 24.44A16 16 0 0 0 111.56 200a15.87 15.87 0 0 0 7.44-1.88l40-112a16 16 0 0 0-3.12-16.88ZM112 184l-8-24l24-8l8 24Zm-24-40l-24-8l112-40l-40 112Z'/></svg>
         Открыть Telegram-бота
@@ -621,7 +621,7 @@ function renderCard(r, actions = true, isExpired = false) {
       <div class="card-title" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
       <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect x='32' y='48' width='192' height='160' rx='16' fill='none' stroke='currentColor' stroke-width='16'/><line x1='76' y1='88' x2='76' y2='168' fill='none' stroke='currentColor' stroke-width='12' stroke-linecap='round'/><line x1='108' y1='88' x2='108' y2='168' fill='none' stroke='currentColor' stroke-width='8' stroke-linecap='round'/><line x1='148' y1='88' x2='148' y2='168' fill='none' stroke='currentColor' stroke-width='8' stroke-linecap='round'/><line x1='180' y1='88' x2='180' y2='168' fill='none' stroke='currentColor' stroke-width='12' stroke-linecap='round'/></svg></span> <b>TOB:</b> ${escapeHtml(r.tob)}</div>
       <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='currentColor' stroke-width='16'/><line x1='176' y1='24' x2='176' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='80' y1='24' x2='80' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='40' y1='88' x2='216' y2='88' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg></span> <b>Дата вскрытия:</b> ${escapeHtml(r.opened_at||'—')}</div>
-      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg></span> <b>Годен посл. вскр.:</b> <span class="${minExpiry===expiry1?'highlight-expiry':''}">${escapeHtml(expiry1||'—')}</span></div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg></span> <b>Срок посл вскр:</b> <span class="${minExpiry===expiry1?'highlight-expiry':''}">${escapeHtml(expiry1||'—')}</span></div>
       <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='currentColor' stroke-width='16'/><polyline points='128 72 128 128 184 128' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg></span> <b>Общ. срок до:</b> <span class="${minExpiry===expiry2?'highlight-expiry':''}">${escapeHtml(expiry2||'—')}</span></div>
     </div>`;
     cardStyle = 'min-height:230px;max-height:230px;height:230px;';
@@ -1095,8 +1095,14 @@ async function startApp() {
     showMenu();
   } catch (e) {
     showGlobalLoader(false);
-    setPageTitle('Ошибка');
-    showPage('<div class="error">Не удалось подключиться к серверу.<br>' + escapeHtml(e) + '</div>');
+    setPageTitle('Ошибка 404');
+    showPage(`
+      <div class="welcome-block">
+        <div class="welcome-greet">${escapeHtml(getGreeting())}, гость!</div>
+        <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
+        <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
+      </div>
+    `);
   }
 }
 startApp();
