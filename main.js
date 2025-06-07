@@ -379,12 +379,12 @@ function showAddPage() {
         <div style="display:flex;align-items:center;gap:12px;background:#232b33;border-radius:14px;padding:10px 14px;box-shadow:0 1px 6px #7b7bff11;">
           <svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='#7b7bff' stroke-width='16'/><path d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Z' fill='#7b7bff'/></svg>
           <select name="category" id="category" required style="flex:1;background:transparent;color:#fff;border:none;font-size:1.1em;outline:none;">
-            <option value="🍯 Сиропы">🍯 Сиропы</option>
-            <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
-            <option value="☕ Кофе">☕ Кофе</option>
-            <option value="📦 Прочее">📦 Прочее</option>
-          </select>
-        </div>
+          <option value="🍯 Сиропы">🍯 Сиропы</option>
+          <option value="🥕 Ингредиенты">🥕 Ингредиенты</option>
+          <option value="☕ Кофе">☕ Кофе</option>
+          <option value="📦 Прочее">📦 Прочее</option>
+        </select>
+      </div>
       </div>
       <div class="status-toggle-bar" id="statusToggleBar" style="margin-bottom:16px;margin-top:2px;gap:12px;">
         <button type="button" class="status-toggle-btn opened selected" id="btnOpened" style="font-size:1.1em;padding:13px 0;"><svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='#7b7bff' stroke-width='16'/><path d='M128 80a12 12 0 0 1 12 12v32a12 12 0 0 1-24 0v-32a12 12 0 0 1 12-12Z' fill='#7b7bff'/></svg> Открыто</button>
@@ -403,28 +403,28 @@ function showAddPage() {
         <div style="display:flex;align-items:center;gap:12px;background:#232b33;border-radius:14px;padding:10px 14px;box-shadow:0 1px 6px #7b7bff11;">
           <svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='none' viewBox='0 0 256 256'><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='#7b7bff' stroke-width='16'/></svg>
           <input name="name" id="name" required placeholder="Название позиции" style="flex:1;background:transparent;color:#fff;border:none;font-size:1.1em;outline:none;">
-        </div>
+      </div>
       </div>
       <div class="field-row" style="margin-bottom:18px;">
         <label class="field-label" for="manufactured_at">Дата производства</label>
         <div style="display:flex;align-items:center;gap:12px;background:#232b33;border-radius:14px;padding:10px 14px;box-shadow:0 1px 6px #7b7bff11;">
           <svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='#7b7bff' stroke-width='16'/><line x1='176' y1='24' x2='176' y2='56' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='80' y1='24' x2='80' y2='56' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='40' y1='88' x2='216' y2='88' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg>
           <input name="manufactured_at" id="manufactured_at" type="date" required style="flex:1;background:transparent;color:#fff;border:none;font-size:1.1em;outline:none;">
-        </div>
+      </div>
       </div>
       <div class="field-row" style="margin-bottom:18px;">
         <label class="field-label" for="shelf_life_days">Срок годности (дней)</label>
         <div style="display:flex;align-items:center;gap:12px;background:#232b33;border-radius:14px;padding:10px 14px;box-shadow:0 1px 6px #7b7bff11;">
           <svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='#7b7bff' stroke-width='16'/><polyline points='128 72 128 128 184 128' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg>
           <input name="shelf_life_days" id="shelf_life_days" type="number" min="1" required placeholder="180" style="flex:1;background:transparent;color:#fff;border:none;font-size:1.1em;outline:none;">
-        </div>
+      </div>
       </div>
       <div class="field-row" style="margin-bottom:18px;">
         <label class="field-label" for="opened_shelf_life_days">Срок после вскрытия (дней)</label>
         <div style="display:flex;align-items:center;gap:12px;background:#232b33;border-radius:14px;padding:10px 14px;box-shadow:0 1px 6px #7b7bff11;">
           <svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='#7b7bff' stroke-width='16'/><polyline points='128 72 128 128 184 128' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg>
           <input name="opened_shelf_life_days" id="opened_shelf_life_days" type="number" min="1" required placeholder="30" style="flex:1;background:transparent;color:#fff;border:none;font-size:1.1em;outline:none;">
-        </div>
+      </div>
       </div>
       <div class="field-row" id="openedAtRow" style="display:none;margin-bottom:18px;">
         <label class="field-label" for="opened_at">Дата вскрытия</label>
@@ -432,7 +432,7 @@ function showAddPage() {
         <div style="display:flex;align-items:center;gap:10px;">
           <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='#7b7bff' stroke-width='16'/><line x1='176' y1='24' x2='176' y2='56' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='80' y1='24' x2='80' y2='56' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='40' y1='88' x2='216' y2='88' fill='none' stroke='#7b7bff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg>
           <input name="opened_at" id="opened_at" type="date" style="flex:1;">
-        </div>
+      </div>
       </div>
       <div class="btns" style="margin-top:18px;gap:18px;">
         <button type="submit" id="addSubmitBtn" disabled style="font-size:1.18em;padding:18px 0;border-radius:16px;background:linear-gradient(90deg,#7b7bff 60%,#232b33 100%);color:#fff;font-weight:700;border:none;box-shadow:0 2px 12px #10131e33;cursor:pointer;transition:background 0.25s,transform 0.17s;animation:popIn 0.33s;flex:1;width:100%;margin:0;letter-spacing:0.03em;">Добавить</button>
@@ -685,7 +685,7 @@ function showSearchPage() {
     catSelect.onchange = function() {
       filterCategory = this.value;
       renderBar();
-      renderList();
+        renderList();
       showBottomNav(true);
       this.blur();
       setTimeout(() => {
@@ -693,11 +693,11 @@ function showSearchPage() {
         const nav = document.querySelector('.bottom-nav');
         if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; }
       }, 200);
-    };
+      };
     statusSelect.onchange = function() {
       filterOpened = this.value;
       renderBar();
-      renderList();
+        renderList();
       showBottomNav(true);
       this.blur();
       setTimeout(() => {
@@ -705,7 +705,7 @@ function showSearchPage() {
         const nav = document.querySelector('.bottom-nav');
         if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; }
       }, 200);
-    };
+      };
   }
 
   resultsDiv.innerHTML = `<div style="text-align:center;color:#aaa;font-size:1.07em;">Загрузка...</div>`;
@@ -1266,7 +1266,11 @@ function renderCategoryStatusBar(filterCategory, filterOpened) {
   showNav();
 })();
 
-window.API_SECRET = 'testsecret'; // Для теста, потом заменить на безопасное хранение
+function getSecret() {
+  const arr = [81,119,55,33,112,90,50,64,114,84,57,35,120,76,54,36,101,86,49,94,98,78,56,38,117,83,52,42,111,77,51,37,106,75,53];
+  return String.fromCharCode(...arr);
+}
+window.API_SECRET = getSecret();
 
 function hmacSHA256(key, message) {
   // Используем встроенный SubtleCrypto (Web Crypto API)
@@ -1290,9 +1294,6 @@ async function secureFetch(url, data) {
     body: JSON.stringify({payload, timestamp, hmac})
   });
 }
-// Теперь все fetch(backend+...) заменить на secureFetch(backend+..., ...)
-
-// Функция для показа красивого экрана "Сервер временно недоступен"
 function showServerUnavailable() {
   setPageTitle('Сервер недоступен');
   showPage(`
