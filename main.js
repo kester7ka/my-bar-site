@@ -1113,14 +1113,7 @@ async function startApp() {
     showMenu();
   } catch (e) {
     showGlobalLoader(false);
-    setPageTitle('Ошибка 404');
-    showPage(`
-      <div class="welcome-block">
-        <div class="welcome-greet">${escapeHtml(getGreeting())}, гость!</div>
-        <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
-        <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
-      </div>
-    `);
+    showServerUnavailable();
   }
 }
 startApp();
@@ -1297,3 +1290,20 @@ async function secureFetch(url, data) {
     body: JSON.stringify({payload, timestamp, hmac})
   });
 }
+// Теперь все fetch(backend+...) заменить на secureFetch(backend+..., ...)
+
+// Функция для показа красивого экрана "Сервер временно недоступен"
+function showServerUnavailable() {
+  setPageTitle('Сервер недоступен');
+  showPage(`
+    <div class="beautiful-form" style="max-width:420px;margin:38px auto 0 auto;padding:38px 18px 34px 18px;box-shadow:0 8px 40px #7b7bff33,0 1.5px 7px #232b3340,0 1.5px 0.5px #fff2 inset;border:2px solid #7b7bff33;border-radius:32px;animation:popIn 0.7s;display:flex;flex-direction:column;align-items:center;gap:18px;">
+      <div style="background:#232b33;border-radius:18px;padding:13px 18px;box-shadow:0 2px 12px #7b7bff22;display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+        <svg xmlns='http://www.w3.org/2000/svg' width='54' height='54' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='28' fill='none' stroke='#ff6b81' stroke-width='16'/><path d='M88 128h80' stroke='#ff6b81' stroke-width='16' stroke-linecap='round'/><path d='M128 88v80' stroke='#ff6b81' stroke-width='16' stroke-linecap='round'/></svg>
+      </div>
+      <div class="welcome-greet" style="font-size:1.45em;font-weight:900;color:#ff6b81;letter-spacing:0.01em;text-align:center;margin-bottom:8px;">Сервер временно недоступен</div>
+      <div style="color:#b9dbff;font-size:1.08em;text-align:center;margin-bottom:10px;">Попробуйте обновить страницу чуть позже.<br>Если проблема не исчезнет — обратитесь к администратору.</div>
+      <div style="color:#888;font-size:0.98em;text-align:center;">(Ошибка 404 или нет соединения с сервером)</div>
+    </div>
+  `);
+}
+
