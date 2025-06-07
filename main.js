@@ -51,6 +51,9 @@ let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : nu
 let userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
 console.log('userId:', userId);
 if (!userId) {
+  document.getElementById('pageTitle').style.display = 'none';
+  const nav = document.querySelector('.bottom-nav');
+  if (nav) nav.style.display = 'none';
   document.getElementById('main').innerHTML = `
     <div class="beautiful-form" style="max-width:420px;margin:38px auto 0 auto;padding:38px 18px 34px 18px;box-shadow:0 8px 40px #7b7bff33,0 1.5px 7px #232b3340,0 1.5px 0.5px #fff2 inset;border:2px solid #7b7bff33;border-radius:32px;animation:popIn 0.7s;display:flex;flex-direction:column;align-items:center;gap:18px;">
       <div style="background:#232b33;border-radius:18px;padding:13px 18px;box-shadow:0 2px 12px #7b7bff22;display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
@@ -1081,17 +1084,29 @@ async function startApp() {
     if (dt < MIN_LOAD) await new Promise(res => setTimeout(res, MIN_LOAD - dt));
     showGlobalLoader(false);
     if (!d.ok) {
+      document.getElementById('pageTitle').style.display = 'none';
+      const nav = document.querySelector('.bottom-nav');
+      if (nav) nav.style.display = 'none';
       setPageTitle('Добро пожаловать');
       showPage(`
-        <div class="welcome-block">
-          <div class="welcome-greet">${escapeHtml(getGreeting())}, гость!</div>
-          <div style="margin:16px 0 24px 0;color:#888;font-size:1.05em;">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
-          <a href="${botLink}" target="_blank" style="display:inline-block; padding:14px 28px; background:linear-gradient(90deg,#007aff 70%,#13c1e3 100%); color:#fff; border-radius:15px; font-size:1.1em; font-weight:700; text-decoration:none; box-shadow:0 3px 16px #13c1e340; margin-bottom:9px; transition:background 0.24s;">Открыть Telegram-бота</a>
+        <div class=\"beautiful-form\" style=\"max-width:420px;margin:38px auto 0 auto;padding:38px 18px 34px 18px;box-shadow:0 8px 40px #7b7bff33,0 1.5px 7px #232b3340,0 1.5px 0.5px #fff2 inset;border:2px solid #7b7bff33;border-radius:32px;animation:popIn 0.7s;display:flex;flex-direction:column;align-items:center;gap:18px;\">
+          <div style=\"background:#232b33;border-radius:18px;padding:13px 18px;box-shadow:0 2px 12px #7b7bff22;display:flex;align-items:center;justify-content:center;margin-bottom:18px;\">
+            <svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='28' fill='none' stroke='#7b7bff' stroke-width='16'/><path d='M80 128h96' stroke='#7b7bff' stroke-width='16' stroke-linecap='round'/><path d='M128 80v96' stroke='#7b7bff' stroke-width='16' stroke-linecap='round'/></svg>
+          </div>
+          <div class=\"welcome-greet\" style=\"font-size:1.45em;font-weight:900;color:#7b7bff;letter-spacing:0.01em;text-align:center;margin-bottom:8px;\">Добро пожаловать!</div>
+          <div style=\"color:#b9dbff;font-size:1.08em;text-align:center;margin-bottom:10px;\">Сначала зарегистрируйтесь через Telegram-бота, чтобы пользоваться приложением.</div>
+          <a href=\"${botLink}\" target=\"_blank\" style=\"display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 32px;background:linear-gradient(90deg,#7b7bff 60%,#232b33 100%);color:#fff;border-radius:16px;font-size:1.18em;font-weight:700;text-decoration:none;box-shadow:0 3px 16px #7b7bff30;margin-top:8px;transition:background 0.24s;\">
+            <svg xmlns='http://www.w3.org/2000/svg' width='26' height='26' fill='none' viewBox='0 0 256 256'><path fill='#fff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/><path fill='#7b7bff' d='M195.88 70.12a16 16 0 0 0-16.88-3.75l-112 40A16 16 0 0 0 72 144.44l24.44 8.15l8.15 24.44A16 16 0 0 0 111.56 200a15.87 15.87 0 0 0 7.44-1.88l40-112a16 16 0 0 0-3.12-16.88ZM112 184l-8-24l24-8l8 24Zm-24-40l-24-8l112-40l-40 112Z'/></svg>
+            Открыть Telegram-бота
+          </a>
         </div>
       `);
       return;
     }
     USER = { username: d.username, bar_name: d.bar_name };
+    document.getElementById('pageTitle').style.display = '';
+    const nav = document.querySelector('.bottom-nav');
+    if (nav) nav.style.display = '';
     showMenu();
   } catch (e) {
     showGlobalLoader(false);
