@@ -1262,26 +1262,20 @@ function renderCategoryStatusBar(filterCategory, filterOpened) {
       }
     }, 120);
   });
-  // Инициализация
   showNav();
 })();
 
-function getSecret() {
-  const arr = [81,119,55,33,112,90,50,64,114,84,57,35,120,76,54,36,101,86,49,94,98,78,56,38,117,83,52,42,111,77,51,37,106,75,53];
-  return String.fromCharCode(...arr);
-}
-window.API_SECRET = getSecret();
+window.API_SECRET = 'Qw7!pZ2@rT9#xL6$eV1^bN8&uS4*oM3%jK5';     
 
 function hmacSHA256(key, message) {
-  // Используем встроенный SubtleCrypto (Web Crypto API)
   const enc = new TextEncoder();
   return window.crypto.subtle.importKey(
-    'raw', enc.encode(key), {name: 'HMAC', hash: 'SHA-256'}, false, ['sign']
+    'raw', enc.encode(key), {name: 'HMAC', hash: 'SHA-256'}, false, ['sign']                              
   ).then(cryptoKey =>
     window.crypto.subtle.sign('HMAC', cryptoKey, enc.encode(message))
   ).then(sig =>
     Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('')
-  );
+  );  
 }
 
 async function secureFetch(url, data) {
@@ -1307,4 +1301,3 @@ function showServerUnavailable() {
     </div>
   `);
 }
-
