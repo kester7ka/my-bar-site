@@ -893,6 +893,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 0.85em;
     max-width: 44px;
   }
+  .card-main {
+    font-size: 0.97em;
+  }
+  .card-row {
+    font-size: 0.93em;
+  }
+  .card-title {
+    font-size: 1.05em;
+  }
 }
 /* Стили для нативного select */
 .filter-native-select {
