@@ -118,6 +118,8 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     greet = `<div class='welcome-block' style='text-align:center;margin-bottom:18px;'>
       <div class='welcome-greet' style='font-size:2.2em;font-weight:800;letter-spacing:0.01em;'>${getGreeting()}, <span style=\"color:#7b7bff;\">${uname}</span>!</div>
     </div>`;
+    // Добавляем контейнер для графика, если его нет
+    greet += `<div class="category-chart-tile" id="categoryChartTile" style="margin-bottom:24px;"></div>`;
   }
   let content = `
     <div class=\"expired-tile beautiful-form\" id=\"expiredTile\" style=\"box-shadow:0 8px 40px #ff6b8133, 0 1.5px 7px #232b3340, 0 1.5px 0.5px #fff2 inset; border: 2px solid #ffb86b33; padding:36px 18px 32px 18px; margin-bottom:32px;\">
@@ -191,12 +193,10 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         if (data.ok) {
           if (filter === 'today') {
             filtered = (data.results||[]).filter(x=>x.expiry_final && x.expiry_final <= checkDate);
+          } else if (filter === 'tomorrow') {
+            filtered = (data.results||[]).filter(x=>x.expiry_final === checkDate);
           } else {
-            filtered = (data.results||[]).filter(x=>[
-              x.expiry_final,
-              x.expiry_by_opened,
-              x.expiry_by_total
-            ].some(dt => dt === checkDate));
+            filtered = [];
           }
         } else {
           filtered = [];
@@ -1177,7 +1177,7 @@ async function renderCategoryChart(animate = true) {
   };
   const shortNames = {
     '🍯 Сиропы': 'Сиропы',
-    '🥕 Ингредиенты': 'Ингр.',
+    '🥕 Ингредиенты': 'Ингредиенты',
     '☕ Кофе': 'Кофе',
     '📦 Прочее': 'Прочее'
   };
