@@ -479,6 +479,8 @@ function showAddPage() {
       btnClosed.classList.add("selected", "closed");
       openedAtRow.style.display = 'none';
     }
+    // Кнопка всегда видна
+    submitBtn.style.display = '';
   }
   btnOpened.onclick = function() {
     opened = true;
@@ -1128,6 +1130,7 @@ async function startApp() {
       return;
     }
     USER = { username: d.username, bar_name: d.bar_name };
+    window.USER = USER;
     document.getElementById('pageTitle').style.display = '';
     const nav = document.querySelector('.bottom-nav');
     if (nav) nav.style.display = '';
