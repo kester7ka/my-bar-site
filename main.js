@@ -169,7 +169,7 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     tile.style.paddingTop = '';
     tile.style.paddingBottom = '';
     statusIcon.style.transition = 'all 0.5s cubic-bezier(.4,0,.2,1)';
-    statusIcon.style.background = 'rgba(35,43,51,0.92)';
+    statusIcon.style.background = 'rgba(255,184,107,0.92)';
     statusIcon.style.color = '#fff';
     statusIcon.style.boxShadow = '0 2px 8px #232b3340';
     title.style.transition = 'color 0.5s';
@@ -502,8 +502,10 @@ function showAddPage() {
     if (!isValidShelf(shelfInput.value)) allOk = false;
     if (!isValidShelf(openedShelfInput.value)) allOk = false;
     if (!manufacturedInput.value) allOk = false;
-    if (opened && !openedAtInput.value) allOk = false;
-    if (opened && openTobExists) allOk = false;
+    if (opened) {
+      if (!openedAtInput.value) allOk = false;
+      if (openTobExists) allOk = false;
+    }
     submitBtn.disabled = !allOk;
     if (!allOk) submitBtn.classList.add('disabled');
     else submitBtn.classList.remove('disabled');
@@ -1166,7 +1168,7 @@ async function renderCategoryChart(animate = true) {
   const icons = {
     '🍯 Сиропы': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7b7bff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
     '🥕 Ингредиенты': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7bffb7' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
-    '☕ Кофе': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ffb86b' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '☕ Кофе': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ffb86b' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Z'/></svg>`,
     '📦 Прочее': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ff6b81' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`
   };
   const colors = {
@@ -1177,7 +1179,7 @@ async function renderCategoryChart(animate = true) {
   };
   const shortNames = {
     '🍯 Сиропы': 'Сиропы',
-    '🥕 Ингредиенты': 'Ингр.',
+    '🥕 Ингредиенты': 'Ингредиенты',
     '☕ Кофе': 'Кофе',
     '📦 Прочее': 'Прочее'
   };
