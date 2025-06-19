@@ -441,9 +441,26 @@ function showAddPage() {
   `));
   setTimeout(() => {
     let inputs = document.querySelectorAll('.beautiful-form input, .beautiful-form select');
-    inputs.forEach(inp => {
+    inputs.forEach((inp, idx) => {
       inp.addEventListener('focus', function() {
         scrollInputIntoView(this);
+      });
+      // Автопереход по Enter/Next
+      inp.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          // Найти следующее видимое поле
+          for (let j = idx + 1; j < inputs.length; j++) {
+            if (!inputs[j].disabled && inputs[j].offsetParent !== null) {
+              inputs[j].focus();
+              return;
+            }
+          }
+          // Если это последнее поле — попытаться отправить форму
+          if (!submitBtn.disabled) {
+            submitBtn.click();
+          }
+        }
       });
     });
   }, 100);
@@ -506,9 +523,11 @@ function showAddPage() {
       if (!openedAtInput.value) allOk = false;
       if (openTobExists) allOk = false;
     }
+    // Кнопка всегда видна, но тусклая если невалидно
     submitBtn.disabled = !allOk;
     if (!allOk) submitBtn.classList.add('disabled');
     else submitBtn.classList.remove('disabled');
+    submitBtn.style.display = '';
   }
 
   async function fetchItemsOnce() {
@@ -614,7 +633,7 @@ function showAddPage() {
 function renderCard(r, actions = true, isExpired = false) {
   const accent = {
     '🍯 Сиропы': '#7b7bff',
-    '🥕 Ингредиенты': '#7bffb7',
+    '🥕 Ингредиенты': '#7ffb7b',
     '☕ Кофе': '#ffb86b',
     '📦 Прочее': '#ff6b81'
   }[r.category] || '#7b7bff';
@@ -1173,7 +1192,7 @@ async function renderCategoryChart(animate = true) {
   };
   const colors = {
     '🍯 Сиропы': '#7b7bff',
-    '🥕 Ингредиенты': '#7bffb7',
+    '🥕 Ингредиенты': '#7ffb7b',
     '☕ Кофе': '#ffb86b',
     '📦 Прочее': '#ff6b81'
   };
@@ -1262,4 +1281,10 @@ function renderCategoryStatusBar(filterCategory, filterOpened) {
   // Инициализация
   showNav();
 })();
+
+window.userId = userId;
+window.username = username;
+window.userPhoto = userPhoto;
+window.USER = USER;
+window.escapeHtml = escapeHtml;
 
