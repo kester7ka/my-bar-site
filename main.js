@@ -118,8 +118,6 @@ function showExpiredPage(isMain = false, afterRenderCb) {
     greet = `<div class='welcome-block' style='text-align:center;margin-bottom:18px;'>
       <div class='welcome-greet' style='font-size:2.2em;font-weight:800;letter-spacing:0.01em;'>${getGreeting()}, <span style=\"color:#7b7bff;\">${uname}</span>!</div>
     </div>`;
-    // Добавляем контейнер для графика, если его нет
-    greet += `<div class="category-chart-tile" id="categoryChartTile" style="margin-bottom:24px;"></div>`;
   }
   let content = `
     <div class=\"expired-tile beautiful-form\" id=\"expiredTile\" style=\"box-shadow:0 8px 40px #ff6b8133, 0 1.5px 7px #232b3340, 0 1.5px 0.5px #fff2 inset; border: 2px solid #ffb86b33; padding:36px 18px 32px 18px; margin-bottom:32px;\">
@@ -193,10 +191,12 @@ function showExpiredPage(isMain = false, afterRenderCb) {
         if (data.ok) {
           if (filter === 'today') {
             filtered = (data.results||[]).filter(x=>x.expiry_final && x.expiry_final <= checkDate);
-          } else if (filter === 'tomorrow') {
-            filtered = (data.results||[]).filter(x=>x.expiry_final === checkDate);
           } else {
-            filtered = [];
+            filtered = (data.results||[]).filter(x=>[
+              x.expiry_final,
+              x.expiry_by_opened,
+              x.expiry_by_total
+            ].some(dt => dt === checkDate));
           }
         } else {
           filtered = [];
@@ -1177,26 +1177,14 @@ async function renderCategoryChart(animate = true) {
   };
   const shortNames = {
     '🍯 Сиропы': 'Сиропы',
-    '🥕 Ингредиенты': 'Ингредиенты',
+    '🥕 Ингредиенты': 'Ингр.',
     '☕ Кофе': 'Кофе',
     '📦 Прочее': 'Прочее'
   };
-  let chart = `<div class=\"category-chart-tile\">
-    <div class=\"chart-title\">Статистика по категориям</div>
-    <div class=\"chart-bars\">
-      ${Object.entries(data).map(([cat, val], i) => `
-        <div class=\"chart-bar-wrap\">
-          <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 16px 16px 8px 8px / 24px 24px 8px 8px;\"></div>
-          <div class=\"chart-bar-label\">${icons[cat]}</div>
-          <div class=\"chart-bar-name\">${shortNames[cat]}</div>
-          <div class=\"chart-bar-value\">${val}</div>
-        </div>
-      `).join('')}
-    </div>
-  </div>`;
+  let chart = `<div class=\"category-chart-tile\">\n    <div class=\"chart-title\">Статистика по категориям</div>\n    <div class=\"chart-bars\">\n      ${Object.entries(data).map(([cat, val], i) => `\n        <div class=\"chart-bar-wrap\">\n          <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 16px 16px 8px 8px / 24px 24px 8px 8px;\"></div>\n          <div class=\"chart-bar-label\">${icons[cat]}</div>\n          <div class=\"chart-bar-name\">${shortNames[cat]}</div>\n          <div class=\"chart-bar-value\">${val}</div>\n        </div>\n      `).join('')}\n    </div>\n  </div>`;
   let expiredBlock = mainDiv.querySelector('.beautiful-form');
   let old = mainDiv.querySelector('.category-chart-tile');
-  if (old) return;
+  if (old) old.remove(); // Удаляем старый график, если он есть
   if (expiredBlock) {
     expiredBlock.insertAdjacentHTML('afterend', chart);
   } else {
