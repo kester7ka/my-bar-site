@@ -434,6 +434,7 @@ function showAddPage() {
           <input name="opened_at" id="opened_at" type="date" style="flex:1;">
         </div>
       </div>
+      </div>
       <div class="btns" style="margin-top:18px;gap:18px;">
         <button type="submit" id="addSubmitBtn" disabled style="font-size:1.18em;padding:18px 0;border-radius:16px;background:linear-gradient(90deg,#7b7bff 60%,#232b33 100%);color:#fff;font-weight:700;border:none;box-shadow:0 2px 12px #10131e33;cursor:pointer;transition:background 0.25s,transform 0.17s;animation:popIn 0.33s;flex:1;width:100%;margin:0;letter-spacing:0.03em;">Добавить</button>
       </div>
