@@ -536,15 +536,22 @@ function showAddPage() {
     // Кнопка всегда видна, но тусклая если невалидно
     submitBtn.disabled = !allOk;
     submitBtn.classList.toggle('disabled', !allOk);
-    // Сбросить стиль кнопки (убрать градиент)
     submitBtn.style.background = '#7b7bff';
     submitBtn.style.backgroundImage = 'none';
     submitBtn.style.color = '#fff';
     submitBtn.style.opacity = !allOk ? '0.45' : '1';
     submitBtn.style.filter = !allOk ? 'grayscale(0.2)' : 'none';
     submitBtn.style.cursor = !allOk ? 'not-allowed' : 'pointer';
-    submitBtn.style.display = '';
   }
+  // Только цифры для сроков
+  shelfInput.addEventListener('input', function(e) {
+    this.value = this.value.replace(/\D/g, '');
+    validateForm();
+  });
+  openedShelfInput.addEventListener('input', function(e) {
+    this.value = this.value.replace(/\D/g, '');
+    validateForm();
+  });
 
   async function fetchItemsOnce() {
     if (fetchedItems) return;
@@ -956,7 +963,7 @@ function openReopenForm(rJson, openAfterEdit = false) {
       </div>
       <div class="field-row">
         <label class="field-label" for="edit_manufactured_at">Дата производства</label>
-        <input name="edit_manufactured_at" id="edit_manufactured_at" type="date" required value="${escapeHtml(r.manufactured_at||'')}">
+               <input name="edit_manufactured_at" id="edit_manufactured_at" type="date" required value="${escapeHtml(r.manufactured_at||'')}">
       </div>
       <div class="field-row">
         <label class="field-label" for="edit_shelf_life_days">Срок годности (дней)</label>
