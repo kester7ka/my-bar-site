@@ -464,6 +464,13 @@ function showAddPage() {
         }
       });
     });
+    // Сбросить стиль кнопки (убрать градиент)
+    submitBtn.style.background = '#7b7bff';
+    submitBtn.style.backgroundImage = 'none';
+    submitBtn.style.color = '#fff';
+    submitBtn.style.opacity = submitBtn.disabled ? '0.45' : '1';
+    submitBtn.style.filter = submitBtn.disabled ? 'grayscale(0.2)' : 'none';
+    submitBtn.style.cursor = submitBtn.disabled ? 'not-allowed' : 'pointer';
   }, 100);
 
   let opened = true;
@@ -528,8 +535,14 @@ function showAddPage() {
     }
     // Кнопка всегда видна, но тусклая если невалидно
     submitBtn.disabled = !allOk;
-    if (!allOk) submitBtn.classList.add('disabled');
-    else submitBtn.classList.remove('disabled');
+    submitBtn.classList.toggle('disabled', !allOk);
+    // Сбросить стиль кнопки (убрать градиент)
+    submitBtn.style.background = '#7b7bff';
+    submitBtn.style.backgroundImage = 'none';
+    submitBtn.style.color = '#fff';
+    submitBtn.style.opacity = !allOk ? '0.45' : '1';
+    submitBtn.style.filter = !allOk ? 'grayscale(0.2)' : 'none';
+    submitBtn.style.cursor = !allOk ? 'not-allowed' : 'pointer';
     submitBtn.style.display = '';
   }
 
