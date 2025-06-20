@@ -89,26 +89,51 @@ document.getElementById('wrap').addEventListener('touchstart', function(e) {
 let chartAnimated = false;
 window.showMenu = function() {
   setPageTitle('Главная');
-  showExpiredPage(true, function() {
-    if (!document.querySelector('.category-chart-tile')) {
-      renderCategoryChart(true);
-    }
-    let filler = document.getElementById('scrollFiller');
-    if (!filler) {
-      const mainDiv = document.getElementById('main');
-      const div = document.createElement('div');
-      div.id = 'scrollFiller';
-      div.style.height = '30vh';
-      div.style.minHeight = '120px';
-      div.style.width = '100%';
-      div.style.pointerEvents = 'none';
-      mainDiv.appendChild(div);
-    }
-    setTimeout(()=>{window.scrollTo(0,1);}, 60);
-  });
+  // Новый приветственный блок
+  let uname = (typeof USER !== 'undefined' && USER && USER.username) ? USER.username : '';
+  let greetBlock = `
+    <div class="main-greet-block">
+      <div class="main-greet-icon">
+        <svg xmlns='http://www.w3.org/2000/svg' width='54' height='54' fill='none' viewBox='0 0 256 256'><path fill='#7b7bff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>
+      </div>
+      <div class="main-greet-text">
+        <div class="main-greet-title">${getGreeting()}, <span>${uname}</span>!</div>
+        <div class="main-greet-sub">Добро пожаловать в бар-ассистент</div>
+      </div>
+    </div>
+  `;
+  // Крупные кнопки действий
+  let mainActions = `
+    <div class="main-actions">
+      <button class="main-action-btn" onclick="showAddPage()">
+        <span class="main-action-icon"> <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='28' fill='none' stroke='#7b7bff' stroke-width='16'/><path d='M80 128h96' stroke='#7b7bff' stroke-width='16' stroke-linecap='round'/><path d='M128 80v96' stroke='#7b7bff' stroke-width='16' stroke-linecap='round'/></svg></span>
+        <span>Добавить</span>
+      </button>
+      <button class="main-action-btn" onclick="showSearchPage()">
+        <span class="main-action-icon"> <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 256 256'><path fill='#7bffb7' d='M229.66 218.34l-52.11-52.12a88 88 0 1 0-11.31 11.32l52.11 52.11a8 8 0 0 0 11.31-11.31ZM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72Z'/></svg></span>
+        <span>Поиск</span>
+      </button>
+      <button class="main-action-btn" onclick="showStatsPage()">
+        <span class="main-action-icon"> <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 256 256'><path fill='#ffb86b' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg></span>
+        <span>Статистика</span>
+      </button>
+    </div>
+  `;
+  // График категорий (рендерится отдельно)
+  let chartBlock = `<div id="mainCategoryChart"></div>`;
+  showPage(`
+    <div class="main-menu-wrap">
+      ${greetBlock}
+      ${mainActions}
+      ${chartBlock}
+    </div>
+  `);
+  setTimeout(()=>{window.scrollTo(0,1);}, 60);
   showBottomNav(true);
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('nav-home').classList.add('active');
+  // Рендерим график
+  renderCategoryChart(true, 'mainCategoryChart');
 };
 
 function showExpiredPage(isMain = false, afterRenderCb) {
@@ -612,7 +637,7 @@ function renderCard(r, actions = true, isExpired = false) {
       <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect x='32' y='48' width='192' height='160' rx='16' fill='none' stroke='currentColor' stroke-width='16'/><line x1='76' y1='88' x2='76' y2='168' fill='none' stroke='currentColor' stroke-width='12' stroke-linecap='round'/><line x1='108' y1='88' x2='108' y2='168' fill='none' stroke='currentColor' stroke-width='8' stroke-linecap='round'/><line x1='148' y1='88' x2='148' y2='168' fill='none' stroke='currentColor' stroke-width='8' stroke-linecap='round'/><line x1='180' y1='88' x2='180' y2='168' fill='none' stroke='currentColor' stroke-width='12' stroke-linecap='round'/></svg></span> <b>TOB:</b> ${escapeHtml(r.tob)}</div>
       <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><rect x='40' y='40' width='176' height='176' rx='8' fill='none' stroke='currentColor' stroke-width='16'/><line x1='176' y1='24' x2='176' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='80' y1='24' x2='80' y2='56' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/><line x1='40' y1='88' x2='216' y2='88' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg></span> <b>Дата вскрытия:</b> ${escapeHtml(r.opened_at||'—')}</div>
       <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg></span> <b>Срок посл вскр:</b> <span class="${minExpiry===expiry1?'highlight-expiry':''}">${escapeHtml(expiry1||'—')}</span></div>
-      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><circle cx='128' cy='128' r='96' fill='none' stroke='currentColor' stroke-width='16'/><polyline points='128 72 128 128 184 128' fill='none' stroke='currentColor' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/></svg></span> <b>Общ. срок до:</b> <span class="${minExpiry===expiry2?'highlight-expiry':''}">${escapeHtml(expiry2||'—')}</span></div>
+      <div class="card-row"><span style='color:#ffb86b;vertical-align:middle;display:inline-flex;align-items:center;'><svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 256 256'><path fill='currentColor' d='M128 24A104 104 0 1 0 232 128 104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88 88.1 88.1 0 0 1-88 88Zm8-40v-48a8 8 0 0 0-16 0v56a8 8 0 0 0 8 8h32a8 8 0 0 0 0-16Zm-8-96a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z'/></svg></span> <b>Общ. срок до:</b> <span class="${minExpiry===expiry2?'highlight-expiry':''}">${escapeHtml(expiry2||'—')}</span></div>
     </div>`;
     cardStyle = 'min-height:230px;max-height:230px;height:230px;';
   } else {
@@ -1132,8 +1157,8 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
   });
 });
 
-async function renderCategoryChart(animate = true) {
-  const mainDiv = document.getElementById('main');
+// Обновляю renderCategoryChart для поддержки кастомного контейнера
+async function renderCategoryChart(animate = true, containerId = null) {
   let data = { '🍯 Сиропы': 0, '🥕 Ингредиенты': 0, '☕ Кофе': 0, '📦 Прочее': 0 };
   try {
     let resp = await fetch(`${backend}/search`, {
@@ -1148,10 +1173,10 @@ async function renderCategoryChart(animate = true) {
   } catch(e) {}
   let max = Math.max(...Object.values(data), 1);
   const icons = {
-    '🍯 Сиропы': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7b7bff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
-    '🥕 Ингредиенты': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#7bffb7' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
-    '☕ Кофе': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ffb86b' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
-    '📦 Прочее': `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='none' viewBox='0 0 256 256'><path fill='#ff6b81' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`
+    '🍯 Сиропы': `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 256 256'><path fill='#7b7bff' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '🥕 Ингредиенты': `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 256 256'><path fill='#7bffb7' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '☕ Кофе': `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 256 256'><path fill='#ffb86b' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`,
+    '📦 Прочее': `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 256 256'><path fill='#ff6b81' d='M128 24a104 104 0 1 0 104 104A104.12 104.12 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z'/></svg>`
   };
   const colors = {
     '🍯 Сиропы': '#7b7bff',
@@ -1165,35 +1190,36 @@ async function renderCategoryChart(animate = true) {
     '☕ Кофе': 'Кофе',
     '📦 Прочее': 'Прочее'
   };
-  let chart = `<div class=\"category-chart-tile\">
-    <div class=\"chart-title\">Статистика по категориям</div>
-    <div class=\"chart-bars\">
+  let chart = `<div class="category-chart-tile main-chart-tile">
+    <div class="chart-title">Статистика по категориям</div>
+    <div class="chart-bars">
       ${Object.entries(data).map(([cat, val], i) => `
-        <div class=\"chart-bar-wrap\">
-          <div class=\"chart-bar\" data-final=\"${40 + 80 * (val/max)}\" style=\"height:${animate ? 0 : (40 + 80 * (val/max))}px;background:${colors[cat]};box-shadow:0 4px 24px ${colors[cat]}44; border-radius: 16px 16px 8px 8px / 24px 24px 8px 8px;\"></div>
-          <div class=\"chart-bar-label\">${icons[cat]}</div>
-          <div class=\"chart-bar-name\">${shortNames[cat]}</div>
-          <div class=\"chart-bar-value\">${val}</div>
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" data-final="${60 + 110 * (val/max)}" style="height:${animate ? 0 : (60 + 110 * (val/max))}px;background:${colors[cat]};box-shadow:0 4px 32px ${colors[cat]}44; border-radius: 18px 18px 10px 10px / 28px 28px 10px 10px;"></div>
+          <div class="chart-bar-label">${icons[cat]}</div>
+          <div class="chart-bar-name">${shortNames[cat]}</div>
+          <div class="chart-bar-value">${val}</div>
         </div>
       `).join('')}
     </div>
   </div>`;
-  let expiredBlock = mainDiv.querySelector('.beautiful-form');
-  let old = mainDiv.querySelector('.category-chart-tile');
-  if (old) return;
-  if (expiredBlock) {
-    expiredBlock.insertAdjacentHTML('afterend', chart);
+  let container = containerId ? document.getElementById(containerId) : null;
+  if (container) {
+    container.innerHTML = chart;
   } else {
+    let mainDiv = document.getElementById('main');
+    let old = mainDiv.querySelector('.category-chart-tile');
+    if (old) return;
     mainDiv.insertAdjacentHTML('beforeend', chart);
   }
   if (animate) {
     setTimeout(() => {
-      mainDiv.querySelectorAll('.category-chart-tile .chart-bar').forEach((bar, idx) => {
+      (container || document.getElementById('main')).querySelectorAll('.category-chart-tile .chart-bar').forEach((bar, idx) => {
         let final = bar.getAttribute('data-final');
-        bar.style.transition = 'height 0.9s cubic-bezier(.4,0,.2,1), border-radius 0.5s';
+        bar.style.transition = 'height 1.1s cubic-bezier(.4,0,.2,1), border-radius 0.6s';
         setTimeout(() => {
           bar.style.height = final + 'px';
-          bar.style.borderRadius = '16px 16px 8px 8px / 24px 24px 8px 8px';
+          bar.style.borderRadius = '18px 18px 10px 10px / 28px 28px 10px 10px';
         }, 120 + idx * 120);
       });
     }, 80);
